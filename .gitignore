@@ -18,3 +18,4 @@ exams/错题本/*.pdf
 # 系统文件
 Thumbs.db
 .DS_Store
+*.bak_*
