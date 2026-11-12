@@ -3,6 +3,12 @@
 > 一个用 **AI 智能体 + Python 工具链**驱动的中级经济师（金融专业）备考仓库：
 > 976 道真题切成分章卷、错题自动归并为三版本知识点、考试前合成一本「终极一本通」——全程由 AI 导师讲授、判卷、复盘。
 
+<p align="center">
+  <img src="assets/wechat-qr.jpg" alt="微信公众号：遇见 Agent" width="220">
+  <br>
+  <b>扫码关注公众号「遇见 Agent」，获取这套 AI 备考系统的最新实践</b>
+</p>
+
 ## 这是什么
 
 这不是一份静态笔记，而是一套**人机协作的备考系统**：
@@ -56,14 +62,6 @@ python tools/build_ultimate.py   # 合成考前终极一本通
 - **宁少选不错选**：多选题只勾「教材真这么写」的选项
 
 详见 [学习方法总纲.md](学习方法总纲.md)。
-
-## 相关发布
-
-我在公众号「**遇见 Agent**」记录这套 AI 备考系统的实践过程，欢迎扫码交流：
-
-<p align="center">
-  <img src="assets/wechat-qr.jpg" alt="公众号：遇见 Agent" width="260">
-</p>
 
 ## License
 
