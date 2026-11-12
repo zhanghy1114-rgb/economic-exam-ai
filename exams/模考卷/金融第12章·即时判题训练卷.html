@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第12章 · 金融监管</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第12章 · 金融监管<small id="sub">错题 2 题 + 自命题 20 题 ｜ 21 分钟 ｜ 满分 29</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div id="skelGate" style="position:fixed;inset:0;z-index:9999;background:#f4f6fa;overflow:auto"> <div style="max-width:920px;margin:0 auto;padding:26px 20px 60px">  <div style="background:#fff;border:1px solid #dde3ec;border-radius:12px;padding:18px 20px;box-shadow:0 2px 14px rgba(20,40,80,.08)">   <h2 style="margin:0 0 6px;font-size:20px;color:#12305e">金融第12章 · 金融监管 · 骨架速过卡（约 5 分钟）</h2>   <div style="color:#6b7280;font-size:13px;margin-bottom:12px">    03/05 章裸做崩盘（24% / 43%）的根因是<b>先做题、后补骨架</b>；    06 章实测「先过骨架」后<b>自命题 93%、回炉 33%</b>——骨架过了新题就拿分。    09 章反过来：回炉 25%＝<b>锚表没默写就动笔</b>，同一批模考错题又摔一遍；    10 章锚表发了、回炉仍只有 30%；11 章遮住自答了，回炉仍 24%——    <b>「看锚」≠「提取」，锚要答得出才算数</b>。    所以：<b>骨架没过完不发卷；回炉锚要遮住自问自答，答得出才开卷</b>。    本章真题仅 3 题，本卷 22 题里 20 道是依 2026 大纲写的自命题——    <b>先过下面 12 条，新题基本就是送分</b>。逐条念一遍再开卷——念完点底部按钮。   </div>   <div style="border:1px solid #e5e9f0;border-radius:8px;overflow:hidden"><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★脆弱性→危机演化六步（2026新增）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>脆弱性积累（高杠杆、期限错配、信息不对称、资产泡沫）→ 外部冲击（利率上升/资产价格下跌/违约事件）→ 资产价格暴跌、机构资产负债表恶化 → 去杠杆抛售、流动性枯竭 → 机构倒闭与存款人挤兑 → 跨机构跨市场传染（多米诺）→ 系统性金融危机、实体经济衰退</b>（口诀「<b>积冲跌抛倒染</b>」）。⚠️ 问「<b>关键触发/导火索</b>」＝<b>外部冲击</b>；脆弱性是易燃物，不是火种。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">危机四类 + 危害四条</div><div style="flex:1;color:#26303d;line-height:1.6">分类「<b>货币、银行、债务、系统性</b>」：<b>币贬储逃＝货币</b>（本币贬值＋储备流失＋资本外逃）｜<b>挤兑倒闭＝银行</b>｜<b>主权外债违约＝债务</b>｜<b>跨机构跨市场传染＋实体衰退＝系统性</b>（双条件齐备才升格）。危害＝<b>降低货币政策效率、抑制经济复苏、使金融机构陷入经营困境、加重财政负担与社会财富再分配</b>。⚠️ 见「<b>财政盈余</b>」直接划（方向反）；「<b>财政危机</b>」不是危机分类。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">监管目标三件套</div><div style="flex:1;color:#26303d;line-height:1.6"><b>维护金融体系安全与稳定（首要）｜保护存款人、投资者合法权益｜提高金融体系运行效率</b>（口诀「<b>稳、保、效</b>」）。⚠️ 见「<b>消除金融风险</b>」「<b>确保机构不倒闭</b>」「<b>保证持续盈利</b>」一律划——风险只能管理与转移，不能消灭。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">监管基本原则（真题口径）</div><div style="flex:1;color:#26303d;line-height:1.6">教材原则主要包括<b>依法监管、适度竞争、内部监管与自律并重</b>（真题多选答案 <b>BDE</b>）。配对：<b>有法可依/法定程序＝依法监管</b>｜<b>防止过度竞争与垄断＝适度竞争</b>｜<b>内控＋行业自律＝内部监管与自律并重</b>。⚠️「<b>效率优先、兼顾公平</b>」是<b>财政</b>收入分配原则，不是监管原则。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">监管理论四论</div><div style="flex:1;color:#26303d;line-height:1.6"><b>公共利益论＝市场失灵、纠正失灵</b>｜<b>捕获论（俘虏/追逐论）＝监管者被被监管者控制</b>｜<b>社会选择论＝从社会公众个人选择角度解释管制（管制作为产品有供求）</b>｜<b>经济调节论＝监管是政府调节经济的手段</b>。⚠️ 见「<b>只能</b>由政府安排」＝公共利益论式表述＋绝对化词，不是社会选择论（真题 Q70 的 D 项就是这么埋的）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">监管体制三型</div><div style="flex:1;color:#26303d;line-height:1.6"><b>分业监管＝按机构切（银/证/保各管各）</b>｜<b>统一监管＝一家通吃</b>｜<b>双峰监管＝按目标分两峰（审慎监管 + 行为监管）</b>。⚠️ 见「<b>两峰 / 目标监管</b>」直接选双峰；自律监管不是并列体制类型。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">我国演变三步（年份钉）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>2003 银监会成立＝一行三会</b> → <b>2018 银保合并＝一行两会</b> → <b>2023 组建国家金融监督管理总局＝一行一局一会</b>（央行 + 金融监管总局 + 证监会）。⚠️ 时序题先<b>钉年份</b>再选格局。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">国际协调四组织 + 四形式</div><div style="flex:1;color:#26303d;line-height:1.6">组织：<b>BCBS＝银行（资本充足率）</b>｜<b>IOSCO＝证券</b>｜<b>IAIS＝保险</b>｜<b>FSB＝全球金融稳定总协调</b>（不制定行业规则）。形式：<b>信息交换与披露、监管磋商、联合行动、制定并执行国际准则</b>。⚠️ 国际规则<b>一般不具有强制约束力</b>，协调<b>不是统一各国立法</b>——见「强制约束/统一立法」直接划。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★巴塞尔Ⅲ 数字钉（2026新增）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>核心一级 4.5%｜一级 6%｜总资本 8%｜储备资本缓冲 2.5%｜逆周期缓冲 0–2.5%｜系统重要性附加 1%–3.5%｜杠杆率 3%｜LCR 与 NSFR 均 ≥100%</b>。⚠️ 题干写「<b>巴塞尔</b>」用这套；写「<b>我国</b>」用下一行。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">我国执行口径</div><div style="flex:1;color:#26303d;line-height:1.6"><b>核心一级 5%｜一级 6%｜总资本 8%｜杠杆率 4%</b>。⚠️ 与巴塞尔<b>只差两处</b>：<b>核心一级 5（vs 4.5）、杠杆率 4（vs 3）</b>——<b>先看主语再报数</b>，这是本章最高频的数值错位陷阱。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★分业监管三业内容（2026新增）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>银行业＝资本充足率、不良贷款率等资产质量、流动性、关联交易、公司治理、存款保险</b>｜<b>保险业＝偿付能力监管（偿二代 C-ROSS）、资金运用比例、产品与费率</b>｜<b>证券业＝净资本与风险资本准备、客户交易结算资金第三方存管、信息披露、投资者保护</b>。⚠️ 见「<b>偿付能力</b>」必是保险、见「<b>净资本</b>」必是证券、见「<b>存款保险</b>」必是银行。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">回炉 2 题锚（遮住自问自答）</div><div style="flex:1;color:#26303d;line-height:1.6">①<b>社会选择论＝「社会公众个人选择的视角」</b>（旧错 D：选了带「只能」的绝对化项）→ 正解 <b>C</b>；②<b>金融危机危害＝「货币政策难使、经济受抑、机构陷困」三项</b>（旧错 ABCDE 全勾 0 分）→ 正解 <b>ABE</b>，C 自相矛盾、D「财政盈余」方向反。⚠️ 遮住右列自问自答，<b>答得出才开卷</b>。</div></div></div>   <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">    <button id="skelGo" style="background:#1a4fa0;color:#fff;border:0;border-radius:8px;padding:11px 22px;font-size:15px;cursor:pointer">✅ 骨架过完了，开始做题</button>    <span style="color:#8a94a6;font-size:12px">（点击后本卡收起，计时开始）</span>   </div>  </div> </div></div>
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第12章 金融监管 · 即时判题训练卷", "totalMin": 21, "pass": 17, "full": 29, "nSingle": 15, "nMulti": 7, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 2 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 20 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "关于金融监管社会选择论的说法，正确的是（）", "opts": [{"k": "A", "t": "社会选择论认为自由的市场机制并不能为社会带来资源的最优化配置"}, {"k": "B", "t": "社会选择论认为金融管制制度作为产品并不存在供給和需求的问题"}, {"k": "C", "t": "社会选择论主要从社会公众个人选择的角度来解释政府的金融管制"}, {"k": "D", "t": "社会选择论强调只能由代表社会利益的政府来安排和实施金融管制"}], "ans": "C", "kp": "第12章·金融监管理论", "model": "理论归属配对型（给观点 → 找理论）", "chain": ["金融监管理论主要有：<b>公共利益论</b>（市场失灵、政府代表社会利益）、<b>俘获理论</b>（监管者被被监管者俘获）、<b>社会选择论</b>（公共选择视角）、<b>监管经济理论</b>（供给需求）", "<b>社会选择论</b>：从<b>公共选择/社会公众个人选择</b>的角度解释政府金融管制的产生", "选项 A、D 描述的是<b>公共利益论</b>；B 说的是供给需求（属监管经济理论）"], "fast": "⚡四理论一句话定位：<b>公共利益论=市场失灵·政府代表社会；社会选择论=公众个人选择·公共选择；俘获论=监管者被俘获；经济理论=供求分析</b>。题干\"社会选择论\" → 找\"个人选择/公共选择\"字样 → C。", "traps": ["A、D 的表述本身在经济学上成立，但它们属于<b>公共利益论</b> —— 典型\"张冠李戴\"干扰", "B 的\"供给与需求\"属于<b>监管经济学</b>的分析框架"], "mother": "母题抽象：<b>金融监管四理论配对</b> —— 公共利益(市场失灵·政府代表社会)｜俘获(监管者被利益集团俘获)｜社会选择(公共选择·个人选择加总)｜监管经济(供给需求分析)。凡给观点找理论，先抓<b>关键词</b>再查表。", "analysis": "<p><b>社会选择论</b>又称公共选择论，主要从<b>社会公众个人选择</b>（公共选择）的角度来解释政府金融管制的产生：金融管制作为一种公共产品，是公众通过一定的政治程序进行集体选择的结果，管制的需求与供给由此形成。C 正确。</p><p>A、D 属<b>公共利益论</b>的观点（市场失灵需要政府代表社会利益进行管制）；B 涉及管制的供求分析，属监管经济学的研究范畴。</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABCDE", "src": "真题错题", "stem": "金融危机的主要危害有()。", "opts": [{"k": "A", "t": "降低货币政策效率，增加货币政策实施难度"}, {"k": "B", "t": "抑制经济复苏，打击经济增长"}, {"k": "C", "t": "信用过度扩张，企业信用过分紧缩"}, {"k": "D", "t": "中央银行财政负担加重，地方政府财政大量盈余"}, {"k": "E", "t": "使金融机构陷入经营困境"}], "ans": "ABE", "kp": "第12章·金融危机的危害", "model": "多选 · 后果判断型（哪些属于危害）", "chain": ["A 降低货币政策效率、增加实施难度 → <b>选</b>（危机中利率传导失灵、\"流动性陷阱\"使政策失效）", "B 抑制经济复苏、打击经济增长 → <b>选</b>", "C 信用过度扩张、企业信用过分紧缩 → 这是危机的<b>成因与表现</b>，不是\"危害\"的规范表述 → <b>不选</b>", "D 中央银行财政负担加重、<b>地方政府财政大量盈余</b>？后半句明显与危机现实相反（危机中财政是赤字/紧张） → <b>不选</b>", "E 使金融机构陷入经营困境 → <b>选</b>"], "fast": "⚡排除法最快：<b>凡是半句对半句错的（C、D）直接划掉</b> —— D 的\"地方政府财政大量盈余\"在危机中根本不可能出现。剩下危害层面清晰的三条 → ABE。", "traps": ["C 描述的是危机的形成过程（信用扩张→紧缩），不是危害 —— <b>成因/表现 ≠ 危害</b>", "D 后半句\"大量盈余\"与常识相反，属<b>方向反转</b>型干扰"], "mother": "母题抽象：<b>\"危害\"题的排除三原则</b> —— ①属于成因的不选（C）②半真半假的不选（D）③不属于该主体影响范围的不选。剩下的即为危害：政策失灵（A）、实体经济受损（B）、机构困境（E）。", "analysis": "<p>金融危机的主要危害包括：使<b>货币政策效率降低、实施难度增加</b>（A，如利率传导机制失灵、陷入流动性陷阱）；<b>抑制经济复苏、打击经济增长</b>（B，信贷萎缩、需求下滑）；<b>使金融机构陷入经营困境</b>（E，资产质量恶化、流动性枯竭甚至倒闭）。故选 <b>ABE</b>。</p><p>C 描述的是危机形成过程中的信用扩张与紧缩，属成因与表现，并非危害的规范表述；D 中\"中央银行财政负担加重\"表述不当，且\"地方政府财政大量盈余\"与危机时期财政普遍紧张的现实相反。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "在金融脆弱性向金融危机的演化路径中，把潜在的脆弱性转化为现实危机的关键触发环节是（　）。", "opts": [{"k": "A", "t": "金融机构普遍存在高杠杆与期限错配"}, {"k": "B", "t": "外部冲击，如利率上升、资产价格下跌、大额违约事件"}, {"k": "C", "t": "系统重要性机构被接管重组"}, {"k": "D", "t": "实体经济出现衰退与失业上升"}], "ans": "B", "kp": "第12章·金融脆弱性向危机的演化路径", "model": "环节定位（相邻概念错位）", "chain": ["教材路径：<b>脆弱性积累 → 外部冲击 → 资产价格暴跌与资产负债表恶化 → 去杠杆抛售、流动性枯竭 → 机构倒闭与挤兑 → 跨机构跨市场传染 → 系统性危机</b>", "脆弱性是「<b>易燃物</b>」，外部冲击是「<b>点火</b>」——问触发环节就是冲击", "→ B"], "fast": "⚡演化六步「<b>积→冲→跌→抛→倒→染</b>」；问「关键触发/导火索」＝<b>外部冲击</b>。A 是背景（易燃物）、D 是后果（烧完的废墟），都不是触发点。", "traps": ["A 高杠杆与期限错配是<b>脆弱性本身</b>，属于背景条件而非触发环节——最易选错", "D 实体经济衰退是危机的<b>后果</b>，出现在路径末端，不是中间环节"], "mother": "金融脆弱性表现为高杠杆、期限错配、信息不对称、资产泡沫；外部冲击（利率上升/资产价格下跌/违约事件）触发后，经资产价格暴跌、去杠杆抛售、流动性枯竭、机构倒闭挤兑、跨机构跨市场传染，最终演化为系统性金融危机。", "analysis": "<p>演化路径中，脆弱性（高杠杆、期限错配等）是<b>潜在条件</b>，只有当<b>外部冲击</b>出现时才被激活并转化为现实危机，<b>B 正确</b>。A 错误：高杠杆、期限错配属于脆弱性积累阶段，是「易燃物」不是「火种」。C 错误：机构被接管是危机深化后的处置措施，位于路径后段。D 错误：实体经济衰退与失业上升是系统性金融危机的<b>后果</b>，位于路径末端。故选 <b>B</b>。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 60, "wasWrong": false, "src": "自命题·仿真", "stem": "关于金融脆弱性向金融危机演化路径的说法，错误的是（　）。", "opts": [{"k": "A", "t": "金融脆弱性表现为高杠杆、期限错配、信息不对称和资产泡沫"}, {"k": "B", "t": "外部冲击会引发资产价格大幅下跌与机构资产负债表恶化"}, {"k": "C", "t": "机构去杠杆、抛售资产会进一步压低资产价格并形成流动性枯竭"}, {"k": "D", "t": "风险在机构与市场之间的传染只发生在危机全面爆发之后，传染过程本身不会加剧危机"}], "ans": "D", "kp": "第12章·危机演化中的传染机制", "model": "选非题 + 半真半假长选项", "chain": ["先圈「<b>错误</b>」——逐项判 ✅❌", "A ✅ 脆弱性四表现｜B ✅ 冲击后果｜C ✅ 去杠杆—抛售—流动性枯竭的<b>自我强化</b>链条", "D ❌ 两处错：传染本身就是危机<b>深化</b>的机制（多米诺效应），且「不会加剧」与教材相悖", "→ D"], "fast": "⚡选非题＝「<b>只勾❌</b>」。见「<b>不会加剧 / 只发生…之后 / 不影响</b>」这类<b>否定机制</b>的表述，多半就是那个❌——传染（多米诺）恰恰是危机升级的发动机。", "traps": ["D 前半句「传染发生在爆发之后」听着合理，后半句「不会加剧危机」才是真错处——长选项最爱藏雷在后半段", "ABC 都是教材路径原句，选非题里越像原话越要划掉"], "mother": "演化路径：脆弱性积累 → 外部冲击 → 资产价格暴跌与资产负债表恶化 → 去杠杆抛售、流动性枯竭 → 机构倒闭与挤兑 → 跨机构跨市场传染（多米诺效应）→ 系统性金融危机与实体经济衰退。传染是危机深化的核心机制。", "analysis": "<p>本题为<b>选非题</b>。A、B、C 均为演化路径的教材表述：脆弱性表现为高杠杆、期限错配、信息不对称与资产泡沫；外部冲击引发资产价格下跌与资产负债表恶化；去杠杆抛售资产会形成「价格下跌—抛售—再下跌」的负反馈并导致流动性枯竭。<b>D 错误</b>：风险跨机构、跨市场传染（多米诺效应）<b>本身就是危机深化与升级的机制</b>，并非只在危机全面爆发后才出现，也不是无害的过程。故选 <b>D</b>。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "某国短期内出现本币大幅贬值、外汇储备急剧流失、资本大规模外逃，该国发生的是（　）。", "opts": [{"k": "A", "t": "货币危机"}, {"k": "B", "t": "银行业危机"}, {"k": "C", "t": "债务危机"}, {"k": "D", "t": "系统性金融危机"}], "ans": "A", "kp": "第12章·金融危机的分类", "model": "例子→类型配对（相邻概念错位）", "chain": ["题眼：<b>本币贬值 + 储备流失 + 资本外逃</b>＝汇率与外汇市场", "四类判据：货币＝<b>币值/储备/外逃</b>｜银行＝<b>挤兑/倒闭</b>｜债务＝<b>还不起</b>｜系统性＝<b>跨市场+实体衰退</b>", "→ A"], "fast": "⚡四类一秒配对：<b>币贬储逃＝货币</b>｜<b>挤兑倒闭＝银行</b>｜<b>主权外债违约＝债务</b>｜<b>跨机构跨市场+实体衰退＝系统性</b>。题干只谈汇率和外汇，别往「系统性」上拔高。", "traps": ["D 系统性金融危机最「高级」，容易被当成万能答案——但它需要<b>跨机构跨市场传染 + 实体经济衰退</b>两个条件", "B 银行业危机的题眼是挤兑与批量倒闭，本题未出现"], "mother": "金融危机基本类型：货币危机（本币大幅贬值、储备流失、资本外逃）、银行业危机（挤兑与机构倒闭）、债务危机（主权或外债违约）、系统性金融危机（跨机构跨市场传染并冲击实体经济）。", "analysis": "<p>题干三个特征——本币大幅贬值、外汇储备急剧流失、资本大规模外逃——全部指向<b>货币（汇率）领域</b>，属于<b>货币危机</b>，<b>A 正确</b>。B 错误：银行业危机的标志是存款人挤兑与银行批量倒闭。C 错误：债务危机指主权债务或外债无法按期偿付。D 错误：系统性金融危机要求风险跨机构、跨市场传染并引发实体经济衰退，本题未涉及。故选 <b>A</b>。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "基", "sec2": 35, "wasWrong": false, "src": "自命题·仿真", "stem": "下列不属于金融危机基本类型的是（　）。", "opts": [{"k": "A", "t": "货币危机"}, {"k": "B", "t": "银行业危机"}, {"k": "C", "t": "债务危机"}, {"k": "D", "t": "财政危机"}], "ans": "D", "kp": "第12章·金融危机分类（选非）", "model": "选非题 + 相邻概念错位", "chain": ["先圈「<b>不属于</b>」——逐项判 ✅❌", "A/B/C ✅ 教材四类之三（还有系统性金融危机）", "D ❌ 财政危机不是金融危机的分类项", "→ D"], "fast": "⚡危机四类「<b>货币、银行、债务、系统性</b>」——见「<b>财政 / 产业 / 能源危机</b>」直接划，那是财政与实体部门的事。", "traps": ["D「财政危机」与危机后果（财政负担加重）相关，容易因<b>联想</b>而被当成同族概念", "选非题别选「看着最严重」的那项，要选<b>不在清单里</b>的那项"], "mother": "金融危机按表现形式分为货币危机、银行业危机、债务危机、系统性金融危机四类；危机的危害之一是加重财政负担（救助支出增加、税收减少），但「财政危机」本身不属于危机分类。", "analysis": "<p>本题为<b>选非题</b>。金融危机的四种基本类型为货币危机、银行业危机、债务危机和系统性金融危机（A、B、C 均属于）。<b>D 不属于</b>：财政危机是政府财政收支失衡的概念，虽与危机后果（财政负担加重）相关，但不在金融危机的分类体系内。故选 <b>D</b>。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "多家金融机构相继倒闭，风险通过支付清算与同业市场跨机构、跨市场传染，并引发实体经济严重衰退。按金融危机的分类，这属于（　）。", "opts": [{"k": "A", "t": "货币危机"}, {"k": "B", "t": "银行业危机"}, {"k": "C", "t": "债务危机"}, {"k": "D", "t": "系统性金融危机"}], "ans": "D", "kp": "第12章·系统性金融危机的判定", "model": "层级判定（范围错位）", "chain": ["两条判据齐了才算系统性：①<b>跨机构跨市场传染</b> ②<b>实体经济严重衰退</b>", "本题两个条件都给足 → 系统性", "→ D"], "fast": "⚡系统性＝「<b>传染 + 实体衰退</b>」双条件。只倒闭银行＝<b>银行业危机</b>；加上传染和衰退才升格<b>系统性</b>——别越级也别降级。", "traps": ["B 银行业危机与 D 是<b>层级关系</b>：银行体系内的危机是 B，溢出到多市场并拖累实体经济才是 D（08 章「挤兑→系统性」同款坑）", "A 货币危机的题眼在汇率与储备，题干未出现"], "mother": "系统性金融危机是多种危机并存并相互传染、冲击整个金融体系与实体经济的形态，标志是跨机构跨市场传染与实体经济衰退；与之区分：银行业危机限于银行体系，货币危机限于汇率与储备，债务危机限于偿债能力。", "analysis": "<p>题干同时给出<b>跨机构、跨市场传染</b>与<b>实体经济严重衰退</b>两个条件，符合系统性金融危机的判定标准，<b>D 正确</b>。B 错误：银行业危机局限于银行体系，未强调跨市场传染与实体部门衰退。A 错误：货币危机表现为本币贬值、储备流失。C 错误：债务危机表现为债务违约。故选 <b>D</b>。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "关于金融监管目标的说法，错误的是（　）。", "opts": [{"k": "A", "t": "维护金融体系的安全与稳定"}, {"k": "B", "t": "保护存款人、投资者等金融消费者的合法权益"}, {"k": "C", "t": "提高金融体系的运行效率"}, {"k": "D", "t": "消除金融风险，确保金融机构不发生倒闭"}], "ans": "D", "kp": "第12章·金融监管目标（选非）", "model": "选非题 + 绝对化收网", "chain": ["先圈「<b>错误</b>」——逐项判 ✅❌", "A/B/C ✅ 教材三目标：<b>稳定、保护、效率</b>", "D ❌ 两颗绝对化词「<b>消除</b>」「<b>确保不</b>」——风险只能管理不能消灭", "→ D"], "fast": "⚡监管目标三件套「<b>稳、保、效</b>」（稳定、保护存款人投资者、提高效率）。见「<b>消除风险 / 确保不倒闭 / 全部盈利</b>」一律划——<b>风险只能管理与转移，不能消灭</b>（07 章「消除系统风险」同款雷）。", "traps": ["D 前半句「消除金融风险」与后半句「确保不倒闭」双重绝对化，是教材明确否定的说法", "T3 铁律：见「消除/确保/只能/全部」先找反例"], "mother": "金融监管目标：维护金融体系安全与稳定（首要）、保护存款人和投资者合法权益、提高金融体系运行效率。监管只能管理与控制风险，不能消除风险，也不能保证机构不倒闭。", "analysis": "<p>本题为<b>选非题</b>。A、B、C 是金融监管的三项目标：维护金融体系安全稳定、保护存款人与投资者合法权益、提高金融运行效率。<b>D 错误</b>：金融风险只能被管理、分散与转移，不可能被「消除」；监管也不承诺「确保金融机构不发生倒闭」，机构退出是市场约束的组成部分。故选 <b>D</b>。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "单选", "lv": "基", "sec2": 35, "wasWrong": false, "src": "自命题·仿真", "stem": "金融监管应当有法可依、依法实施、按法定程序进行，这体现的监管原则是（　）。", "opts": [{"k": "A", "t": "依法监管原则"}, {"k": "B", "t": "适度竞争原则"}, {"k": "C", "t": "内部监管与自律并重原则"}, {"k": "D", "t": "效率优先、兼顾公平原则"}], "ans": "A", "kp": "第12章·金融监管基本原则", "model": "概念→名称配对", "chain": ["题眼：<b>有法可依、依法实施、法定程序</b>＝「法」字当头", "→ 依法监管原则", "→ A"], "fast": "⚡见「<b>有法可依 / 法定程序 / 依法</b>」→ <b>依法监管</b>；见「<b>防止过度竞争与垄断</b>」→ 适度竞争；见「<b>内控 + 行业自律</b>」→ 内部监管与自律并重。", "traps": ["D「效率优先、兼顾公平」是<b>财政</b>收入分配原则，不是监管原则（主体错位）", "B、C 都是真实原则，但描述不匹配——配对题要按<b>题眼</b>选，不是按「哪个眼熟」选"], "mother": "金融监管基本原则主要包括依法监管原则、适度竞争原则、内部监管与自律并重原则等；依法监管强调监管须有法律依据、依法实施并遵循法定程序。", "analysis": "<p>题干关键词「有法可依、依法实施、按法定程序」对应<b>依法监管原则</b>，<b>A 正确</b>。B 不符：适度竞争原则强调防止过度竞争与垄断、保持竞争活力。C 不符：内部监管与自律并重强调机构内控与行业自律相结合。<b>D 错误</b>：「效率优先、兼顾公平」是财政收入分配的原则表述，不属于金融监管原则。故选 <b>A</b>。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "认为监管者最终会被被监管者（利益集团）所控制，监管反而为被监管者的利益服务的监管理论是（　）。", "opts": [{"k": "A", "t": "公共利益论"}, {"k": "B", "t": "捕获论（俘虏理论、追逐论）"}, {"k": "C", "t": "社会选择论"}, {"k": "D", "t": "经济调节论"}], "ans": "B", "kp": "第12章·金融监管理论配对", "model": "理论配对（四论打包）", "chain": ["四论一句话：<b>公共＝市场失灵、捕获＝被监管者俘虏、社会选择＝公众选择视角、经济调节＝政府调节经济的手段</b>", "题干「被被监管者控制」＝<b>捕获</b>", "→ B"], "fast": "⚡四论一句锁：<b>失灵→公共｜被俘→捕获｜公众选择→社会选择｜政府调节→经济调节</b>。见「<b>被…控制 / 为被监管者服务</b>」＝捕获论。", "traps": ["A 公共利益论描述<b>监管者主动纠正失灵</b>，与「被控制」方向相反（方向反转）", "C 社会选择论是真题考过的项（Q70），眼熟度最高，但它的题眼是「<b>公众个人选择角度</b>」"], "mother": "监管理论：公共利益论（纠正市场失灵）、捕获论/俘虏理论（监管者被被监管者俘虏）、社会选择论（从社会公众个人选择角度解释管制，管制作为产品存在供求）、经济调节论（监管是政府调节经济的手段）。", "analysis": "<p>捕获论（又称俘虏理论、追逐论）的核心观点是：监管机构在长期博弈中<b>最终会被被监管者即利益集团所控制</b>，监管安排反而服务于被监管者的利益，<b>B 正确</b>。A 错误：公共利益论认为市场机制无法实现资源最优配置，需要政府管制纠正市场失灵。C 错误：社会选择论从社会公众个人选择的视角解释政府管制，将管制视为存在供给与需求的「产品」。D 错误：经济调节论把监管视为政府调节经济的手段。故选 <b>B</b>。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "以“市场机制不能实现资源最优配置、需要政府管制以纠正市场失灵”为核心观点的监管理论是（　）。", "opts": [{"k": "A", "t": "公共利益论"}, {"k": "B", "t": "捕获论（俘虏理论）"}, {"k": "C", "t": "社会选择论"}, {"k": "D", "t": "经济调节论"}], "ans": "A", "kp": "第12章·金融监管理论配对", "model": "理论配对（与 P8 互为镜像）", "chain": ["题眼：<b>市场失灵</b>——四论里只有公共利益论谈失灵", "→ A"], "fast": "⚡见「<b>市场失灵 / 资源未最优配置</b>」→ <b>公共利益论</b>（唯一配对项）；见「<b>被监管者控制</b>」→ 捕获论。两句题眼各配一家，别串门。", "traps": ["C 社会选择论也谈「管制作为产品的供求」，但它不涉及<b>市场失灵</b>的论证（相邻概念错位）", "D 经济调节论把监管当宏观调控工具，动机是调节经济而非纠正失灵"], "mother": "公共利益论从市场失灵出发论证监管必要性：市场机制不能实现资源最优配置，需要政府管制予以纠正；与之区别：捕获论强调监管者被俘获，社会选择论强调公众选择视角，经济调节论强调监管是调节经济的手段。", "analysis": "<p>公共利益论认为市场机制本身不能实现资源的最优配置（存在垄断、外部性、信息不对称等失灵），因而需要政府管制加以纠正，<b>A 正确</b>。B 错误：捕获论强调监管者被被监管者控制。C 错误：社会选择论从公众个人选择角度解释政府管制。D 错误：经济调节论把监管作为政府调节经济的手段。故选 <b>A</b>。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "以“审慎监管 + 行为监管”两峰分立为基本特征的金融监管体制类型是（　）。", "opts": [{"k": "A", "t": "分业监管（机构监管）"}, {"k": "B", "t": "统一监管（单一监管）"}, {"k": "C", "t": "双峰监管（目标监管）"}, {"k": "D", "t": "自律监管"}], "ans": "C", "kp": "第12章·金融监管体制类型", "model": "特征→类型配对", "chain": ["三型判据：<b>分业＝按机构分（银保证各管各）</b>｜<b>统一＝一家全管</b>｜<b>双峰＝按目标分两峰（审慎 + 行为）</b>", "题干「两峰」「审慎 + 行为」→ 双峰", "→ C"], "fast": "⚡三型一秒锁：<b>按机构切＝分业</b>｜<b>一家通吃＝统一</b>｜<b>审慎+行为两峰＝双峰</b>。见「<b>两峰 / 目标监管</b>」直接选双峰。", "traps": ["A 分业监管按<b>机构类型</b>划分监管者，与按<b>监管目标</b>划分的双峰是两条不同的切法（维度串台）", "D 自律监管不是与三者并列的体制类型"], "mother": "监管体制主要类型：分业监管（机构监管，按银行/证券/保险分设监管者）、统一监管（单一监管机构统管全部金融业）、双峰监管（按监管目标分设审慎监管机构与行为监管机构）。", "analysis": "<p>双峰监管按<b>监管目标</b>将监管职能分为两峰：一峰负责<b>审慎监管</b>（机构安全稳健），另一峰负责<b>行为监管</b>（市场行为与消费者保护），<b>C 正确</b>。A 错误：分业监管按机构类型而非监管目标划分。B 错误：统一监管由单一机构统管，不存在两峰分立。D 错误：自律监管不属于与前三者并列的监管体制类型。故选 <b>C</b>。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "2023 年我国组建国家金融监督管理总局后，形成的金融监管格局是（　）。", "opts": [{"k": "A", "t": "一行三会"}, {"k": "B", "t": "一行两会"}, {"k": "C", "t": "一行一局一会"}, {"k": "D", "t": "一行一委"}], "ans": "C", "kp": "第12章·我国金融监管体制演变", "model": "时序配对（数值/阶段错位）", "chain": ["演变三步走：<b>2003 银监会成立＝一行三会</b> → <b>2018 银保合并＝一行两会</b> → <b>2023 组建金融监管总局＝一行一局一会</b>", "题干锁定 2023 → 一行<b>一局</b>一会（央行 + 金融监管总局 + 证监会）", "→ C"], "fast": "⚡年份钉三步：<b>03 三会｜18 两会｜23 一局一会</b>。2023 起＝<b>央行 + 国家金融监督管理总局 + 证监会</b>——「局」就是金融监管总局。", "traps": ["A、B 都是真实存在过的历史格局，只是年份不对——时序题先<b>钉年份</b>再选格局", "D「一行一委」不是我国现行表述"], "mother": "我国金融监管体制演变：人民银行统管 → 2003 年银监会成立形成「一行三会」→ 2018 年银监会与保监会合并形成「一行两会」→ 2023 年组建国家金融监督管理总局，形成「一行一局一会」（中国人民银行 + 国家金融监督管理总局 + 中国证监会）。", "analysis": "<p>2023 年机构改革组建<b>国家金融监督管理总局</b>后，我国形成「一行一局一会」格局：中国人民银行、国家金融监督管理总局、中国证券监督管理委员会，<b>C 正确</b>。A 是 2003 年银监会成立后的格局。B 是 2018 年银监会与保监会合并后的格局。<b>D 错误</b>：我国无「一行一委」的表述。故选 <b>C</b>。</p>"}, {"no": 3012, "label": "P12", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "主要负责制定银行监管国际规则（如资本充足率标准）的国际组织是（　）。", "opts": [{"k": "A", "t": "巴塞尔银行监管委员会（BCBS）"}, {"k": "B", "t": "国际证监会组织（IOSCO）"}, {"k": "C", "t": "国际保险监督官协会（IAIS）"}, {"k": "D", "t": "金融稳定理事会（FSB）"}], "ans": "A", "kp": "第12章·金融监管国际协调组织", "model": "主体配对（四组织打包）", "chain": ["四组织一句锁：<b>BCBS＝银行｜IOSCO＝证券｜IAIS＝保险｜FSB＝全球金融稳定总协调</b>", "题干「银行监管国际规则 + 资本充足率」→ BCBS", "→ A"], "fast": "⚡四组织按行业锁：<b>银行→巴塞尔（BCBS）</b>｜<b>证券→IOSCO</b>｜<b>保险→IAIS</b>｜<b>宏观稳定→FSB</b>。见「<b>资本充足率</b>」必是巴塞尔。", "traps": ["D FSB 负责全球金融稳定与改革的总协调，不制定具体行业规则（层级错位）", "B、C 行业不对口，且 IOSCO/IAIS 分别对应证券业与保险业"], "mother": "金融监管国际协调组织：巴塞尔银行监管委员会（BCBS，银行业规则与资本标准）、国际证监会组织（IOSCO，证券业）、国际保险监督官协会（IAIS，保险业）、金融稳定理事会（FSB，全球金融稳定与监管改革协调）。", "analysis": "<p>巴塞尔银行监管委员会（BCBS）是<b>银行业</b>监管国际规则的主要制定者，资本充足率标准、杠杆率、流动性指标等均出自巴塞尔体系，<b>A 正确</b>。B 错误：IOSCO 是证券业监管国际组织。C 错误：IAIS 是保险业监管国际组织。D 错误：FSB 负责全球金融稳定与监管改革的总体协调，不直接制定银行业具体规则。故选 <b>A</b>。</p>"}, {"no": 3013, "label": "P13", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "根据巴塞尔协议Ⅲ，商业银行核心一级资本充足率的最低要求是不得低于（　）。", "opts": [{"k": "A", "t": "4.5%"}, {"k": "B", "t": "5%"}, {"k": "C", "t": "6%"}, {"k": "D", "t": "8%"}], "ans": "A", "kp": "第12章·巴塞尔Ⅲ资本充足率数字钉", "model": "数值错位（两套口径互换）", "chain": ["先判口径：题干说<b>巴塞尔协议Ⅲ</b> → 用<b>4.5 / 6 / 8</b>（裸标准）", "问「核心一级」→ 三级里最低那档＝<b>4.5%</b>", "→ A"], "fast": "⚡两套数字各归各家：<b>巴塞尔Ⅲ＝核心一级 4.5、一级 6、总 8</b>；<b>我国＝核心一级 5、一级 6、总 8</b>。题干写「巴塞尔」用 4.5，写「我国」用 5——<b>只差在核心一级这一档</b>。", "traps": ["B 5% 是<b>我国</b>核心一级口径，题干问巴塞尔，两套数字只差这一档（最经典的数值错位）", "C 6% 是一级资本充足率、D 8% 是总资本充足率"], "mother": "巴塞尔协议Ⅲ最低要求：核心一级资本充足率 4.5%、一级资本充足率 6%、总资本充足率 8%；另有储备资本缓冲 2.5%、逆周期资本缓冲 0–2.5%、系统重要性银行附加资本 1%–3.5%、杠杆率 3%。我国执行口径为核心一级 5%、一级 6%、总 8%、杠杆率 4%。", "analysis": "<p>巴塞尔协议Ⅲ规定核心一级资本充足率最低为<b>4.5%</b>，<b>A 正确</b>。B 错误：5% 是我国对核心一级资本充足率的执行口径（题干问巴塞尔协议Ⅲ）。C 错误：6% 是一级资本充足率的最低要求。D 错误：8% 是总资本充足率的最低要求。故选 <b>A</b>。</p>"}, {"no": 3014, "label": "P14", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "我国对商业银行杠杆率的最低要求是不得低于（　）。", "opts": [{"k": "A", "t": "3%"}, {"k": "B", "t": "4%"}, {"k": "C", "t": "5%"}, {"k": "D", "t": "6%"}], "ans": "B", "kp": "第12章·杠杆率数字钉（我国 vs 巴塞尔）", "model": "数值错位（两套口径互换）", "chain": ["两问：①题干写<b>我国</b> ②问<b>杠杆率</b>", "巴塞尔杠杆率 3%，我国更严＝<b>4%</b>", "→ B"], "fast": "⚡杠杆率两套：<b>巴塞尔 3%、我国 4%</b>（我国更严一档）。题干写「我国」选 4%，写「巴塞尔」选 3%——<b>先看主语再报数</b>。", "traps": ["A 3% 是<b>巴塞尔协议Ⅲ</b>的杠杆率标准，本题问我国（与 P13 是同一套陷阱的正反面）", "C、D 把资本充足率的数字串到杠杆率上（概念串台）"], "mother": "杠杆率＝一级资本净额/调整后表内外资产余额，是不含风险权重的补充约束指标。巴塞尔协议Ⅲ要求不低于 3%，我国要求不低于 4%，均高于对应口径。", "analysis": "<p>我国对商业银行杠杆率的最低要求为<b>4%</b>，高于巴塞尔协议Ⅲ的 3%，<b>B 正确</b>。A 错误：3% 是巴塞尔协议Ⅲ的标准。C、D 错误：5% 与 6% 分别是我国核心一级资本充足率、一级资本充足率的要求，不属于杠杆率口径。故选 <b>B</b>。</p>"}, {"no": 3015, "label": "P15", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "金融脆弱性向金融危机演化的主要环节包括（　）。", "opts": [{"k": "A", "t": "高杠杆、期限错配、信息不对称等脆弱性不断积累"}, {"k": "B", "t": "外部冲击引发资产价格大幅下跌与机构资产负债表恶化"}, {"k": "C", "t": "机构去杠杆、抛售资产，形成流动性枯竭"}, {"k": "D", "t": "风险跨机构、跨市场传染"}, {"k": "E", "t": "监管部门在危机爆发前主动关闭全部高风险机构，从而阻断演化"}], "ans": "ABCD", "kp": "第12章·危机演化路径（清单多选）", "model": "清单多选 + 绝对化收网", "chain": ["A ✅ 脆弱性积累是起点｜B ✅ 冲击与资产负债表恶化｜C ✅ 去杠杆—抛售—流动性枯竭｜D ✅ 跨机构跨市场传染", "E ✗ 两处错：「<b>全部</b>」绝对化；监管关闭机构是危机<b>后</b>的处置，不是演化环节本身", "→ ABCD"], "fast": "⚡演化四环节「<b>积、跌、抛、染</b>」全勾；见「<b>全部 / 危机前就阻断</b>」划掉——演化路径讲的是风险怎么<b>失控扩散</b>，不是监管怎么提前掐灭。", "traps": ["E 前半句像监管的有效作为，后半句「全部」「危机爆发前阻断」暴露绝对化与时间错位", "本题正确项 4 个，别被惯性拖着勾满 5 项"], "mother": "演化路径：脆弱性积累 → 外部冲击 → 资产价格暴跌与资产负债表恶化 → 去杠杆抛售与流动性枯竭 → 机构倒闭与挤兑 → 跨机构跨市场传染 → 系统性金融危机与实体经济衰退。", "analysis": "<p>A、B、C、D 均属于演化路径的环节：脆弱性（高杠杆、期限错配、信息不对称）积累，外部冲击引发资产价格下跌与资产负债表恶化，去杠杆抛售导致流动性枯竭，风险跨机构跨市场传染。<b>E 错误</b>：其一，监管关闭问题机构属于危机发生后的处置措施，不是演化路径的环节；其二，「全部」属于绝对化表述，监管不可能在危机爆发前关闭全部高风险机构。故选 <b>ABCD</b>。</p>"}, {"no": 3016, "label": "P16", "sec": "prop", "type": "多选", "lv": "基", "sec2": 60, "wasWrong": false, "src": "自命题·仿真", "stem": "金融危机按表现形式划分的基本类型包括（　）。", "opts": [{"k": "A", "t": "货币危机"}, {"k": "B", "t": "银行业危机"}, {"k": "C", "t": "债务危机"}, {"k": "D", "t": "系统性金融危机"}, {"k": "E", "t": "财政危机"}], "ans": "ABCD", "kp": "第12章·金融危机分类（清单多选）", "model": "清单多选 + 相邻概念错位", "chain": ["四类清单「<b>货币、银行、债务、系统性</b>」→ A/B/C/D 全勾", "E ✗ 财政危机不在分类内（危机是<b>加重</b>财政负担，不是造成财政危机这一类型）", "→ ABCD"], "fast": "⚡四类四项「<b>货币、银行、债务、系统性</b>」——<b>四项就是四项</b>，勾满 5 项必错。见「<b>财政 / 产业危机</b>」划（与 P4 单选同源）。", "traps": ["E 与危机后果（财政负担加重）相关，最容易靠<b>联想</b>顺手勾上", "本题与 P4 是同一清单的正反两面：单选问「哪个不属于」，多选问「哪些属于」"], "mother": "金融危机基本类型四类：货币危机、银行业危机、债务危机、系统性金融危机。财政危机不属于该分类，但危机后果之一是财政负担加重。", "analysis": "<p>金融危机按表现形式分为货币危机、银行业危机、债务危机和系统性金融危机四类，A、B、C、D 全选。<b>E 错误</b>：财政危机是政府财政领域的概念，不属于金融危机的分类体系；需注意危机确实会加重财政负担，但这是危害而非类型。故选 <b>ABCD</b>。</p>"}, {"no": 3017, "label": "P17", "sec": "prop", "type": "多选", "lv": "真", "sec2": 65, "wasWrong": false, "src": "自命题·仿真", "stem": "金融监管的目标主要包括（　）。", "opts": [{"k": "A", "t": "维护金融体系的安全与稳定"}, {"k": "B", "t": "保护存款人和投资者的合法权益"}, {"k": "C", "t": "提高金融体系的运行效率"}, {"k": "D", "t": "消除金融风险，确保金融机构不发生倒闭"}, {"k": "E", "t": "保证所有金融机构持续盈利"}], "ans": "ABC", "kp": "第12章·金融监管目标（清单多选）", "model": "清单多选 + 绝对化收网（双雷）", "chain": ["A ✅ 稳定（首要）｜B ✅ 保护｜C ✅ 效率", "D ✗「消除风险」+「确保不倒闭」双重绝对化｜E ✗「保证」「所有」「持续盈利」三重绝对化", "→ ABC（<b>只有 3 项</b>）"], "fast": "⚡目标三件套「<b>稳、保、效</b>」——<b>只有三项</b>。见「<b>消除 / 确保 / 保证所有</b>」一律划，风险不能消灭、盈利不能保证（与 P6 单选同源）。", "traps": ["D、E 两颗都是绝对化雷，且都带着「听起来像好事」的正能量表述", "正确项只有 3 个——专治「四条以上才敢下手」的惯性"], "mother": "金融监管目标：维护金融体系安全与稳定、保护存款人与投资者合法权益、提高金融体系运行效率；监管不能消除风险，也不能保证机构不倒闭或持续盈利。", "analysis": "<p>A、B、C 是金融监管的三项目标。<b>D 错误</b>：风险只能管理与控制，不能被「消除」，监管也不承诺确保机构不倒闭。<b>E 错误</b>：监管不保证机构持续盈利，机构盈亏由市场决定。故选 <b>ABC</b>。</p>"}, {"no": 3018, "label": "P18", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "根据巴塞尔协议Ⅲ，下列关于商业银行监管指标的说法中，正确的有（　）。", "opts": [{"k": "A", "t": "核心一级资本充足率不得低于 4.5%"}, {"k": "B", "t": "一级资本充足率不得低于 6%"}, {"k": "C", "t": "总资本充足率不得低于 8%"}, {"k": "D", "t": "杠杆率不得低于 3%"}, {"k": "E", "t": "储备资本缓冲不得低于 1%"}], "ans": "ABCD", "kp": "第12章·巴塞尔Ⅲ监管指标（数字钉多选）", "model": "清单多选 + 数值错位", "chain": ["先判口径：题干写「<b>巴塞尔协议Ⅲ</b>」→ 全程用 4.5 / 6 / 8 / 3%", "A ✅ 核心一级 4.5%｜B ✅ 一级 6%｜C ✅ 总 8%｜D ✅ 杠杆率 3%", "E ✗ 储备资本缓冲是 <b>2.5%</b>，不是 1%", "→ ABCD"], "fast": "⚡巴塞尔Ⅲ四钉「<b>4.5 / 6 / 8 / 3%</b>」＋储备缓冲 <b>2.5%</b>。杠杆率巴塞尔 3%、我国 4%；核心一级巴塞尔 4.5%、我国 5%——<b>先看主语再报数</b>。", "traps": ["E 把储备资本缓冲从 2.5% 改成 1%（数值错位，最接近的混淆值）", "若题干改成「我国」，则 A 应改为 5%、D 应改为 4%——审题先抓主语"], "mother": "巴塞尔协议Ⅲ：核心一级资本充足率 4.5%、一级资本充足率 6%、总资本充足率 8%、储备资本缓冲 2.5%、逆周期资本缓冲 0–2.5%、系统重要性银行附加资本 1%–3.5%、杠杆率 3%、流动性覆盖率与净稳定资金比例均不低于 100%。我国口径：核心一级 5%、一级 6%、总 8%、杠杆率 4%。", "analysis": "<p>按巴塞尔协议Ⅲ：核心一级资本充足率不低于 4.5%（A 正确）、一级资本充足率不低于 6%（B 正确）、总资本充足率不低于 8%（C 正确）、杠杆率不低于 3%（D 正确）。<b>E 错误</b>：储备资本缓冲要求为 2.5%，而非 1%。故选 <b>ABCD</b>。</p>"}, {"no": 3019, "label": "P19", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "根据我国分业监管的主要内容，下列不属于银行业监管主要内容的有（　）。", "opts": [{"k": "A", "t": "资本充足率监管"}, {"k": "B", "t": "不良贷款率等资产质量监管"}, {"k": "C", "t": "偿付能力监管（偿二代 C-ROSS）"}, {"k": "D", "t": "净资本与风险资本准备监管"}, {"k": "E", "t": "存款保险与公司治理监管"}], "ans": "CD", "kp": "第12章·分业监管内容（选非 + 行业错位）", "model": "选非题 + 主体错位（跨行业串门）", "chain": ["先圈「<b>不属于</b>」——逐项判 ✅❌，<b>只勾❌</b>", "A ✅ 银行｜B ✅ 银行｜E ✅ 银行（存款保险 + 公司治理）", "C ❌ 偿付能力＝<b>保险业</b>｜D ❌ 净资本与风险资本准备＝<b>证券业</b>", "→ CD（<b>只有 2 项</b>）"], "fast": "⚡三业一句话锁：<b>银行＝资本充足率 + 不良 + 流动性 + 存款保险 + 公司治理</b>；<b>保险＝偿付能力（偿二代）</b>；<b>证券＝净资本 / 风险资本准备 + 第三方存管</b>。见「<b>偿付能力</b>」必是保险、见「<b>净资本</b>」必是证券。", "traps": ["选非题答案是 <b>2 项</b>，别被「多选应勾三四个」的惯性拖着勾满", "C、D 都是真监管内容，只是<b>行业不对口</b>——这是「半真半假」最典型的手法"], "mother": "我国分业监管主要内容：银行业——资本充足率、不良贷款率等资产质量、流动性、关联交易、公司治理、存款保险；保险业——偿付能力监管（偿二代 C-ROSS）、资金运用比例、产品与费率；证券业——净资本与风险资本准备、客户交易结算资金第三方存管、信息披露、投资者保护。", "analysis": "<p>本题为<b>选非题</b>，要求选出<b>不属于</b>银行业监管内容的选项。A（资本充足率）、B（不良贷款率等资产质量）、E（存款保险与公司治理）均属于银行业监管内容，应排除。<b>C 不属于</b>：偿付能力监管（偿二代 C-ROSS）是<b>保险业</b>监管的核心内容。<b>D 不属于</b>：净资本与风险资本准备监管是<b>证券业</b>监管的核心内容。故选 <b>CD</b>。</p>"}, {"no": 3020, "label": "P20", "sec": "prop", "type": "多选", "lv": "真", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "关于金融监管国际协调的说法，下列表述错误的有（　）。", "opts": [{"k": "A", "t": "协调形式包括信息交换与披露、监管磋商、联合行动"}, {"k": "B", "t": "协调形式包括制定并推动执行国际监管准则"}, {"k": "C", "t": "国际组织制定的监管规则对各国具有强制约束力"}, {"k": "D", "t": "国际协调的目标之一是把各国的金融监管立法统一为一套法律"}, {"k": "E", "t": "巴塞尔银行监管委员会是银行业监管国际协调的重要组织"}], "ans": "CD", "kp": "第12章·金融监管国际协调（选非）", "model": "选非题 + 绝对化收网（双雷）", "chain": ["先圈「<b>错误</b>」——逐项判 ✅❌，<b>只勾❌</b>", "A ✅ 三种协调形式｜B ✅ 制定并执行准则也是形式之一｜E ✅ BCBS 是银行业协调组织", "C ❌ 国际规则<b>一般不具有强制约束力</b>，靠各国自愿采纳与落实", "D ❌ 协调<b>不是统一立法</b>，各国仍保留本国监管立法主权", "→ CD（<b>只有 2 项</b>）"], "fast": "⚡协调四形式「<b>换信息、磋商、联合行动、定准则</b>」+ 一条性质「<b>非强制</b>」。见「<b>强制约束 / 统一立法</b>」直接划——国际协调是<b>自愿协同</b>，不是超国家立法。", "traps": ["C、D 都是把「国际协调」拔高成「超国家强制体系」，属于典型的绝对化收网", "选非题答案只有 2 项，勾到第 3 项立刻停手复查"], "mother": "金融监管国际协调形式：信息交换与披露、监管磋商、联合行动、制定并执行国际监管准则；国际组织的规则一般不具有强制约束力，靠成员国自愿采纳；协调的目的是协同与趋同，不是统一各国立法。主要组织：BCBS（银行）、IOSCO（证券）、IAIS（保险）、FSB（总体协调）。", "analysis": "<p>本题为<b>选非题</b>。A、B 属于协调形式（信息交换与披露、监管磋商、联合行动、制定并执行国际准则）；E 正确，巴塞尔银行监管委员会是银行业监管国际协调的核心组织。<b>C 错误</b>：国际组织制定的监管规则通常<b>不具有强制约束力</b>，依靠各国自愿采纳与落实。<b>D 错误</b>：国际协调追求监管标准的协同与趋同，<b>不要求、也不追求把各国金融监管立法统一为一套法律</b>。故选 <b>CD</b>。</p>"}]};
+const KEY  = 'fin_drill_ch12_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+<script>
+(function(){
+  var g=document.getElementById("skelGate");
+  var b=document.getElementById("skelGo");
+  if(!g||!b) return;
+  b.onclick=function(){ g.style.display="none"; try{ window.dispatchEvent(new Event("skelDone")); }catch(e){} window.scrollTo(0,0); };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融专业知识与实务 · 知识思维导图（12章详版）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#FAFAF7;--card:#FFFFFF;--ink:#262624;--sub:#5F5E5A;--hint:#8A8880;
+--line:#E6E4DC;--line2:#D3D0C4;
+--c1:#185FA5;--c2:#0F6E56;--c3:#854F0B;--c4:#993C1D;--c5:#534AB7;
+--fs:13.5px;
+}
+html,body{background:var(--bg);color:var(--ink);
+font-family:"Microsoft YaHei","PingFang SC",system-ui,-apple-system,sans-serif;
+font-size:var(--fs);line-height:1.66;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:20;background:rgba(250,250,247,.96);
+border-bottom:1px solid var(--line);padding:16px 28px 12px;backdrop-filter:blur(6px)}
+.hd h1{font-size:19px;font-weight:600;letter-spacing:.3px}
+.hd .sub{font-size:12px;color:var(--hint);margin-top:3px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.tools input{flex:1 1 260px;max-width:340px;padding:7px 11px;font-size:12.5px;
+border:1px solid var(--line2);border-radius:7px;background:#fff;color:var(--ink);outline:none;
+font-family:inherit}
+.tools input:focus{border-color:var(--c1)}
+button{padding:6px 12px;font-size:12.5px;border:1px solid var(--line2);border-radius:7px;
+background:#fff;color:var(--sub);cursor:pointer;font-family:inherit;transition:.15s}
+button:hover{color:var(--ink);border-color:var(--hint);background:#F4F3ED}
+button.on{background:var(--c1);border-color:var(--c1);color:#fff}
+.fs{display:inline-flex;gap:4px;margin-left:auto}
+.fs button{width:34px;padding:6px 0;text-align:center}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:11.5px;color:var(--hint)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.dot.ok{background:#1D9E75}.dot.warn{background:#EF9F27}.dot.bad{background:#E24B4A}
+
+main{position:relative;max-width:1320px;margin:0 auto;padding:26px 28px 90px 76px}
+main::before{content:"";position:absolute;left:40px;top:60px;bottom:60px;width:2px;
+background:linear-gradient(180deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5))}
+
+.root{position:relative;display:inline-block;padding:12px 24px;margin-bottom:26px;
+background:var(--ink);color:#fff;border-radius:10px;font-size:15px;font-weight:500;letter-spacing:.5px}
+.root small{display:block;font-size:11px;font-weight:400;opacity:.7;letter-spacing:0;margin-top:2px}
+.root::after{content:"";position:absolute;left:50%;bottom:-26px;width:2px;height:26px;background:var(--ink);opacity:.35}
+
+.chap{position:relative;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--c);
+border-radius:12px;padding:18px 20px 16px;margin-bottom:16px}
+.chap::before{content:"";position:absolute;left:-36px;top:30px;width:33px;height:2px;background:var(--c);opacity:.55}
+.chead{display:flex;align-items:baseline;gap:11px;flex-wrap:wrap;cursor:pointer;user-select:none}
+.cno{font-size:12px;font-weight:600;color:var(--c);letter-spacing:1px;font-variant-numeric:tabular-nums}
+.chead h2{font-size:16px;font-weight:600;letter-spacing:.3px}
+.badge{font-size:11px;padding:2px 8px;border-radius:20px;border:1px solid var(--line2);color:var(--sub);background:#FBFAF6}
+.badge.b-ok{border-color:#9FE1CB;background:#E1F5EE;color:#0F6E56}
+.badge.b-warn{border-color:#FAC775;background:#FAEEDA;color:#854F0B}
+.badge.b-bad{border-color:#F7C1C1;background:#FCEBEB;color:#A32D2D}
+.cnote{font-size:11.5px;color:var(--hint);margin-left:auto;text-align:right}
+.tip{font-size:12px;color:#993C1D;background:#FAECE7;border-left:2px solid #D85A30;
+padding:6px 10px;border-radius:4px;margin-top:10px}
+
+.branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:10px 18px;margin-top:14px}
+.br{border-top:1px dashed var(--line2);padding-top:9px}
+.br h3{font-size:13px;font-weight:600;color:var(--c);cursor:pointer;user-select:none;
+display:flex;align-items:center;gap:6px;padding:2px 0}
+.br h3::before{content:"—";color:var(--line2);font-weight:400}
+.br.closed h3::after{content:"+";margin-left:auto;color:var(--hint);font-weight:400}
+.br ul{list-style:none;margin:5px 0 2px 13px;border-left:1px solid var(--line);padding-left:12px}
+.br.closed ul{display:none}
+.br li{position:relative;font-size:12.8px;color:var(--sub);padding:2.5px 0;line-height:1.6}
+.br li::before{content:"";position:absolute;left:-12px;top:12px;width:8px;height:1px;background:var(--line2)}
+.br li b{color:var(--ink);font-weight:600}
+.br li.k b{color:#0F6E56}
+.br li.k::after{content:"考点";font-size:10px;color:#0F6E56;background:#E1F5EE;
+border:1px solid #9FE1CB;border-radius:3px;padding:0 4px;margin-left:5px;vertical-align:1px}
+.br li.e b{color:#A32D2D}
+.br li.e::after{content:"易错";font-size:10px;color:#A32D2D;background:#FCEBEB;
+border:1px solid #F7C1C1;border-radius:3px;padding:0 4px;margin-left:5px;vertical-align:1px}
+.br li.hit{background:#FAC775;border-radius:3px;padding-left:3px;margin-left:-3px}
+
+body.only-k .br li:not(.k){display:none}
+body.only-k .br.hide{display:none}
+body.only-k .chap.hide{display:none}
+
+.hint-frac{max-width:1320px;margin:0 auto;padding:0 28px 40px 76px;font-size:11.5px;color:var(--hint)}
+
+@media print{
+header{position:static;border:none;padding:0 0 10px;background:none}
+.tools,.legend,.fs{display:none}
+main{padding:0}
+main::before,.root::after,.chap::before{display:none}
+.chap{break-inside:avoid;border-left-width:3px;margin-bottom:10px;padding:10px 12px}
+.branches{grid-template-columns:repeat(3,1fr);gap:4px 14px}
+.br.closed ul{display:block}
+body{font-size:10px}
+@page{size:A4;margin:8mm}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd">
+    <h1>金融专业知识与实务 · 知识思维导图</h1>
+    <p class="sub">2026 中级经济师（金融）| 12 章 / 全知识点 | 已按 2026 官方大纲逐条核对通过（二次核验 2026-10-17）| 绿字＝高频考点，红字＝你的易错点 | ⚠️ 标"大纲未列"者仅作背景，不占复习优先级</p>
+  </div>
+  <div class="tools">
+    <input id="q" placeholder="搜索知识点：三支柱 / 五级分类 / 三元悖论 / 货币乘数…">
+    <button data-act="open">全部展开</button>
+    <button data-act="close">全部折叠</button>
+    <button data-act="imp">只看考点</button>
+    <button data-act="print">打印 / 存 PDF</button>
+    <span class="fs"><button data-fs="-">A−</button><button data-fs="+">A+</button></span>
+  </div>
+  <div class="legend">
+    <span><i class="dot ok"></i>已掌握</span>
+    <span><i class="dot warn"></i>需再焊</span>
+    <span><i class="dot bad"></i>薄弱</span>
+    <span>点击章标题／板块标题可折叠</span>
+  </div>
+</header>
+
+<main>
+
+<div class="root">金融专业知识与实务<small>12 章 · 按教材顺序</small></div>
+
+<section class="chap" style="--c:var(--c1)">
+  <div class="chead"><span class="cno">01</span><h2>金融学基础</h2>
+  <span class="badge b-ok">已掌握 · 94%</span><span class="cnote">利率 + 汇率，全科地基</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>利率决定理论</h3><ul>
+      <li class="k"><b>古典学派</b>储蓄—投资决定利率，只看实物因素</li>
+      <li class="k"><b>凯恩斯</b>流动性偏好：货币供求决定利率（交易·预防·投机三动机）</li>
+      <li class="k"><b>可贷资金理论</b>实物与货币因素都看，两者综合</li>
+      <li class="e"><b>三理论别串门</b>古典＝储蓄投资｜凯恩斯＝货币供求｜可贷＝都看</li>
+    </ul></div>
+
+    <div class="br"><h3>利率期限结构（三理论）</h3><ul>
+      <li class="k"><b>预期理论</b>长短期<b>可完全替代</b>，长期利率＝未来短期预期均值</li>
+      <li class="k"><b>市场分割理论</b>各期限是<b>独立市场、不可替代</b></li>
+      <li class="k"><b>流动性偏好理论</b>可替代但有<b>流动性溢价</b>（长期要加价）</li>
+      <li class="e"><b>判据只有一条</b>能不能替代 → 可替代＝预期／有溢价＝流动性偏好</li>
+    </ul></div>
+
+    <div class="br"><h3>利率计算与种类</h3><ul>
+      <li><b>单利 / 复利</b>复利＝利滚利；连续复利 e^rt</li>
+      <li><b>名义 vs 实际</b>实际 ≈ 名义 − 通胀（费雪效应）</li>
+      <li><b>即期 vs 远期</b>远期利率＝未来某段的价格，由即期推导</li>
+      <li><b>基准利率</b>DR007（银行间）、LPR（贷款市场报价）—— 属跨章细节，了解即可</li>
+    </ul></div>
+
+    <div class="br"><h3>汇率标价法</h3><ul>
+      <li class="k"><b>直接标价法（我国）</b>1 外币 = X 本币，<b>数字变大 = 本币贬值</b></li>
+      <li class="k"><b>间接标价法</b>1 本币 = X 外币，数字变大 = 本币升值</li>
+      <li><b>买卖价</b>银行买入价 &lt; 卖出价，差价＝银行收益</li>
+      <li class="e"><b>反直觉点</b>直接标价法下"汇率上升"＝人民币贬值，别按字面判</li>
+    </ul></div>
+
+    <div class="br"><h3>汇率决定理论</h3><ul>
+      <li><b>购买力平价 PPP</b>长期理论，看两国物价之比</li>
+      <li><b>利率平价</b>短期理论，看利差与远期升贴水</li>
+      <li><b>国际收支说</b>顺差→本币升值，逆差→贬值</li>
+      <li><b>资产组合说</b>把货币、债券、外币资产一起看</li>
+    </ul></div>
+
+    <div class="br"><h3>利率的风险结构</h3><ul>
+      <li class="k"><b>违约风险</b>信用越差，要求利率越高（风险溢价）</li>
+      <li class="k"><b>流动性</b>越难变现，利率越高</li>
+      <li class="k"><b>税收因素</b>免税债券票面利率更低（看税后收益）</li>
+      <li class="e"><b>与期限结构的区别</b>风险结构＝<b>同一期限、不同债券</b>的利差；期限结构＝同一债券不同期限</li>
+    </ul></div>
+
+    <div class="br"><h3>货币时间价值</h3><ul>
+      <li class="k"><b>终值</b>FV = PV × (1 + r)^n</li>
+      <li class="k"><b>现值</b>PV = FV ÷ (1 + r)^n</li>
+      <li><b>年金</b>普通年金、预付年金的现值与终值</li>
+      <li class="k"><b>影响因素</b>时间长短、利率高低、计息方式（单利/复利/连续复利）</li>
+    </ul></div>
+
+    <div class="br"><h3>国际货币体系演变</h3><ul>
+      <li class="k"><b>国际金本位</b>约 1870s–1914，金币本位、汇率由铸币平价决定</li>
+      <li class="k"><b>布雷顿森林体系</b>1944，<b>双挂钩</b>：美元挂黄金、各国货币挂美元；1973 崩溃</li>
+      <li class="k"><b>牙买加体系</b>1976，<b>浮动汇率合法化</b>、黄金非货币化</li>
+      <li><b>现行格局</b>多元储备、无统一本位</li>
+    </ul></div>
+
+    <div class="br"><h3>汇率变动对经济的影响</h3><ul>
+      <li class="k"><b>贸易收支</b>本币贬值→出口增、进口减（有 J 曲线时滞）</li>
+      <li class="k"><b>资本流动</b>贬值预期→资本外流压力</li>
+      <li class="k"><b>物价</b>贬值→进口品涨价→<b>输入型通胀</b></li>
+      <li class="k"><b>外债负担</b>贬值→以外币计的外债折本币变重</li>
+      <li><b>汇率制度类别</b>固定、浮动、中间（盯住/爬行）</li>
+    </ul></div>
+
+    <div class="br"><h3>汇率影响因素（方向题）</h3><ul>
+      <li class="k"><b>国际收支</b>顺差→升值｜逆差→贬值</li>
+      <li class="k"><b>利率</b>加息→资本流入→本币升值</li>
+      <li class="k"><b>通胀</b>本国通胀高于他国→本币贬值</li>
+      <li><b>经济增长</b>经济强、信心足→本币升值</li>
+      <li class="e"><b>动作</b>先圈"升值/贬值"，再逐项判，别边读边猜</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c2)">
+  <div class="chead"><span class="cno">02</span><h2>金融体系</h2>
+  <span class="badge b-ok">已掌握 · 89%</span><span class="cnote">2026 整章重写为"六大体系"</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>六大体系（2026 新版）</h3><ul>
+      <li class="k"><b>金融调控体系</b>央行＋货币政策</li>
+      <li class="k"><b>金融机构体系</b>银行、证券、保险、其他</li>
+      <li class="k"><b>金融市场体系</b>货币、资本、外汇、衍生品</li>
+      <li class="k"><b>金融工具体系</b>存贷、债券、股票、保险、信托（大纲原文＝"金融工具"，不是"产品"）</li>
+      <li class="k"><b>金融监管体系</b>一行一局一会</li>
+      <li class="k"><b>金融基础设施体系</b>清算、征信、登记、平台</li>
+    </ul></div>
+
+    <div class="br"><h3>金融基础设施（必考 4 项）</h3><ul>
+      <li class="k"><b>支付清算系统</b>锚：钱走清算</li>
+      <li class="k"><b>征信系统</b>锚：人看征信</li>
+      <li class="k"><b>登记托管结算系统</b>锚：账走登记</li>
+      <li class="k"><b>交易场所与信息平台</b>锚：场在交易</li>
+      <li class="e"><b>别只记两项</b>四锚缺一即错，选非题最爱在这里挖坑</li>
+    </ul></div>
+
+    <div class="br"><h3>金融机构体系构成</h3><ul>
+      <li><b>中央银行</b>不办普通存贷，只管调控</li>
+      <li><b>存款类</b>商业银行、政策性银行、农信社</li>
+      <li><b>非存款类</b>证券、保险、基金、信托、租赁、消费金融</li>
+      <li><b>监管机构</b>金融监管总局、证监会</li>
+    </ul></div>
+
+    <div class="br"><h3>五篇大文章（2026 新增）</h3><ul>
+      <li class="k"><b>科技金融</b>服务科技创新与成果转化</li>
+      <li class="k"><b>绿色金融</b>支持低碳转型（对应碳减排工具）</li>
+      <li class="k"><b>普惠金融</b>小微、三农、弱势群体可及性</li>
+      <li class="k"><b>养老金融</b>养老储蓄、养老理财、第三支柱</li>
+      <li class="k"><b>数字金融</b>数字人民币、平台金融、数据要素</li>
+      <li class="e"><b>五篇缺一即错</b>多选必出，先默"科绿普养数"</li>
+    </ul></div>
+
+    <div class="br"><h3>五大监管（本章＝5 种）</h3><ul>
+      <li class="k"><b>机构监管</b>看是谁（主体）</li>
+      <li class="k"><b>行为监管</b>看干啥（业务行为）</li>
+      <li class="k"><b>功能监管</b>看业务本质（同功能同规则）</li>
+      <li class="k"><b>穿透式监管</b>看到底（穿透资金来源与投向）</li>
+      <li class="k"><b>持续监管</b>看全程（全生命周期）</li>
+      <li class="e"><b>易混</b>经济基础第 21 章是"四种"，本章是"五种"，别对不上</li>
+    </ul></div>
+
+    <div class="br"><h3>金融市场功能（4 项）</h3><ul>
+      <li class="k"><b>资金融通</b>最基本功能</li>
+      <li class="k"><b>价格发现</b>最容易被漏，必须落笔</li>
+      <li class="k"><b>风险管理</b>通过衍生品转移风险</li>
+      <li class="k"><b>提供流动性</b>让资产能变现</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c3)">
+  <div class="chead"><span class="cno">03</span><h2>商业银行</h2>
+  <span class="badge b-ok">已掌握 · 72%→100%</span><span class="cnote">⭐ 案例题高频</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>三大业务</h3><ul>
+      <li class="k"><b>负债业务</b>存款（最主要）、同业拆借、向央行借款、发行债券</li>
+      <li class="k"><b>资产业务</b>贷款（最主要）、证券投资、<b>贴现</b></li>
+      <li class="k"><b>中间 / 表外</b>结算、代理、理财、承诺、担保、衍生交易</li>
+      <li class="e"><b>方向别反</b>贴现＝资产｜拆入＝负债；"钱出去了"就是资产</li>
+    </ul></div>
+
+    <div class="br"><h3>经营原则（教材＝四原则）</h3><ul>
+      <li class="k"><b>三性原则</b>安全性 · 流动性 · 盈利性</li>
+      <li class="k"><b>同向 / 对立</b>安全性与流动性<b>同向</b>；盈利性与前两者<b>对立</b></li>
+      <li class="k"><b>审慎经营原则</b>稳健经营、充分计提、不透支风险</li>
+      <li class="k"><b>分业经营原则</b>银行、证券、保险业务分离，防止风险交叉传染</li>
+      <li class="k"><b>金融创新原则</b>在合规与风险可控前提下创新</li>
+      <li class="e"><b>2026 变化</b>教材由"三性"扩为<b>四原则</b>，只答"三性"会漏项</li>
+    </ul></div>
+
+    <div class="br"><h3>资本管理（巴塞尔口径）</h3><ul>
+      <li class="k"><b>核心一级</b>普通股、留存收益</li>
+      <li class="k"><b>其他一级</b>优先股、<b>永续债</b></li>
+      <li class="k"><b>二级资本</b>二级资本债、超额贷款损失准备</li>
+      <li class="k"><b>监管红线</b>总资本 8%｜一级 6%｜核心一级 4.5%｜杠杆率 3%｜LCR 100%</li>
+      <li class="k"><b>两个公式</b>资本充足率＝资本 ÷ 风险加权资产；杠杆率＝一级资本 ÷ 表内外总资产（<b>不加权</b>）</li>
+      <li class="e"><b>杠杆率分母</b>表内外总资产（<b>不加权</b>），不是风险加权资产</li>
+      <li><b>补充渠道</b>内源＝留存收益｜外源＝IPO、增发、优先股、永续债、二级资本债</li>
+    </ul></div>
+
+    <div class="br"><h3>资产负债管理</h3><ul>
+      <li><b>缺口管理</b>利率敏感性缺口＝敏感性资产 − 敏感性负债</li>
+      <li><b>久期管理</b>久期缺口衡量净值对利率的敏感度</li>
+      <li class="k"><b>利率互换</b><b>本金不换</b>，只换利息支付方式（固定↔浮动）</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c4)">
+  <div class="chead"><span class="cno">04</span><h2>保险公司</h2>
+  <span class="badge b-ok">已掌握 · 89%</span><span class="cnote">偏记忆章 · 多选曾满分</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>保险基本原则</h3><ul>
+      <li class="k"><b>最大诚信</b>如实告知、明确说明</li>
+      <li class="k"><b>保险利益</b>投保人对标的须有法律上承认的利益</li>
+      <li class="k"><b>近因原则</b>按最直接、起决定作用的原因定赔</li>
+      <li class="k"><b>损失补偿</b>主要适用财产险；人身险为定额给付，不适用</li>
+    </ul></div>
+
+    <div class="br"><h3>业务分类</h3><ul>
+      <li class="k"><b>财产险</b>含货物运输险 —— 保的是<b>自己的物</b></li>
+      <li><b>人身险</b>寿险、健康险、意外伤害险</li>
+      <li class="k"><b>责任险</b>对第三方依法应负的赔偿责任</li>
+      <li><b>信用保证险</b>信用风险、履约风险</li>
+      <li class="e"><b>易错</b>货物运输投保的是财产险，不是责任险</li>
+    </ul></div>
+
+    <div class="br"><h3>保险功能与市场参与主体</h3><ul>
+      <li class="k"><b>三大功能</b>经济补偿（最基本）· 资金融通 · 社会管理</li>
+      <li class="k"><b>市场主体</b>保险人（公司）· 投保人 · 被保险人 · 受益人</li>
+      <li class="k"><b>中介主体</b>保险代理人 · 保险经纪人 · <b>保险公估人</b>（查勘定损）</li>
+      <li class="k"><b>营销四要素</b>营销主体 · 营销客体（产品）· 营销对象（客户）· 营销方式</li>
+    </ul></div>
+
+    <div class="br"><h3>承保与理赔（2026 新增）</h3><ul>
+      <li><b>承保流程</b>投保→核保→承保→出单</li>
+      <li><b>理赔流程</b>报案→查勘→定损→核赔→赔付</li>
+      <li><b>核保核心</b>判断可保风险与费率匹配</li>
+    </ul></div>
+
+    <div class="br"><h3>再保险</h3><ul>
+      <li class="k"><b>比例再保险</b>成数再保险、溢额再保险</li>
+      <li class="k"><b>非比例再保险</b>险位超赔、事故超赔</li>
+      <li><b>作用</b>分散巨额风险、扩大承保能力</li>
+      <li><b>2026 新增</b>再保险责任分担模式</li>
+    </ul></div>
+
+    <div class="br"><h3>资金运用</h3><ul>
+      <li class="k"><b>铁律</b>安全 &gt; 流动 &gt; 收益</li>
+      <li><b>约束</b>投资渠道与比例受监管限制</li>
+      <li><b>原因</b>保险资金是"欠投保人的钱"，先保偿付</li>
+    </ul></div>
+
+    <div class="br"><h3>中介：代理人 vs 经纪人</h3><ul>
+      <li class="k"><b>代理人</b>受<b>保险人</b>（保险公司）委托</li>
+      <li class="k"><b>经纪人</b>受<b>投保人</b>（客户）委托</li>
+      <li class="e"><b>身份最易颠倒</b>记：代理替公司卖，经纪替客户买</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c5)">
+  <div class="chead"><span class="cno">05</span><h2>证券公司与基金管理公司</h2>
+  <span class="badge b-ok">已掌握 · 78%→通过</span><span class="cnote">★ 重点章 · 易出案例</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>证券公司业务</h3><ul>
+      <li class="k"><b>经纪业务</b>代客买卖，收佣金（不承担价格风险）</li>
+      <li class="k"><b>承销与保荐</b>IPO、增发、配股</li>
+      <li><b>自营业务</b>用自有资金投资，承担市场风险</li>
+      <li><b>资产管理</b>代客理财，收管理费</li>
+      <li class="k"><b>财务顾问</b>并购重组、改制辅导</li>
+      <li class="k"><b>融资融券</b>（信用业务）借钱买券=融资｜借券卖出=融券；<b>须缴保证金、有强制平仓线</b></li>
+      <li class="e"><b>IB 业务</b>介绍经纪商，<b>不是承销</b>，别混</li>
+    </ul></div>
+
+    <div class="br"><h3>基金分类</h3><ul>
+      <li class="k"><b>按运作</b>封闭式（份额固定，可场内交易）｜开放式（可申赎）</li>
+      <li class="k"><b>按投资对象</b>股票型 &gt; 混合型 &gt; 债券型 &gt; 货币型（风险递减）</li>
+      <li class="k"><b>按法律形式</b>契约型（我国主流，<b>基金合同</b>为基础）｜公司型（<b>基金公司</b>为法人）</li>
+      <li><b>按募集方式</b>公募（公开）｜私募（特定对象）</li>
+      <li><b>特殊类型</b>ETF、LOF、QDII、FOF</li>
+    </ul></div>
+
+    <div class="br"><h3>基金费用</h3><ul>
+      <li class="k"><b>管理费</b>按前一日基金净值 × 年费率 ÷ 当年天数</li>
+      <li><b>托管费</b>付给托管银行</li>
+      <li><b>申赎费</b>申购费、赎回费（可能进基金资产）</li>
+      <li><b>销售服务费</b>持续营销费用</li>
+    </ul></div>
+
+    <div class="br"><h3>基金参与主体与托管人</h3><ul>
+      <li class="k"><b>五类参与主体</b>基金份额持有人 · 基金管理人 · <b>基金托管人</b> · 销售机构 · 监管机构</li>
+      <li class="k"><b>托管人法定职责</b>安全保管基金财产 · 开设独立账户 · 复核资产净值 · <b>监督管理人投资运作</b> · 出具托管报告</li>
+      <li class="k"><b>托管人准入</b>须具备净资产、专门托管部门、技术系统等条件（商业银行等）</li>
+      <li class="k"><b>管理人职责</b>投资运作、信息披露、份额登记</li>
+      <li class="e"><b>角色别混</b>管理人"管钱怎么投"，托管人"管钱在不在"，两者相互制衡</li>
+    </ul></div>
+
+    <div class="br"><h3>证券公司内部控制</h3><ul>
+      <li class="k"><b>隔离墙</b>自营、经纪、资管、投行之间信息隔离，防利益输送</li>
+      <li><b>三道防线</b>业务部门 → 合规风控 → 内部审计</li>
+      <li><b>重点领域</b>自营与资管、投行与研究所之间的利益冲突管理</li>
+    </ul></div>
+
+    <div class="br"><h3>红线与治理</h3><ul>
+      <li class="e"><b>绝对禁止</b>承诺最低收益、保本保底 —— 见之即错</li>
+      <li><b>治理</b>投资决策委员会、风险控制委员会</li>
+      <li><b>披露</b>定期报告、重大事项披露</li>
+      <li><b>从业禁止</b>老鼠仓、利益输送、违规荐股</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c1)">
+  <div class="chead"><span class="cno">06</span><h2>金融市场与金融工具</h2>
+  <span class="badge b-ok">已掌握 · 89%</span><span class="cnote">与经济基础第 20 章重合</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>市场分层</h3><ul>
+      <li class="k"><b>一级市场</b>发行市场（钱进发行人手里）</li>
+      <li class="k"><b>二级市场</b>流通市场（投资者之间转手）</li>
+      <li><b>场内 vs 场外</b>交易所集中撮合｜OTC 分散议价</li>
+    </ul></div>
+
+    <div class="br"><h3>货币市场（≤1 年）</h3><ul>
+      <li class="k"><b>同业拆借</b>银行间短期资金调剂</li>
+      <li class="k"><b>回购</b>以券融资，期限短、最活跃</li>
+      <li class="k"><b>票据</b>商业票据、银行承兑汇票</li>
+      <li><b>大额可转让存单</b>、短期国债</li>
+      <li class="e"><b>一年为界</b>内＝货币（短期），上＝资本（长期）</li>
+    </ul></div>
+
+    <div class="br"><h3>资本市场（&gt;1 年）</h3><ul>
+      <li class="k"><b>股票</b>所有权凭证，无到期日</li>
+      <li class="k"><b>中长期债券</b>债权凭证，有到期日</li>
+      <li><b>证券投资基金</b>集合投资、专业管理</li>
+      <li><b>银行中长期贷款</b>间接融资</li>
+    </ul></div>
+
+    <div class="br"><h3>外汇市场</h3><ul>
+      <li class="k"><b>交易类型</b>即期、远期、掉期、外汇期权</li>
+      <li class="k"><b>参与者</b>银行、企业、个人，<b>央行也是参与者</b>（干预市场）</li>
+      <li class="e"><b>"只能即期"</b>绝对化表述一律错</li>
+    </ul></div>
+
+    <div class="br"><h3>衍生品四类</h3><ul>
+      <li class="k"><b>远期</b>OTC、非标准、<b>信用风险高</b></li>
+      <li class="k"><b>期货</b>交易所、标准化、保证金、<b>信用风险低</b></li>
+      <li class="k"><b>期权</b>买方有权利付权利金，卖方有义务</li>
+      <li class="k"><b>互换</b>利率互换、货币互换</li>
+      <li class="k"><b>三大功能</b>套期保值、价格发现、投机套利</li>
+      <li><b>交易主体</b>套期保值者（转移风险）｜投机者（承担风险博差价）｜套利者（赚无风险价差）</li>
+    </ul></div>
+
+    <div class="br"><h3>我国金融市场发展现状与运行特点</h3><ul>
+      <li class="k"><b>直接融资占比偏低</b>社会融资以<b>银行贷款（间接融资）为主</b>，股市债市占比待提升 —— 这是我国金融结构最核心的特征</li>
+      <li class="k"><b>货币市场</b>银行间市场为主体，<b>回购</b>交易量最大、最活跃；参与主体以机构为主，个人不可直接进入</li>
+      <li class="k"><b>资本市场</b>多层次体系：主板 / 科创板 / 创业板 / 北交所 / 新三板 / 区域性股权市场</li>
+      <li class="k"><b>外汇市场</b>银行间外汇市场为核心，<b>实需原则</b>（交易须有真实贸易投资背景）</li>
+      <li class="k"><b>衍生品市场</b>场内（中金所）与场外（银行间）并行，起步晚、品种逐步扩容</li>
+      <li class="e"><b>易错</b>"我国直接融资已占主导"→ 必错；"个人可直接参与银行间市场"→ 必错</li>
+    </ul></div>
+
+    <div class="br"><h3>互联网金融（大纲未单列 · 了解即可）</h3><ul>
+      <li><b>业态</b>第三方支付、互联网保险、互联网基金销售</li>
+      <li><b>监管原则</b>持牌经营、穿透监管、功能监管</li>
+      <li><b>P2P</b>已全部清退，不复存在</li>
+      <li class="e"><b>优先级最低</b>2026 大纲第 6 章只列四个子市场，互联网金融属旧教材残留</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c2)">
+  <div class="chead"><span class="cno">07</span><h2>金融资产定价</h2>
+  <span class="badge b-ok">已掌握 · 61%→重讲通过</span><span class="cnote">⭐ 2026 核心大改 · 计算题主战场</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>收益与风险度量</h3><ul>
+      <li><b>期望收益率</b>各情形收益的加权平均</li>
+      <li class="k"><b>方差 / 标准差</b>衡量<b>总风险</b></li>
+      <li><b>协方差 / 相关系数</b>r ∈ [−1, 1]</li>
+      <li class="k"><b>系统 vs 非系统风险</b>非系统可通过组合分散，系统不能</li>
+    </ul></div>
+
+    <div class="br"><h3>CAPM 资本资产定价</h3><ul>
+      <li class="k"><b>公式</b>E(Ri) = Rf + βi × (Rm − Rf)</li>
+      <li class="k"><b>β 的含义</b>β&gt;1 进攻型｜β&lt;1 防御型｜β=1 同大盘</li>
+      <li class="k"><b>核心结论</b>市场只补偿<b>系统风险</b>，非系统风险不给钱</li>
+      <li><b>市场组合</b>理论上包含所有风险资产</li>
+    </ul></div>
+
+    <div class="br"><h3>三大业绩指数（最易混）</h3><ul>
+      <li class="k"><b>夏普指数</b>(Rp − Rf) ÷ <b>σp（总风险）</b></li>
+      <li class="k"><b>特雷诺指数</b>(Rp − Rf) ÷ <b>βp（系统风险）</b></li>
+      <li class="k"><b>詹森 α</b>Rp − [Rf + β(Rm − Rf)]，&gt;0 表示跑赢</li>
+      <li class="e"><b>只有一条判据</b>分母是 σ 还是 β —— 夏普配 σ、特雷诺配 β</li>
+    </ul></div>
+
+    <div class="br"><h3>APT 套利定价</h3><ul>
+      <li class="k"><b>多因素模型</b>收益由多个共同因子驱动</li>
+      <li><b>核心逻辑</b>无套利均衡——同风险同收益</li>
+      <li class="e"><b>与 CAPM 区别</b>CAPM 单因素（市场组合）｜APT 多因素</li>
+    </ul></div>
+
+    <div class="br"><h3>资产配置与风险资产选择理论</h3><ul>
+      <li class="k"><b>核心逻辑</b>两资产组合的风险取决于<b>相关系数</b>，r&lt;1 就能分散风险</li>
+      <li class="k"><b>有效前沿</b>同等风险下收益最高的组合集合（马科维茨）</li>
+      <li class="k"><b>最优组合</b>有效前沿与投资者<b>无差异曲线</b>的切点</li>
+      <li class="k"><b>分离定理</b>先定最优风险组合，再按风险偏好配置无风险资产</li>
+    </ul></div>
+
+    <div class="br"><h3>股票估值</h3><ul>
+      <li class="k"><b>股利贴现模型</b>P0 = Σ Dt ÷ (1 + r)^t</li>
+      <li class="k"><b>戈登模型（固定增长）</b>P0 = D1 ÷ (r − g)，要求 r &gt; g</li>
+      <li class="k"><b>市盈率法</b>P = EPS × 合理市盈率</li>
+      <li><b>自由现金流折现</b>FCF 折现，适用不分红公司</li>
+    </ul></div>
+
+    <div class="br"><h3>远期与期货定价</h3><ul>
+      <li class="k"><b>持有成本模型</b>F = S × (1 + r)^T − 持有收益</li>
+      <li class="k"><b>无套利原理</b>定价偏离即出现套利，价格必回归</li>
+      <li><b>期货 vs 远期</b>期货每日结算、有基差风险；远期到期一次性结算</li>
+    </ul></div>
+
+    <div class="br"><h3>债券定价</h3><ul>
+      <li class="k"><b>定价原理</b>未来现金流按市场利率折现</li>
+      <li class="k"><b>溢价 / 折价 / 平价</b>票面利率 &gt; 市场利率→溢价；&lt;→折价；=→平价</li>
+      <li class="k"><b>久期</b>加权平均回收期，衡量利率敏感性；久期越长，价格波动越大</li>
+      <li><b>凸性</b>久期对较大利率变动的修正（延伸内容，了解即可）</li>
+    </ul></div>
+
+    <div class="br"><h3>期权</h3><ul>
+      <li class="k"><b>基本类型</b>看涨期权（买入权）／看跌期权（卖出权）</li>
+      <li class="k"><b>价值构成</b>期权费 = 内在价值 + 时间价值</li>
+      <li class="k"><b>影响因素</b>标的价↑→看涨↑看跌↓｜执行价↑→看涨↓看跌↑</li>
+      <li class="k"><b>波动率与期限</b>波动率↑、到期时间↑ → <b>两者都变贵</b></li>
+      <li class="k"><b>平价关系</b>C + PV(K) = P + S</li>
+      <li><b>实值 / 平值 / 虚值</b>按立即执行是否有利判断</li>
+      <li class="e"><b>方向题</b>先判"看涨还是看跌"，再判"这个因素让它更值钱还是更便宜"</li>
+    </ul></div>
+
+    <div class="br"><h3>有效市场假说（大纲未单列 · 背景知识）</h3><ul>
+      <li class="k"><b>弱式有效</b>历史价格信息已反映，技术分析无效</li>
+      <li class="k"><b>半强式有效</b>公开信息已反映，基本面分析无效</li>
+      <li class="k"><b>强式有效</b>内幕信息也反映，无人能获超额收益</li>
+      <li class="e"><b>定位</b>2026 大纲第 7 章未列 EMH，属理解性背景，<b>不必死背三层次细节</b></li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c3)">
+  <div class="chead"><span class="cno">08</span><h2>公司治理与风险管理</h2>
+  <span class="badge b-ok">已掌握 · 94%</span><span class="cnote">金融第二高分章</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>治理结构（三会一层）</h3><ul>
+      <li class="k"><b>股东（大）会</b>最高权力机构</li>
+      <li class="k"><b>董事会</b>决策机构，对股东会负责</li>
+      <li class="k"><b>监事会</b>监督机构，监督董事与高管</li>
+      <li class="k"><b>高级管理层</b>执行机构 —— <b>最易漏，必须落笔</b></li>
+      <li><b>配套机制</b>独立董事、专门委员会、激励约束</li>
+    </ul></div>
+
+    <div class="br"><h3>治理目标·模式·评价</h3><ul>
+      <li class="k"><b>三大目标</b>保障股东与利益相关者权益 · 降低代理成本 · 提高决策效率</li>
+      <li class="k"><b>英美模式</b>外部市场监督为主，<b>单层董事会</b>，股权分散</li>
+      <li class="k"><b>德日模式</b>内部监督为主，<b>双层董事会/监事会</b>，银行主导</li>
+      <li class="k"><b>家族模式</b>股权集中、家族控制</li>
+      <li class="k"><b>评价维度</b>股权结构 · 董事会独立性 · 激励约束 · 信息披露</li>
+      <li class="k"><b>利益相关者</b>股东 · 债权人 · 员工 · 客户 · 供应商 · 社区</li>
+      <li class="k"><b>激励约束</b>股权激励 · 股票期权 · 薪酬递延 · 追索扣回</li>
+    </ul></div>
+
+    <div class="br"><h3>代理成本</h3><ul>
+      <li><b>第一类</b>股东 vs 管理层（所有权与经营权分离）</li>
+      <li><b>第二类</b>大股东 vs 中小股东（隧道挖掘）</li>
+      <li><b>降低手段</b>股权激励、独立董事、信息披露</li>
+    </ul></div>
+
+    <div class="br"><h3>全面风险管理</h3><ul>
+      <li class="k"><b>风险治理架构</b>"三会一层"+ 风险管理委员会，三道防线：业务部门（第一）→ 风险管理与合规（第二）→ 内部审计（第三）</li>
+      <li class="k"><b>风险管理策略（四类）</b><b>风险规避</b>（不做）· <b>风险降低</b>（控住）· <b>风险转移</b>（保险/衍生品）· <b>风险承受</b>（自留）</li>
+      <li class="k"><b>风险偏好</b>董事会定调（激进/稳健/保守），向下拆为<b>风险限额</b>（额度、集中度、止损线）</li>
+      <li><b>政策与流程</b>识别→计量→监测→控制→报告</li>
+      <li><b>工具</b>风险偏好陈述、限额管理、压力测试、风险报告</li>
+      <li class="e"><b>易错</b>"风险偏好由高管层随意调整"→ 错，<b>由董事会确定</b>；四类策略中<b>没有"风险消除"</b></li>
+    </ul></div>
+
+    <div class="br"><h3>风险类型</h3><ul>
+      <li class="k"><b>信用风险</b>交易对手不履约、不还钱</li>
+      <li class="k"><b>市场风险</b>利率、汇率、股价、商品价格波动</li>
+      <li class="k"><b>操作风险</b>人员、流程、系统、外部事件</li>
+      <li class="k"><b>流动性风险</b>无法变现或借不到钱</li>
+      <li><b>其他</b>声誉风险、战略风险、国别风险</li>
+    </ul></div>
+
+    <div class="br"><h3>内控与内审</h3><ul>
+      <li class="k"><b>内控五要素</b>内部环境、风险评估、控制活动、信息与沟通、内部监督</li>
+      <li><b>内审</b>独立、客观，向董事会/审计委员会报告</li>
+      <li class="e"><b>VaR</b>大纲未列，属拓展，不是核心考点</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c4)">
+  <div class="chead"><span class="cno">09</span><h2>货币供求与货币均衡</h2>
+  <span class="badge b-bad">薄弱 · 67%</span><span class="cnote">⭐ 2026 新增 IS-LM｜k/K 仍需再焊</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>货币需求四理论</h3><ul>
+      <li class="k"><b>费雪（现金交易说）</b>MV = PT，<b>带 V</b>，"钱在跑"</li>
+      <li class="k"><b>剑桥（现金余额说）</b>Md = kPY，<b>带 k</b>，"钱在停"；<b>k = 1/V</b></li>
+      <li class="k"><b>凯恩斯</b>流动性偏好：交易、预防、投机 → <b>看利率</b></li>
+      <li class="k"><b>弗里德曼</b>核心变量＝<b>恒久性收入</b>（长期）</li>
+      <li class="e"><b>四句话定位</b>见 V→费雪｜见 k→剑桥｜见利率→凯恩斯｜见恒久→弗里德曼</li>
+      <li class="e"><b>术语对应</b>费雪＋剑桥＝<b>货币数量论</b>（传统货币数量说），考纲"货币需求理论"必含此二者</li>
+    </ul></div>
+
+    <div class="br"><h3>货币供给与乘数</h3><ul>
+      <li class="k"><b>基础货币</b>= 流通中现金 + 准备金存款</li>
+      <li class="k"><b>货币乘数（教材口径）</b>K = 1 ÷ (存款准备金率 + 货币结构比率)</li>
+      <li class="e"><b>k 与 K 别混</b>小 k＝剑桥系数（=1/V）｜大 K＝货币乘数</li>
+      <li class="k"><b>派生存款三制约</b>准备金（拦一道）· 现金漏损（取一道）· 税收（抽一道）</li>
+    </ul></div>
+
+    <div class="br"><h3>存款货币创造过程</h3><ul>
+      <li class="k"><b>两个前提</b>部分准备金制度 + 非现金结算（转账）</li>
+      <li class="k"><b>创造链条</b>原始存款 → 放贷 → 变成他人存款 → 再放贷，一轮比一轮少</li>
+      <li class="k"><b>派生结果</b>存款总额 = 原始存款 ÷ 法定准备金率</li>
+      <li class="k"><b>算例</b>原始存款 100 万、准备金率 10% → 存款总额 1000 万，<b>派生存款 900 万</b></li>
+      <li class="k"><b>三处漏出</b>法定准备金 · 现金漏损 · 超额准备金 → 实际倍数小于理论值</li>
+      <li class="e"><b>别除错数</b>求"派生存款"要减掉原始存款，求"存款总额"才是整个 1000 万</li>
+    </ul></div>
+
+    <div class="br"><h3>货币层次</h3><ul>
+      <li class="k"><b>M0</b>流通中现金</li>
+      <li class="k"><b>M1</b>M0 + 单位活期存款（"单位活期"只在 M1）</li>
+      <li class="k"><b>M2</b>M1 + 准货币</li>
+      <li class="k"><b>准货币</b>单位定期 + 个人存款 + 其他；<b>财政存款除外</b></li>
+      <li class="e"><b>两个篮子法</b>左篮 M1，右篮准货币，别把财政存款塞进来</li>
+    </ul></div>
+
+    <div class="br"><h3>货币均衡与通胀</h3><ul>
+      <li><b>均衡</b>货币供给 = 货币需求</li>
+      <li><b>需求拉动型通胀</b>治理＝收货币 + 收财政 + 增供给</li>
+      <li><b>成本推动型通胀</b>工资管制只对这一类有效</li>
+      <li><b>结构性通胀</b>部门间比价失衡</li>
+    </ul></div>
+
+    <div class="br"><h3>IS-LM（2026 新增）</h3><ul>
+      <li class="k"><b>IS 曲线</b>产品市场均衡，Y 与 r <b>反向</b></li>
+      <li class="k"><b>LM 曲线</b>货币市场均衡，Y 与 r <b>同向</b></li>
+      <li class="k"><b>交点</b>同时均衡的产出与利率</li>
+      <li class="k"><b>财政政策动 IS</b>扩张→IS 右移→Y↑、r↑（有挤出效应）</li>
+      <li class="k"><b>货币政策动 LM</b>扩张→LM 右移→Y↑、r↓</li>
+      <li class="e"><b>别画反</b>先问"哪个市场变了"，再动对应那条线</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c5)">
+  <div class="chead"><span class="cno">10</span><h2>开放经济均衡</h2>
+  <span class="badge b-ok">已掌握 · 已盖章</span><span class="cnote">⭐ 2026 新增三元悖论／米德冲突／IS-LM-BP</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>国际收支三账户</h3><ul>
+      <li class="k"><b>经常账户</b>货物、服务、<b>初次收入（投资收益）</b>、二次收入（经常转移）</li>
+      <li class="k"><b>资本与金融账户</b>直接投资、证券投资、其他投资</li>
+      <li class="k"><b>净误差与遗漏</b>轧平差额的平衡项</li>
+      <li class="e"><b>最大坑</b>"投资收益"看着像投资 → 却归<b>经常账户</b></li>
+    </ul></div>
+
+    <div class="br"><h3>国际收支失衡与调节</h3><ul>
+      <li class="k"><b>五类成因</b>结构性 · 周期性 · 货币性（通胀差）· 收入性 · 偶发性（灾害）</li>
+      <li class="k"><b>外汇缓冲政策</b>动用国际储备弥补差额（治标，短期）</li>
+      <li class="k"><b>支出变更政策</b>财政与货币政策压缩总需求（治本，影响增长）</li>
+      <li class="k"><b>支出转换政策</b>汇率贬值，把需求从进口转向国内</li>
+      <li class="k"><b>直接管制</b>外汇与贸易管制（见效快、扭曲大）</li>
+      <li><b>国际协调</b>多边磋商、联合干预</li>
+      <li class="e"><b>两个高频锚</b>"动用储备"＝外汇缓冲｜"汇率贬值"＝支出转换，别对调</li>
+    </ul></div>
+
+    <div class="br"><h3>国际储备四构成</h3><ul>
+      <li class="k"><b>货币黄金</b>官方持有的黄金</li>
+      <li class="k"><b>外汇储备</b>★ 最主要部分</li>
+      <li class="k"><b>IMF 储备头寸</b>在基金组织的储备档头寸</li>
+      <li class="k"><b>特别提款权 SDR</b>记账单位，<b>不能直接对外支付</b></li>
+      <li class="e"><b>主体限定</b>只算<b>官方</b>持有；商业银行持有的外汇不算</li>
+      <li><b>三大作用</b>弥补逆差、稳定汇率、维持清偿力</li>
+    </ul></div>
+
+    <div class="br"><h3>储备的规模与结构管理</h3><ul>
+      <li class="k"><b>规模过大</b>机会成本高、被动投放基础货币带来通胀压力</li>
+      <li class="k"><b>规模过小</b>抵御外部冲击能力弱、易引发货币危机</li>
+      <li class="k"><b>适度规模参考</b>进口支付能力、短期外债、M2 占比等</li>
+      <li class="k"><b>结构管理</b>币种结构（分散汇率风险）+ 资产结构（安全 &gt; 流动 &gt; 盈利）</li>
+    </ul></div>
+
+    <div class="br"><h3>国际资本流动与外资外债</h3><ul>
+      <li class="k"><b>流动原因</b>利差驱动、汇率预期、资产收益差、避险情绪</li>
+      <li class="k"><b>三类影响</b>冲击汇率与储备 · 推高资产泡沫 · <b>突然停顿（Sudden Stop）</b>引发危机</li>
+      <li class="k"><b>外资管理</b>直接投资（长期稳定）vs 证券投资（易逆转）</li>
+      <li class="k"><b>外债管理</b>看<b>规模、期限（短债占比）、币种</b>三重风险</li>
+      <li class="e"><b>危机规律</b>短期外债 &gt; 外汇储备 → 极易被冲击（亚洲金融危机）</li>
+    </ul></div>
+
+    <div class="br"><h3>汇率制度与三元悖论</h3><ul>
+      <li><b>制度谱系</b>固定 → 中间（盯住、爬行）→ 浮动</li>
+      <li class="k"><b>三元悖论</b>汇率稳定、资本自由流动、货币政策独立，<b>三者只能取其二</b></li>
+      <li class="k"><b>我国选择</b>有管理浮动 + 资本项目渐进开放 → <b>保货币政策独立性</b></li>
+    </ul></div>
+
+    <div class="br"><h3>米德冲突</h3><ul>
+      <li class="k"><b>内部均衡</b>充分就业 + 物价稳定</li>
+      <li class="k"><b>外部均衡</b>国际收支平衡</li>
+      <li class="k"><b>冲突</b>单一政策工具难以同时实现内外均衡</li>
+      <li class="k"><b>搭配</b>财政政策管内部、货币政策管外部</li>
+    </ul></div>
+
+    <div class="br"><h3>IS-LM-BP（蒙代尔—弗莱明）</h3><ul>
+      <li class="k"><b>BP 曲线</b>国际收支均衡；资本完全流动时是<b>水平线</b></li>
+      <li class="k"><b>固定汇率 + 资本自由流动</b>货币政策<b>无效</b>，财政政策有效</li>
+      <li class="k"><b>浮动汇率 + 资本自由流动</b>货币政策<b>有效</b>，财政政策无效</li>
+      <li><b>资本流动程度</b>决定 BP 斜率，是全部结论的分岔口</li>
+    </ul></div>
+
+    <div class="br"><h3>当家三件事（记忆框架）</h3><ul>
+      <li class="k"><b>记账</b>国际收支（钱进出怎么记）</li>
+      <li class="k"><b>备应急钱包</b>国际储备（危机时拿什么救）</li>
+      <li class="k"><b>做取舍</b>三元悖论 + 政策搭配（三个目标只能选两个）</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c1)">
+  <div class="chead"><span class="cno">11</span><h2>中央银行与金融调控</h2>
+  <span class="badge b-warn">刚学 · 72%</span><span class="cnote">⭐ 2026 新增结构性工具／双支柱</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>央行三大性质</h3><ul>
+      <li class="k"><b>发行的银行</b>唯一法定货币发行机关</li>
+      <li class="k"><b>银行的银行</b>集中准备金、最后贷款人、组织清算</li>
+      <li class="k"><b>政府的银行</b>经理国库、代理国债、代表政府参与国际金融</li>
+      <li class="e"><b>核心界限</b>央行<b>不直接对企业、个人办理业务</b>，凡此表述一律错</li>
+    </ul></div>
+
+    <div class="br"><h3>资产负债表</h3><ul>
+      <li class="k"><b>资产三项</b>国外资产（外汇黄金）· 对政府债权（国债）· 对其他存款性公司债权（再贷款／再贴现／逆回购）</li>
+      <li class="k"><b>负债三项</b>货币发行 · 金融机构存款（准备金）· 政府存款</li>
+      <li class="k"><b>恒等式</b>资产 = 负债 + 所有者权益；一笔业务<b>同时动两边</b></li>
+      <li class="k"><b>记忆钩</b>资产＝外汇国债再贷款｜负债＝现金准备国库款</li>
+    </ul></div>
+
+    <div class="br"><h3>四层传导链</h3><ul>
+      <li class="k"><b>政策工具</b>→<b>操作指标</b>（基础货币、短期利率）→<b>中介目标</b>（M2、社融）→<b>最终目标</b>（物价·增长·就业·国际收支）</li>
+      <li class="k"><b>可控性</b>央行能直接控：工具 + 操作指标；只能间接影响：中介目标、最终目标</li>
+      <li class="k"><b>时滞来源</b>中间隔层越多，政策见效越慢</li>
+      <li class="e"><b>扳手与仪表</b>操作指标＝扳手（能拧）｜中介目标＝仪表（只能看）</li>
+    </ul></div>
+
+    <div class="br"><h3>货币政策目标</h3><ul>
+      <li class="k"><b>四大目标</b>物价稳定 · 充分就业 · 经济增长 · 国际收支平衡</li>
+      <li class="k"><b>目标冲突</b>物价稳定 vs 充分就业（菲利普斯曲线）｜经济增长 vs 国际收支平衡</li>
+      <li class="k"><b>我国口径</b>"保持货币<b>币值稳定</b>，并以此促进经济增长"（双重含义：对内物价 + 对外汇率）</li>
+      <li class="k"><b>中介目标四标准</b>可测性 · 可控性 · 相关性 · 抗干扰性</li>
+      <li class="e"><b>别答成"多目标并列"</b>我国是"单一目标、双重含义"，这是常考细节</li>
+    </ul></div>
+
+    <div class="br"><h3>三大传统工具（总量）</h3><ul>
+      <li class="k"><b>存款准备金率</b>作用<b>最猛烈</b>、一刀切、不宜频繁（大锤）</li>
+      <li class="k"><b>再贴现</b><b>被动</b>，主动权在商业银行（开门等客）</li>
+      <li class="k"><b>公开市场业务</b>央行<b>主动</b>、灵活可微调（螺丝刀）</li>
+      <li class="e"><b>方向</b>降准＝放水（扩张）｜提准＝抽水（收缩）—— "降放提收"</li>
+    </ul></div>
+
+    <div class="br"><h3>结构性工具（2026 新增）</h3><ul>
+      <li class="k"><b>四特征</b>定向 · 精准 · 直达 · 滴灌（兼具总量与结构双重功能）</li>
+      <li class="k"><b>机制</b>给<b>低成本资金</b>+附条件 → 银行算账划算 → 主动投放</li>
+      <li class="k"><b>本质</b>不是"下命令"，是"给折扣"</li>
+      <li><b>代表</b>支农支小再贷款、碳减排支持工具、科创再贷款、普惠小微、PSL</li>
+    </ul></div>
+
+    <div class="br"><h3>我国货币政策实践（大纲·分析层级）</h3><ul>
+      <li class="k"><b>2013 起</b>创设 <b>SLF（常备借贷便利）</b>、<b>MLF（中期借贷便利）</b>、PSL，形成"利率走廊"雏形</li>
+      <li class="k"><b>2015 起</b>取消存款利率上限，利率市场化基本完成</li>
+      <li class="k"><b>2019 起</b>LPR 改革：<b>MLF 利率 → LPR → 贷款利率</b>，打通"政策利率→市场利率"传导</li>
+      <li class="k"><b>2020 起</b>结构性工具密集推出：碳减排支持工具、科创再贷款、普惠小微支持工具、<b>设备更新改造专项再贷款</b></li>
+      <li class="k"><b>近年取向</b>稳健的货币政策<b>灵活适度、精准有效</b>；总量上"不搞大水漫灌"，结构上"精准滴灌"</li>
+      <li class="e"><b>易错</b>我国<b>没有</b>实行零利率/量化宽松；结构性工具是"定向"而非"总量放水"</li>
+      <li class="e"><b>跨章</b>经基第 19 章也考"近年来我国货币政策的实践"，口径以 <b>2026 教材</b>为准</li>
+    </ul></div>
+
+    <div class="br"><h3>我国宏观审慎的建立与完善</h3><ul>
+      <li class="k"><b>2009</b>G20 匹兹堡峰会正式提出宏观审慎政策框架</li>
+      <li class="k"><b>2011</b>我国引入<b>差别准备金动态调整</b>机制</li>
+      <li class="k"><b>2016</b>升级为 <b>MPA（宏观审慎评估体系）</b>，七大方面打分</li>
+      <li class="k"><b>2017</b>设立国务院金融稳定发展委员会，"双支柱"写入调控框架</li>
+      <li class="k"><b>2019</b>央行设立<b>宏观审慎管理局</b></li>
+      <li class="k"><b>2021</b>发布《宏观审慎政策指引》，明确工具箱与传导</li>
+      <li class="e"><b>沿革题</b>记节点：2009 提出 → 2011 差别准备金 → 2016 MPA → 2019 设局</li>
+    </ul></div>
+
+    <div class="br"><h3>双支柱（2026 新增）</h3><ul>
+      <li class="k"><b>第一支柱</b>货币政策 → 盯<b>物价稳定、经济增长</b></li>
+      <li class="k"><b>第二支柱</b>宏观审慎 → 盯<b>系统性金融风险</b></li>
+      <li class="k"><b>宏观审慎工具</b>逆周期资本缓冲、LTV（贷款价值比）、DTI（债务收入比）、系统重要性附加资本</li>
+      <li class="k"><b>协同逻辑</b>目标不同、方向可能相反、分工不打架</li>
+      <li class="e"><b>不含财政政策</b>"双支柱"＝货币政策 + 宏观审慎，见财政政策即排除</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<section class="chap" style="--c:var(--c2)">
+  <div class="chead"><span class="cno">12</span><h2>金融监管</h2>
+  <span class="badge b-warn">待复测 · 60%</span><span class="cnote">与经济基础第 21 章重合</span></div>
+  <div class="branches">
+
+    <div class="br"><h3>金融脆弱性四来源</h3><ul>
+      <li class="k"><b>高杠杆</b>1 块本金做 10 块生意，亏 10% 即归零</li>
+      <li class="k"><b>期限错配</b>借短贷长，<b>挤兑死穴</b></li>
+      <li class="k"><b>资产负债不对称</b>看不清资产真实价值，信心一崩就跑</li>
+      <li class="k"><b>信用链条</b>互相欠钱，一个违约连环倒</li>
+    </ul></div>
+
+    <div class="br"><h3>金融危机的分类与危害</h3><ul>
+      <li class="k"><b>按对象分</b>银行业危机 · 货币危机 · 债务危机 · 资本市场（股市）危机</li>
+      <li class="k"><b>按范围分</b>局部危机 / <b>系统性危机</b>（一家倒、全系统瘫）</li>
+      <li class="k"><b>混合型</b>银行业 + 货币危机叠加（亚洲金融危机）</li>
+      <li class="k"><b>五重危害</b>机构连环倒 · 信用收缩 · 财政救助成本 · 产出损失与失业 · 社会动荡</li>
+    </ul></div>
+
+    <div class="br"><h3>危机演化四步</h3><ul>
+      <li class="k"><b>① 脆弱性积累</b>杠杆升高，看着最安全时最危险</li>
+      <li class="k"><b>② 冲击触发</b>某事件点爆</li>
+      <li class="k"><b>③ 风险传染</b>信用链、流动性、恐慌扩散</li>
+      <li class="k"><b>④ 系统性危机</b>市场冻结、机构连环倒</li>
+      <li class="e"><b>顺序题</b>积累→触发→传染→危机，不可乱序</li>
+    </ul></div>
+
+    <div class="br"><h3>监管目标与原则</h3><ul>
+      <li class="k"><b>四项目标</b>保护存款人与投资者 · 维护金融体系稳定 · 维护公平竞争 · 提高金融效率</li>
+      <li class="k"><b>四项原则</b>依法监管 · 公开公正 · 效率原则 · 独立性原则</li>
+      <li class="k"><b>监管三段</b>事前准入（发牌照）· 事中日常（盯指标）· 事后处置（退出与救助）</li>
+      <li class="e"><b>目标与依据别混</b>目标是"要什么"，依据（外信公垄）是"凭什么管"</li>
+    </ul></div>
+
+    <div class="br"><h3>监管四大依据（外信公垄）</h3><ul>
+      <li class="k"><b>负外部性</b>社会成本 &gt; 私人成本</li>
+      <li class="k"><b>信息不对称</b>→ 强制信息披露</li>
+      <li class="k"><b>公共产品</b>稳定人人受益、没人愿掏钱</li>
+      <li class="k"><b>自然垄断</b>清算／登记／征信只能一套 → 准入 + 价格管制</li>
+      <li class="e"><b>四项全选</b>清单少记一条即漏选，先默"外信公垄"</li>
+    </ul></div>
+
+    <div class="br"><h3>监管体制与我国格局</h3><ul>
+      <li><b>类型</b>分业监管（各管各）｜统一监管（一家统管）</li>
+      <li class="k"><b>2003</b>一行三会（人行 + 银证保三会）</li>
+      <li class="k"><b>2018</b>一委一行两会（银保合并）</li>
+      <li class="k"><b>2023</b><b>一行一局一会</b>（人行 + 金融监管总局 + 证监会）</li>
+      <li class="k"><b>分工</b>金融监管总局管<b>除证券业以外</b>全部金融业；证券归证监会</li>
+      <li class="e"><b>两个高频坑</b>"目前仍是一行三会"错｜"总局管全部含证券"错</li>
+    </ul></div>
+
+    <div class="br"><h3>国际协调</h3><ul>
+      <li class="k"><b>BCBS</b>银行｜<b>IOSCO</b>证券｜<b>IAIS</b>保险</li>
+      <li class="k"><b>四形式</b>双边 · 区域 · 多边 · 国际组织</li>
+      <li class="k"><b>性质</b><b>无超国家强制力</b>，属"软法"，靠声誉与市场约束</li>
+      <li class="e"><b>见"强制／超国家／必须执行"</b>一律判错</li>
+    </ul></div>
+
+    <div class="br"><h3>巴塞尔协议三代</h3><ul>
+      <li class="k"><b>巴 I（1988）</b>一个数：资本充足率 <b>8%</b></li>
+      <li class="k"><b>巴 II（2004）</b>三根柱：最低资本要求 · 监管检查 · 市场约束</li>
+      <li class="k"><b>巴 III（2010，危机后）</b>加三条：逆周期资本缓冲 · 杠杆率 ≥3% · 流动性 LCR/NSFR</li>
+      <li class="e"><b>长选项读到底</b>"只适用银行，不涉及资本要求"＝后半句致命错</li>
+    </ul></div>
+
+    <div class="br"><h3>三业监管抓手</h3><ul>
+      <li class="k"><b>银行</b>资本充足率 · <b>贷款五级分类</b>（正常/关注/次级/可疑/损失，后三＝不良）· 存款保险 50 万</li>
+      <li class="k"><b>证券</b>信息披露 · 打击内幕交易与操纵市场 · 投资者适当性</li>
+      <li class="k"><b>保险</b><b>偿付能力</b>监管</li>
+      <li class="e"><b>五级分类＝资产质量</b>，不是盈利能力；盈利看 ROA/ROE</li>
+    </ul></div>
+
+  </div>
+</section>
+
+<p class="hint-frac">统计口径：绿标"考点"＝教材明确列示、历年高频；红标"易错"＝你在练习卷中实际踩过的坑。颜色徽标按你最近的练习得分标注。</p>
+
+</main>
+
+<script>
+(function(){
+  var body=document.body;
+  var fs=13.5;
+
+  document.querySelectorAll('.chead').forEach(function(h){
+    h.addEventListener('click',function(){
+      var bs=h.parentNode.querySelector('.branches');
+      if(!bs) return;
+      var hide = bs.style.display !== 'none';
+      bs.style.display = hide ? 'none' : '';
+    });
+  });
+
+  document.querySelectorAll('.br h3').forEach(function(h){
+    h.addEventListener('click',function(){ h.parentNode.classList.toggle('closed'); });
+  });
+
+  document.querySelectorAll('button[data-act]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var act=b.dataset.act;
+      if(act==='open'){
+        document.querySelectorAll('.br').forEach(function(x){x.classList.remove('closed')});
+        document.querySelectorAll('.branches').forEach(function(x){x.style.display=''});
+      }
+      if(act==='close'){
+        document.querySelectorAll('.br').forEach(function(x){x.classList.add('closed')});
+      }
+      if(act==='imp'){
+        body.classList.toggle('only-k');
+        b.classList.toggle('on');
+        if(body.classList.contains('only-k')){
+          document.querySelectorAll('.br').forEach(function(br){
+            br.classList.toggle('hide', br.querySelectorAll('li.k').length===0);
+          });
+          document.querySelectorAll('.chap').forEach(function(c){
+            c.classList.toggle('hide', c.querySelectorAll('li.k').length===0);
+          });
+          document.querySelectorAll('.br').forEach(function(x){x.classList.remove('closed')});
+        }else{
+          document.querySelectorAll('.hide').forEach(function(x){x.classList.remove('hide')});
+        }
+      }
+      if(act==='print'){ window.print(); }
+    });
+  });
+
+  document.querySelectorAll('button[data-fs]').forEach(function(b){
+    b.addEventListener('click',function(){
+      fs = b.dataset.fs==='+' ? Math.min(fs+1,19) : Math.max(fs-1,10.5);
+      document.documentElement.style.setProperty('--fs', fs+'px');
+    });
+  });
+
+  var input=document.getElementById('q');
+  var timer=null;
+  input.addEventListener('input',function(){
+    clearTimeout(timer);
+    timer=setTimeout(function(){
+      var kw=input.value.trim().toLowerCase();
+      document.querySelectorAll('.br li').forEach(function(li){li.classList.remove('hit')});
+      if(!kw){
+        document.querySelectorAll('.br').forEach(function(x){x.classList.remove('hide')});
+        document.querySelectorAll('.chap').forEach(function(x){x.classList.remove('hide')});
+        document.querySelectorAll('.branches').forEach(function(x){x.style.display=''});
+        return;
+      }
+      document.querySelectorAll('.chap').forEach(function(c){
+        var any=false;
+        c.querySelectorAll('.br').forEach(function(br){
+          var hit=false;
+          br.querySelectorAll('li').forEach(function(li){
+            if(li.textContent.toLowerCase().indexOf(kw)>-1){ li.classList.add('hit'); hit=true; }
+          });
+          br.classList.toggle('hide',!hit);
+          br.classList.remove('closed');
+          if(hit) any=true;
+        });
+        c.classList.remove('hide');
+        var bs=c.querySelector('.branches'); if(bs) bs.style.display='';
+        if(!any) c.classList.add('hide');
+      });
+    },160);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第06章 · 金融市场与工具</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第06章 · 金融市场与工具<small id="sub">错题 12 题 + 自命题 20 题 ｜ 31 分钟 ｜ 满分 42</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div id="skelGate" style="position:fixed;inset:0;z-index:9999;background:#f4f6fa;overflow:auto"> <div style="max-width:920px;margin:0 auto;padding:26px 20px 60px">  <div style="background:#fff;border:1px solid #dde3ec;border-radius:12px;padding:18px 20px;box-shadow:0 2px 14px rgba(20,40,80,.08)">   <h2 style="margin:0 0 6px;font-size:20px;color:#12305e">金融第06章 · 金融市场与工具 · 骨架速过卡（约 5 分钟）</h2>   <div style="color:#6b7280;font-size:13px;margin-bottom:12px">    03/05 章裸做崩盘（24% / 43%）的根因是<b>先做题、后补骨架</b>。    从第 06 章起：<b>骨架没过完，卷子不发</b>。下面 12 条是本章基础分，    逐条念一遍再开卷——念完点底部按钮。   </div>   <div style="border:1px solid #e5e9f0;border-radius:8px;overflow:hidden"><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">货币市场 ←→ 资本市场</div><div style="flex:1;color:#26303d;line-height:1.6">一刀切在<b>1 年</b>：≤1 年＝货币市场（拆借、回购、票据、银行承兑汇票、短期政府债券、大额存单，口诀「<b>拆回票汇券单</b>」）；>1 年＝资本市场（<b>股、债、基</b>）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">两个 1 年钉子</div><div style="flex:1;color:#26303d;line-height:1.6"><b>同业拆借最长期限 1 年</b>；<b>买断式回购 1 天至 365 天</b>（买断＝所有权转移；质押＝只冻结、所有权不动）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">商业票据</div><div style="flex:1;color:#26303d;line-height:1.6">特点「<b>大、短、低、活</b>」＝面额大、期限短、成本低、方式灵活，<b>无抵押纯信用</b>。贴现发行价＝面额×(1−贴现率×天数÷360)，<b>必低于面值</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">票据三级流转</div><div style="flex:1;color:#26303d;line-height:1.6">企业→银行＝<b>贴现</b>；银行→银行＝<b>转贴现</b>；银行→<b>央行</b>＝<b>再贴现</b>。只看对手方是谁。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">股票分类（按主体）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>国家、法人、公众、外资</b>；「普通股/优先股」是按<b>股东权利</b>分的另一维度——维度串了必错。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">基金（按资金来源与用途）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>在岸＝本国募本国投（家门口）</b>；离岸＝他国募投本国/第三国；国际＝本国钱投国外。主动/被动是投资理念维度。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">融资租赁功能</div><div style="flex:1;color:#26303d;line-height:1.6"><b>基础：融资+投资</b>；<b>扩展：产品促销+资产管理</b> →「基础融投、扩展销管」，整组搬，不拆配。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">衍生品</div><div style="flex:1;color:#26303d;line-height:1.6">四特征＝<b>跨期、联动、杠杆、高风险</b>；三功能＝<b>价格发现、套期保值、投机</b>；主体四分＝<b>保投利纪</b>（套期保值者、投机者、套利者、经纪人）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">远期 vs 期货（五维）</div><div style="flex:1;color:#26303d;line-height:1.6">远期＝<b>场外、非标、无盯市无保证金、信用风险大、实物交割为主</b>；期货<b>全部反过来</b>（场内、标准化、盯市+保证金、风险小、现金交割）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">并购</div><div style="flex:1;color:#26303d;line-height:1.6">按行业关系：<b>同行=横、上下游=纵、不搭界=混合</b>；杠杆并购是融资方式维度。兼并＝<b>整体吞并、法人消失、承继债务</b>；收购＝<b>买股权、法人可存续、以出资为限</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">监管分工（配对题）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>票据/拆借/回购/外汇→中国人民银行</b>；证券期货→<b>证监会</b>；银行间市场自律→<b>交易商协会</b>（不是证券业协会）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">市场功能五件套</div><div style="flex:1;color:#26303d;line-height:1.6"><b>价、配、信、流、险</b>＝价格发现、资源配置、降低信息（交易）成本、提供流动性、风险管理。见「<b>消除风险</b>」必错——风险只能转移不能消灭。</div></div></div>   <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">    <button id="skelGo" style="background:#1a4fa0;color:#fff;border:0;border-radius:8px;padding:11px 22px;font-size:15px;cursor:pointer">✅ 骨架过完了，开始做题</button>    <span style="color:#8a94a6;font-size:12px">（点击后本卡收起，计时开始）</span>   </div>  </div> </div></div>
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第06章 金融市场与工具 · 即时判题训练卷", "totalMin": 31, "pass": 25, "full": 42, "nSingle": 22, "nMulti": 10, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 12 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 20 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "买断式回购的期限为1天至()。", "opts": [{"k": "A", "t": "365天"}, {"k": "B", "t": "93天"}, {"k": "C", "t": "31天"}, {"k": "D", "t": "182天"}], "ans": "A", "kp": "第6章·回购市场期限规定（数字钉子）", "model": "数字规定型（期限区间）", "chain": ["买断式回购（债券买断式回购）：期限由交易双方确定", "规定区间：<b>1 天至 365 天</b>", "质押式回购：1 天至 365 天（同类区间），但标的债券所有权不转移"], "fast": "⚡债券回购期限钉子：<b>买断式与质押式回购均为 1 天—365 天</b>。题干\"买断式\"→ A。93 天、182 天是央行票据 / 短期工具的常见期限，属干扰。", "traps": ["把买断式与质押式的期限记成不同 —— 两者<b>区间相同</b>，区别在所有权是否转移", "182 天（半年）、93 天是其他市场的期限数字，专用于混淆"], "mother": "母题抽象：<b>货币市场期限串记</b> —— 同业拆借 ≤1年(银行档)｜债券回购(买断式/质押式) 1天—365天｜票据 纸质6个月/电子1年。凡问期限区间，先定位子市场。", "analysis": "<p>根据全国银行间债券市场债券买断式回购业务的有关规定，<b>买断式回购的期限为 1 天至 365 天</b>，由交易双方自行商定。A 正确。</p><p>需注意：买断式回购与质押式回购的<b>期限区间相同</b>，二者的本质区别在于买断式回购中<b>债券所有权发生转移</b>（逆回购方可自由处置标的债券），而质押式回购只质押不转移所有权。</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "欧洲货币市场的借货交易主体是()。", "opts": [{"k": "A", "t": "本国政府与外国政府"}, {"k": "B", "t": "居民与外国政府"}, {"k": "C", "t": "居民与居民"}, {"k": "D", "t": "非居民与非居民"}], "ans": "D", "kp": "第6章·欧洲货币市场", "model": "概念特征判断型（交易主体是谁）", "chain": ["欧洲货币 = 在货币发行国境外流通、交易的该国货币（如欧洲美元）", "欧洲货币市场 = <b>非居民之间</b>进行境外货币存贷交易的市场", "关键在于\"境外\"+\"非居民\"：不受货币发行国管辖，也不受市场所在国一般金融法规约束"], "fast": "⚡欧洲货币市场三不：<b>非居民之间、境外货币、不受发行国管辖</b>。见\"交易主体\" → <b>非居民与非居民</b> = D。只要出现\"居民\"字样（A/B/C）直接划掉。", "traps": ["把\"欧洲\"理解成地理上的欧洲 —— 它是\"<b>境外/离岸</b>\"的代称（亚洲美元市场同属此类）", "居民与居民（C）是<b>在岸市场</b>的特征，不是离岸"], "mother": "母题抽象：<b>离岸 vs 在岸判据</b> —— 离岸（欧洲货币市场）：非居民×非居民 + 境外货币 + 监管宽松；在岸：居民参与 + 受本国监管。凡问\"欧洲/离岸\"，先排除一切含\"居民\"的选项。", "analysis": "<p>欧洲货币市场是经营<b>境外货币</b>的国际金融市场，其借贷交易发生在<b>非居民与非居民</b>之间，交易所使用的货币是市场所在国以外的货币，因而不受货币发行国与市场所在国的一般金融法规约束。D 正确。</p><p>涉及\"居民\"的选项（A、B、C）均属在岸金融市场的交易特征。</p>"}, {"no": 2003, "label": "R3", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "关于中央银行在外汇市场上操作的说法，正确的是()", "opts": [{"k": "A", "t": "交易目的主要是套利"}, {"k": "B", "t": "交易对手主要是他国央行"}, {"k": "C", "t": "一般不直接进行外汇交易"}, {"k": "D", "t": "频繁在外汇市场上交易"}], "ans": "C", "kp": "第6章·中央银行的外汇市场操作", "model": "正误判断型（四选项逐项验伪）", "chain": ["A 错：央行参与外汇交易的目的是<b>维持汇率稳定、调节外汇储备</b>，不是套利", "B 错：交易对手主要是<b>商业银行等金融机构</b>，不是他国央行", "C 对：央行<b>一般不直接进场</b>，而是通过商业银行等中介机构进行操作", "D 错：央行干预是被动、阶段性的，不会\"频繁交易\""], "fast": "⚡央行外汇操作三句话：<b>目的不是赚钱、对手不是别国央行、一般不亲自下场（委托商业银行）</b>。三句都对上 → C。", "traps": ["以为央行天天在汇市买卖（实为被动干预，非频繁）", "把央行间货币互换/双边本币互换当成外汇市场操作"], "mother": "母题抽象：<b>外汇市场参与者分工</b> —— 商业银行(做市主体，占比最大)、中央银行(被动干预、委托操作、不以盈利为目的)、企业个人(实际需求)。凡问央行，先否定\"盈利\"与\"频繁\"。", "analysis": "<p>中央银行参与外汇市场操作的目的是保持汇率基本稳定、维护外汇市场秩序、调节外汇储备，<b>不以套利为目的</b>（A 错）；其交易对手主要是商业银行等金融机构而非他国央行（B 错）；通常<b>不直接进场交易，而是通过商业银行等中介机构进行</b>（C 正确）；干预具有被动性与阶段性，并非频繁交易（D 错）。</p>"}, {"no": 2004, "label": "R4", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ADE", "src": "真题错题", "stem": "金融衍生品是依据基础产品或基础变量派生出来的金融产品。其基本特征有()", "opts": [{"k": "A", "t": "跨期性"}, {"k": "B", "t": "联动性"}, {"k": "C", "t": "稳定性"}, {"k": "D", "t": "杠杆性"}, {"k": "E", "t": "高风险性"}], "ans": "ABDE", "kp": "第6章·金融衍生品的特征", "model": "多选 · 特征列举型", "chain": ["衍生品四大特征：<b>跨期性</b>（A 选）、<b>联动性</b>（B 选）、<b>杠杆性</b>（D 选）、<b>高风险性</b>（E 选）", "C 稳定性 → <b>不选</b>（衍生品价格随标的资产波动，恰恰<b>不</b>稳定）"], "fast": "⚡四特征口诀「<b>跨期、联动、杠杆、高风险</b>」→ ABDE。衍生品的本质是\"<b>波动放大器</b>\"，凡出现\"稳定性、安全性、低风险\"一律排除。", "traps": ["稳定性（C）与联动性（B）看似可共存，实则相反：联动就是跟着标的变，谈不上稳定", "零和性有时也作为特征出现，但本题选项给出的是\"高风险性\""], "mother": "母题抽象：<b>衍生品特征 = \"依附 + 放大\"</b> —— 依附标的（联动性）、跨期交割（跨期性）、以小博大（杠杆性）、风险放大（高风险性）。<b>凡\"稳\"字头的选项必错。</b>", "analysis": "<p>金融衍生品的基本特征包括：<b>跨期性</b>（A，现在签约、未来交割）、<b>联动性</b>（B，价格随标的资产价格变动）、<b>杠杆性</b>（D，只需少量保证金即可控制大额合约）、<b>高风险性</b>（E，杠杆放大了价格风险与信用风险）。故选 <b>ABDE</b>。</p><p>C「稳定性」不是金融衍生品的特征 —— 衍生品价格受标的资产影响而波动，且因杠杆效应波动被放大。</p>"}, {"no": 2005, "label": "R5", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "BE", "src": "真题错题", "stem": "中国银行间市场交易商协会是包括()等在内的银行间自律组织。", "opts": [{"k": "A", "t": "票据市场"}, {"k": "B", "t": "期货市场"}, {"k": "C", "t": "同业拆借市场"}, {"k": "D", "t": "市易所市场"}, {"k": "E", "t": "外汇市场"}], "ans": "ACE", "kp": "第6章·银行间市场自律组织", "model": "多选 · 市场归属型", "chain": ["中国银行间市场交易商协会是<b>银行间市场</b>的自律组织，覆盖<b>同业拆借市场</b>（C）、<b>票据市场</b>（A）、<b>外汇市场</b>（E）以及债券市场等", "B 期货市场 → 由<b>期货业协会</b>自律管理（中国期货业协会）→ <b>不选</b>", "D 交易所市场 → 由<b>证券交易所</b>自律管理 → <b>不选</b>"], "fast": "⚡判据一句话：<b>「银行间 = 机构之间、场外、报价驱动」</b>。同业拆借✓、票据✓、外汇（银行间）✓；期货✗、交易所✗（这两个是<b>交易所场内市场</b>）→ ACE。", "traps": ["外汇市场也有银行间与零售之分，但我国外汇市场以<b>银行间</b>为主体，归交易商协会自律", "中国银行间市场交易商协会 ≠ 中国证券业协会（后者管证券市场）"], "mother": "母题抽象：<b>自律组织归属表</b> —— 交易商协会(银行间：拆借/票据/债券/外汇)｜证券业协会(证券)｜期货业协会(期货)｜银行业协会(银行业)｜保险行业协会(保险)。凡问\"××市场归谁自律\"，先判断是场内还是银行间。", "analysis": "<p>中国银行间市场交易商协会是银行间市场的自律组织，其涵盖<b>同业拆借市场</b>（C）、<b>票据市场</b>（A）、<b>外汇市场</b>（E）以及债券市场（含短期融资券、中期票据等非金融企业债务融资工具）等子市场。故选 <b>ACE</b>。</p><p>B 期货市场由中国期货业协会自律管理；D 交易所市场由证券交易所进行自律管理，均不属银行间市场范畴。</p>"}, {"no": 2006, "label": "R6", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "关于金融衍生品市场中看涨期权的说法，正确的是（）", "opts": [{"k": "A", "t": "看涨期权的买方可以实现的最大潜在收益是期权费"}, {"k": "B", "t": "看涨期权的买方行使合约的条件是市场价格高于合约执行价格"}, {"k": "C", "t": "看涨期权的买方预约未来市场价格会下跌"}, {"k": "D", "t": "看涨期权的买方可以规避的最大潜在损失为无穷大"}], "ans": "B", "kp": "第7章·期权（看涨期权损益）", "model": "", "chain": ["逐项验伪：A 买方最大收益是期权费 ❌（那是卖方的最大收益；买方收益理论上无限）；B 市场价格 > 执行价格时行权 ✅；C 买方预期市场<b>上涨</b> ❌；D「最大潜在损失为无穷大」❌（买方最大损失 = 期权费，有限；无穷大是卖方风险）"], "fast": "⚡看涨期权口诀：「买方损失封顶（期权费）、收益无限；卖方收益封顶、损失无限」→ B", "traps": ["D 表述有文字陷阱：\"可以规避的最大潜在损失为无穷大\"——恰恰说反，规避的意思是损失有限", "A 偷换买卖双方角色"], "mother": "母题抽象：<b>期权四方损益图</b>——看涨买方：付费换无限上行；看涨卖方：收租担无限下行。所有期权题先分买卖双方再判损益。", "analysis": "<p>看涨期权买方支付期权费获得按执行价格买入的权利：<b>当市场价格高于合约执行价格时行使合约</b>（B 正确）。买方最大损失为期权费（有限）、最大收益理论上无限（A、D 错）；买方预期价格上涨而非下跌（C 错）。故选 B。</p>"}, {"no": 2007, "label": "R7", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "根据我国货币供应量口径划分标准，下列货币范畴中，能够计入M1层次的是()", "opts": [{"k": "A", "t": "储蓄存款"}, {"k": "B", "t": "单位定期存款"}, {"k": "C", "t": "商业票据"}, {"k": "D", "t": "单位活期存款"}], "ans": "D", "kp": "第9章·我国货币层次划分", "model": "", "chain": ["我国口径：M0 = 流通中现金；M1 = M0 + <b>单位活期存款</b>；M2 = M1 + 储蓄存款 + 单位定期存款 + 其他存款 → 商业票据、金融债券等在 M3"], "fast": "⚡M1 钉子「现金 + 单位活期」——储蓄/定期都在 M2，票据在 M3", "traps": ["储蓄存款、单位定期存款：M2（M1 的干扰主力）", "商业票据：M3，连 M2 都不是"], "mother": "母题抽象：<b>货币层次同心圆</b>——M0 现金 → M1 加活期（交易货币）→ M2 加准货币（储蓄、定期）→ M3 加票据与金融债（更宽口径）。", "analysis": "<p>我国货币供应量口径中，M1 = M0 + <b>单位活期存款</b>，反映经济中的交易性货币需求；储蓄存款与单位定期存款计入 M2，商业票据计入 M3。故选 D。</p>"}, {"no": 2008, "label": "R8", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "狭义上，关于兼并与收购区别的说法，错误的是()。", "opts": [{"k": "A", "t": "兼并是通过资本市场对企业进行有关资本经营的代称，收购是通过资本市场对企业进行资产重组的代称"}, {"k": "B", "t": "兼并后，兼并企业成为被兼并企业新的所有者和债权债务的承担者，而在收购中，收购企业是被收购企业的新股东"}, {"k": "C", "t": "在兼并中，被兼并企业作为法人实体不复存在，而在收购中，被收购企业可仍以法人实体存在"}, {"k": "D", "t": "兼并多发生在被兼并企业财务状况不佳、生产经营停滞之时，而收购一般发生在企业正常经营状态。"}], "ans": "A", "kp": "第6章·兼并与收购的区别（狭义）", "model": "", "chain": ["逐项验伪：A 把「资本经营代称 = 兼并、资产重组代称 = 收购」的对应关系强加区分 ❌（广义上并购是资本经营与资产重组的统称，并不作此对应划分）；B 兼并承接债权债务、收购只当新股东 ✅；C 兼并后法人实体消失、收购中可保留 ✅；D 兼并多发生在财务困境时、收购多在正常经营时 ✅"], "fast": "⚡B/C/D 三条是教材\"区别三标准\"原文，剩下 A 即错项", "traps": ["A 的错法是\"张冠李戴\"：给两个概念各配一个不存在的专属代称", "B/D 有排版错字（被兼开→被兼并；停带→停滞；状态→状况），已修复"], "mother": "母题抽象：<b>并购\"三区别\"裸背</b>——①法人实体灭否 ②债权债务承否 ③发生时点情境；广义并购 = 资本经营 + 资产重组的统称（不作专属对应）。", "analysis": "<p>狭义上兼并与收购的区别：①兼并后被兼并企业法人实体不复存在，收购中被收购企业可仍以法人实体存在；②兼并后兼并企业成为新的所有者和债权债务承担者，收购企业只是被收购企业的新股东（以出资为限担责）；③兼并多发生在被兼并企业财务状况不佳之时，收购一般发生在正常经营状态。A 项对\"资本经营/资产重组代称\"的专属对应无此区分，说法错误。故选 A。</p>"}, {"no": 2009, "label": "R9", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "下列机构中，负责监督管理票据市场的是()", "opts": [{"k": "A", "t": "中国人民银行"}, {"k": "B", "t": "中国银行业协会"}, {"k": "C", "t": "中国银行保险监督管理委员会"}, {"k": "D", "t": "中国证券监督管理委员会"}], "ans": "A", "kp": "第6章·金融市场监管体系", "model": "", "chain": ["票据市场属于货币市场 → 我国的金融市场（含票据市场）监管职责在<b>中国人民银行</b>（含上海票据交易所体系）；银保监/证监会分别管机构与证券市场；协会是自律组织"], "fast": "⚡货币市场（拆借、票据、回购）→ 央行；机构审慎监管 → 银保监；证券市场 → 证监会", "traps": ["C 是\"机构监管\"惯性思维的干扰——题干问的是\"市场\"监管"], "mother": "母题抽象：<b>市场 vs 机构监管归属</b>——问\"市场\"归央行（货币市场）/证监会（资本市场）；问\"机构\"归对应行业监管局。", "analysis": "<p>票据市场是货币市场的组成部分，由<b>中国人民银行</b>负责监督管理（上海票据交易所作为基础设施亦在央行体系内）。故选 A。</p>"}, {"no": 2010, "label": "R10", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "票面价格100元，年贴现率5%期限180天的商业票据发行价格()", "opts": [{"k": "A", "t": "99"}, {"k": "B", "t": "100"}, {"k": "C", "t": "97.5"}, {"k": "D", "t": "102.5"}], "ans": "C", "kp": "第6章·商业票据发行价格计算", "model": "", "chain": ["贴现发行价 = 票面金额 × (1 − 贴现率 × 期限/360) = 100 × (1 − 5% × 180/360) = 100 × 0.975 = 97.5 元"], "fast": "⚡贴现公式「面额 ×（1 − 贴现率 × 天数/360）」，代入直接出 97.5", "traps": ["忘记按天数折算（直接 100×5%=5 → 95 或 105 都是方向性错法，本题选项没给，验证了折算必要性）", "贴现发行价必然低于面额（贴现利息预先扣除）"], "mother": "母题抽象：<b>贴现类计算三件套</b>——票据贴现价、国库券收益、贴现率与实际收益率换算（实际收益率 = 贴现利息/(发行价×期限) > 贴现率）。", "analysis": "<p>商业票据按贴现方式发行：发行价格 = 100 × (1 − 5% × 180/360) = 100 × (1 − 2.5%) = <b>97.5 元</b>。故选 C。</p>"}, {"no": 2011, "label": "R11", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "根据交易目的的不同，金融衍生品市场上的交易主体分为()。", "opts": [{"k": "A", "t": "投资者、交易者、经纪人、结算参与者"}, {"k": "B", "t": "套期保值者、投机者、套利者和经纪人"}, {"k": "C", "t": "套期保值者、投机者、套利者和重要交易对手"}, {"k": "D", "t": "买方、卖方、做市商、经纪人"}], "ans": "B", "kp": "第6章·金融衍生品市场交易主体", "model": "", "chain": ["按交易目的：①<b>套期保值者</b>（转移风险）②<b>投机者</b>（承担风险博收益）③<b>套利者</b>（利用价差无风险获利）④<b>经纪人</b>（撮合收佣金）"], "fast": "⚡四分法口诀「保投利纪」——其他组合（做市商/结算参与者/买方卖方）都不是\"按交易目的\"的分类", "traps": ["D「买方/卖方」是头寸方向分类，维度错位", "A「结算参与者」是结算体系角色"], "mother": "母题抽象：<b>衍生品市场四主体</b>——功能互补：保值者转出风险 → 投机者承接风险 → 套利者抹平价差 → 经纪人提供通道。", "analysis": "<p>按交易目的不同，金融衍生品市场交易主体分为<b>套期保值者、投机者、套利者和经纪人</b>四类。故选 B。</p>"}, {"no": 2012, "label": "R12", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ACE", "src": "真题错题", "stem": "关于金融远期与金融期货的说法，正确的有()。", "opts": [{"k": "A", "t": "金融期货属于场内交易，金融远期一般为场外交易"}, {"k": "B", "t": "金融远期协议相较于金融期货合约面临更小的信用风险"}, {"k": "C", "t": "金融远期为标准化合约"}, {"k": "D", "t": "金融期货交易一般设有盯市制度和保证金制度"}, {"k": "E", "t": "金融期货一般采用现金交割"}], "ans": "ADE", "kp": "第6章·金融远期与金融期货比较", "model": "", "chain": ["逐项判定：A 期货场内、远期场外 ✅；B 远期信用风险更小 ❌——远期无保证金与中央对手方，<b>信用风险更大</b>；C 远期标准化 ❌（远期是<b>非标准化</b>定制合约，期货才标准化）；D 期货有盯市 + 保证金制度 ✅；E 期货一般现金交割 ✅（金融期货多以现金结算）"], "fast": "⚡远期 vs 期货五维表：场所（场外/场内）｜标准化（否/是）｜违约风险（大/小）｜盯市保证金（无/有）｜交割（实物为主/现金为主）", "traps": ["B 反向表述是最强干扰——记住\"场外 = 没人管 = 信用风险大\"", "C 别被\"合约都标准\"惯性带偏"], "mother": "母题抽象：<b>远期-期货五维对照表</b>——背表做题；本题 B、C 全靠\"标准化\"与\"信用风险\"两格反推。", "analysis": "<p>金融期货为场内标准化交易，实行盯市制度与保证金制度，一般采用现金交割；金融远期一般为场外非标准化合约，<b>缺乏保证金与中央对手方安排，信用风险更大而非更小</b>。故选 ADE。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "基", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "下列金融工具中，<b>不属于</b>货币市场工具的是（　）。", "opts": [{"k": "A", "t": "同业拆借"}, {"k": "B", "t": "商业票据"}, {"k": "C", "t": "短期政府债券（国库券）"}, {"k": "D", "t": "公司债券"}], "ans": "D", "kp": "第6章·货币市场工具六件套", "model": "期限切分：1年以内 vs 1年以上", "chain": ["切市场的第一刀是<b>期限</b>：1 年以内＝货币市场，1 年以上＝资本市场", "货币市场六件套口诀「<b>拆回票汇券单</b>」＝同业拆借、回购、商业票据、银行承兑汇票、短期政府债券（国库券）、大额可转让定期存单", "<b>公司债券</b>期限通常在 1 年以上，是典型的<b>资本市场</b>工具", "本题问「不属于」→ 只找那个跨过 1 年线的"], "fast": "⚡<b>1 年画线</b>：拆借/回购/票据/存单/国库券 = 短期（货币市场）；股票/债券/基金 = 长期（资本市场）。见「不属于货币市场」直接找<b>债券或股票</b>。", "traps": ["把「短期政府债券」当资本市场工具（带「债券」二字就以为长期）→ 误选 C", "选非题没圈「不属于」，一眼看到熟悉的票据就选"], "mother": "货币/资本市场题一律先问一句：<b>它多久还钱？</b>≤1 年→货币市场，>1 年→资本市场。", "analysis": "<p>货币市场是<b>期限在 1 年以内</b>的短期资金融通市场，主要工具包括同业拆借、回购协议、商业票据、银行承兑汇票、短期政府债券（国库券）和大额可转让定期存单，口诀「拆回票汇券单」。</p><p><b>公司债券</b>的偿还期限一般在 1 年以上，属于资本市场工具，故「不属于货币市场工具」的只有 <b>D</b>。</p><p>C「短期政府债券」虽名为债券，但期限在 1 年以内，是货币市场的重要工具，不能按字面判断。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "我国金融机构之间同业拆借的<b>最长期限</b>为（　）。", "opts": [{"k": "A", "t": "7 天"}, {"k": "B", "t": "3 个月"}, {"k": "C", "t": "6 个月"}, {"k": "D", "t": "1 年"}], "ans": "D", "kp": "第6章·同业拆借期限（数字钉子）", "model": "数字钉子", "chain": ["同业拆借＝金融机构之间<b>短期</b>调剂头寸，期限由双方约定", "监管上限：<b>最长期限不得超过 1 年</b>", "7 天、3 个月、6 个月都是市场上常见的实际期限，但都不是<b>上限</b>", "同类数字钉：买断式回购 <b>1 天至 365 天</b>（同样封顶 1 年）"], "fast": "⚡货币市场两个 1 年封顶：<b>同业拆借最长 1 年、买断式回购 1 天至 365 天</b>。问「最长/上限」选 1 年，问具体区间选 365 天。", "traps": ["把常见的实际期限（7 天、3 个月）当法定上限 → 选 A/B", "与买断式回购的 182 天、93 天混在一起记错表"], "mother": "数字题先问：<b>问的是「实际常见」还是「法定上限」？</b>只要是上限，货币市场一律往 1 年（365 天）上靠。", "analysis": "<p>同业拆借是金融机构之间相互融通短期资金的行为，我国规定同业拆借的<b>期限最长不得超过 1 年</b>，具体期限由交易双方协商确定，实践中以 7 天、1 个月、3 个月等短期品种为主。</p><p>A、B、C 都是市场上常见的拆借期限，但不是法定最长期限，属于典型的「常见值冒充上限值」干扰。故选 <b>D</b>。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "多选", "lv": "真", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "下列市场中，属于我国<b>货币市场</b>组成部分的有（　）。", "opts": [{"k": "A", "t": "同业拆借市场"}, {"k": "B", "t": "债券回购市场"}, {"k": "C", "t": "票据市场"}, {"k": "D", "t": "股票市场"}, {"k": "E", "t": "证券投资基金市场"}], "ans": "ABC", "kp": "第6章·货币市场构成", "model": "市场归类", "chain": ["货币市场＝1 年以内的短期资金市场", "<b>同业拆借、债券回购、票据、短期政府债券、大额存单</b>市场都归货币市场", "<b>股票市场、证券投资基金市场</b>是资本市场（长期）", "逐个过：A✓ B✓ C✓ D✗ E✗"], "fast": "⚡见「股票 / 证券投资基金」→ 一律<b>资本市场</b>，货币市场多选题里直接划掉；剩下拆借、回购、票据、存单、国库券<b>全勾</b>。", "traps": ["把「证券投资基金市场」当货币市场（被「货币市场基金」带偏）→ 多勾归零", "票据市场不确定而漏选 → 少选每项只 0.5，宁可漏不要错"], "mother": "多选归类题：五个字母<b>逐个写 √×</b>，写不出归类理由的不勾。", "analysis": "<p>我国货币市场由同业拆借市场、债券回购市场、票据市场、短期政府债券市场和大额可转让定期存单市场等构成，交易期限均在 1 年以内。</p><p><b>股票市场</b>与<b>证券投资基金市场</b>属于资本市场，交易的是长期资本工具，故 A、B、C 正确，答案为 <b>ABC</b>。</p><p>提示：货币市场<b>基金</b>是投资基金的一种产品，但基金市场本身不是货币市场的组成部分。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "下列金融工具中，属于<b>资本市场工具</b>的是（　）。", "opts": [{"k": "A", "t": "商业票据"}, {"k": "B", "t": "大额可转让定期存单"}, {"k": "C", "t": "公司债券"}, {"k": "D", "t": "同业拆借"}], "ans": "C", "kp": "第6章·资本市场工具", "model": "期限切分反向", "chain": ["资本市场＝期限 1 年以上的长期资金市场，工具是<b>股票、债券、证券投资基金</b>等", "A 商业票据、B 大额存单、D 同业拆借，全部是 1 年以内的货币市场工具", "只有 <b>C 公司债券</b>是 1 年以上的长期工具"], "fast": "⚡资本市场就三样：<b>股、债、基</b>。其余（票据、存单、拆借、回购）统统短期。", "traps": ["大额可转让定期存单带「定期」二字，误以为长期 → 选 B", "商业票据带「票据」以为可长期融资 → 选 A"], "mother": "先念「股债基」，再看选项里有没有这三样；没有就找被<b>排除</b>的那个。", "analysis": "<p>资本市场是期限在 1 年以上的长期资金市场，主要工具包括股票、债券和证券投资基金等。</p><p>商业票据、大额可转让定期存单、同业拆借均为 1 年以内的货币市场工具；公司债券偿还期限在 1 年以上，属于资本市场工具。故选 <b>C</b>。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "某商业票据面额 1000 元，年贴现率 6%，期限 90 天，按贴现方式发行，其<b>发行价格</b>为（　）元。", "opts": [{"k": "A", "t": "985"}, {"k": "B", "t": "990"}, {"k": "C", "t": "1000"}, {"k": "D", "t": "1015"}], "ans": "A", "kp": "第6章·商业票据贴现发行价计算", "model": "计算题", "chain": ["公式：<b>发行价 = 面额 ×（1 − 贴现率 × 天数 ÷ 360）</b>", "代入：1000 ×（1 − 6% × 90/360）= 1000 ×（1 − 0.015）= <b>985 元</b>", "第一步方向自检：贴现发行<b>一定低于面值</b>，高于 1000 的选项先划掉", "D 1015 是加成算错方向；C 1000 是没贴现"], "fast": "⚡<b>贴现价一定小于面值</b>——见高于面值的选项直接划掉。公式：面 ×(1 − r×天数/360)。", "traps": ["把减号算成加号 → 选 D 1015（方向反转 E1）", "用 365 天做分母（票据贴现按 360 天）→ 算成 985.2 之类，找不到答案"], "mother": "计算题两步走：①<b>先判方向</b>（贴现必小于面值）②再套公式，方向不对立刻回头。", "analysis": "<p>商业票据以<b>贴现方式</b>发行，发行价格＝面额 ×(1 − 年贴现率 × 期限天数 ÷ 360)。</p><p>代入：1000 ×(1 − 6% × 90 ÷ 360) = 1000 ×(1 − 0.015) = <b>985 元</b>，故选 <b>A</b>。</p><p>判断技巧：贴现发行是<b>预先扣除利息</b>，发行价格必然低于票面金额，因此 C、D 两个不低于面值的选项可立即排除。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "与银行贷款相比，商业票据融资方式的特点有（　）。", "opts": [{"k": "A", "t": "面额较大"}, {"k": "B", "t": "发行期限较短"}, {"k": "C", "t": "融资成本较低"}, {"k": "D", "t": "融资方式灵活"}, {"k": "E", "t": "必须提供不动产抵押"}], "ans": "ABCD", "kp": "第6章·商业票据特点", "model": "特征四项", "chain": ["商业票据是<b>信用性</b>短期融资工具，靠发行人信用，不要求抵押担保", "四个特点：<b>面额大、期限短、成本低、方式灵活</b>", "E「必须提供不动产抵押」❌——恰恰相反，无抵押是它的优势", "真题最爱反过来问「特点不包括」→ 答案是「发行期限较长」"], "fast": "⚡商业票据四特点：<b>大、短、低、活</b>；凡出现「<b>抵押、担保、期限长</b>」一律不勾（它是纯信用工具）。", "traps": ["把「发行期限较长」当成特点勾上（真题单选「不包括」考过）→ 错选归零", "认为无担保融资成本更高而漏选 C → 少选丢 0.5"], "mother": "商业票据＝<b>无抵押的短期信用借款</b>；凡「需要抵押/期限长」的描述都反着来。", "analysis": "<p>商业票据是由大型信誉良好的企业发行的短期无担保票据，其融资特点包括：<b>面额较大</b>、<b>发行期限较短</b>（一般在 1 年以内）、<b>融资成本较低</b>（低于银行贷款利率）、<b>融资方式灵活</b>（可按需滚动发行）。</p><p>E 错误：商业票据属于<b>信用性融资</b>，不需要提供抵押担保，正是其成本低、效率高的原因。故选 <b>ABCD</b>。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于大额可转让定期存单（CDs）的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "面额固定且起点金额较大"}, {"k": "B", "t": "存单期限固定"}, {"k": "C", "t": "可以在二级市场上转让流通"}, {"k": "D", "t": "持有人可以提前向发行银行支取本金"}], "ans": "D", "kp": "第6章·大额可转让定期存单", "model": "选非题·工具特征", "chain": ["大额可转让定期存单四大特征：<b>面额固定且大、期限固定、可转让、不可提前支取</b>", "「定期」＋「可转让」是一对组合：<b>不能提前兑付，要变现只能去二级市场转让</b>", "逐项判：A✓ B✓ C✓ D✗ → 选非题只勾 D"], "fast": "⚡大额存单＝<b>不可提前支取，只能转让</b>。见「提前支取/提前兑付」直接判 ❌。", "traps": ["选非题方向反了，把正确特征当答案 → 选 A 或 C（E3）", "与普通定期存款混淆（普通定期可提前支取、按活期计息）"], "mother": "选非题三步：①圈「错误」②四项逐个标 ✅/❌ ③<b>只选 ❌</b> 的那一个。", "analysis": "<p>大额可转让定期存单是银行发行的、<b>面额固定且起点较高、期限固定、可在二级市场转让</b>的存款凭证。</p><p>与普通定期存款不同，大额可转让定期存单<b>不得提前支取</b>，持有人如需变现只能在二级市场转让，这正是「可转让」的意义所在。故 D 说法错误，选 <b>D</b>。</p><p>A、B、C 均为大额存单的标准特征。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "我国上市公司股票按<b>投资主体性质</b>可以分为（　）。", "opts": [{"k": "A", "t": "国有股"}, {"k": "B", "t": "法人股"}, {"k": "C", "t": "普通股"}, {"k": "D", "t": "社会公众股"}, {"k": "E", "t": "外资股"}], "ans": "ABDE", "kp": "第6章·股票按投资主体分类", "model": "分类维度配对", "chain": ["按<b>投资主体性质</b>分：国有股、法人股、社会公众股、外资股（四选四）", "按<b>股东权利</b>分：普通股、优先股 → 「普通股」属于另一维度", "逐项：A✓ B✓ C✗ D✓ E✓", "上次你就漏了 D 社会公众股，只拿 1.5 分"], "fast": "⚡按主体＝<b>国家、法人、公众、外资</b>；按权利＝<b>普通、优先</b>。见「普通股」出现在「按投资主体」题里 → 直接划掉。", "traps": ["漏选社会公众股（本题失分点，E5）", "多勾普通股（E4，全题归零）——两个维度串了"], "mother": "分类题先写<b>维度</b>再写<b>成员</b>：维度对不上就 ×，别让「熟悉的名字」骗你。", "analysis": "<p>按投资主体性质，我国股票分为<b>国有股、法人股、社会公众股和外资股</b>四类。</p><p><b>普通股</b>是按<b>股东权利</b>（与优先股相对）划分的另一维度结果，不属于「按投资主体」的分类，故 C 不选。答案为 <b>ABDE</b>。</p><p>本题典型失分是漏选「社会公众股」，建议按「国家—法人—公众—外资」四词一组整体记忆。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "某基金在本国募集资金，并<b>全部投资于本国证券市场</b>，按资金来源与用途划分，该基金属于（　）。", "opts": [{"k": "A", "t": "在岸基金"}, {"k": "B", "t": "离岸基金"}, {"k": "C", "t": "国际基金"}, {"k": "D", "t": "被动型基金"}], "ans": "A", "kp": "第6章·基金按资金来源与用途分类", "model": "三分类配对", "chain": ["<b>在岸基金</b>：本国募集 + 投资<b>本国</b>市场（家门口）", "<b>离岸基金</b>：在他国发售，投资本国或第三国市场", "<b>国际基金</b>：本国资本投向<b>国外</b>市场", "主动型/被动型是按<b>投资理念</b>分的另一维度，与资金来源无关"], "fast": "⚡<b>在岸＝家门口</b>（本国募、本国投）；本国钱投国外＝国际基金；他国募＝离岸。见「主动/被动」直接排除（维度串了）。", "traps": ["选「主动型/被动型」（按投资理念分，维度串了，E2）", "把「国际基金」当在岸（本国钱出去才算国际）"], "mother": "基金分类题先问：<b>钱从哪来、投到哪去</b>。两头都在国内＝在岸；出去＝国际；进来＝离岸。", "analysis": "<p>按资金来源与用途，投资基金可分为在岸基金、离岸基金和国际基金。</p><p><b>在岸基金</b>指在本国募集资金并投资于本国证券市场的基金；<b>离岸基金</b>指在境外发售、投资于本国或第三国市场；<b>国际基金</b>指本国资本投资于国外证券市场。本题「本国募、本国投」＝在岸基金，选 <b>A</b>。</p><p>D 被动型是按投资理念（主动/被动）划分的另一维度，与资金来源无关。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "融资租赁的<b>扩展功能</b>是（　）。", "opts": [{"k": "A", "t": "融资与投资"}, {"k": "B", "t": "产品促销与资产管理"}, {"k": "C", "t": "融资与产品促销"}, {"k": "D", "t": "投资与资产管理"}], "ans": "B", "kp": "第6章·融资租赁功能", "model": "功能组配对", "chain": ["融资租赁功能两组，口诀「<b>基础融投、扩展销管</b>」", "<b>基础功能</b>：融资 + 投资", "<b>扩展功能</b>：产品促销 + 资产管理", "干扰项都是两组各取一半的混搭（A 全基础、C、D 半混搭）"], "fast": "⚡<b>基础融投、扩展销管</b>。问扩展 → 只找「<b>促销</b>」和「<b>资产管理</b>」同时出现的那一项。", "traps": ["把基础功能当扩展功能（选 A，这是你上次的实际错法 E2）", "半混搭项 C、D 看着也对，但两组功能必须<b>整组对应</b>"], "mother": "凡是「功能/分类分组」题，记住<b>整组搬</b>：基础组与扩展组不能拆着配。", "analysis": "<p>融资租赁的功能分为两组：<b>基础功能</b>是融资与投资；<b>扩展功能</b>是产品促销与资产管理，口诀「基础融投、扩展销管」。</p><p>本题问扩展功能，只有 B「产品促销与资产管理」整组对应，故选 <b>B</b>。A 是基础功能；C、D 是两组混搭的干扰项。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "多选", "lv": "真", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "金融衍生品市场的功能包括（　）。", "opts": [{"k": "A", "t": "价格发现"}, {"k": "B", "t": "套期保值（风险管理）"}, {"k": "C", "t": "投机"}, {"k": "D", "t": "消除系统性风险"}, {"k": "E", "t": "为政府筹集财政资金"}], "ans": "ABC", "kp": "第6章·衍生品市场功能", "model": "功能三项", "chain": ["衍生品市场三大功能：<b>价格发现、套期保值（风险管理）、投机</b>", "衍生品只能<b>转移/分散</b>风险，不能<b>消除</b>系统性风险 → D❌", "筹资是<b>证券发行市场</b>的功能，不是衍生品市场的 → E❌", "凡「消除风险」「完全规避」等绝对化表述，先找反例"], "fast": "⚡衍生品三功能：<b>发现价、保值、投机</b>。见「<b>消除</b>风险」「筹资」直接不勾——风险只能转移，不能消灭。", "traps": ["勾 D「消除系统性风险」（绝对化收网，E4 归零）", "把投机当贬义而漏选 C（投机是承担风险、提供流动性的正当功能）"], "mother": "功能题一律防绝对化：衍生品是<b>风险转移工具</b>，「消除/消灭/完全规避」必错。", "analysis": "<p>金融衍生品市场具有<b>价格发现</b>、<b>套期保值（风险管理）</b>和<b>投机</b>三大功能：通过集中交易形成远期价格信号；为套期保值者提供转移风险的工具；为投机者提供承担风险、获取收益并增强市场流动性的渠道。</p><p>D 错误：衍生品可以<b>转移和分散</b>风险，但无法消除系统性风险；E 错误：筹集资金是发行市场（一级市场）的功能。故选 <b>ABC</b>。</p>"}, {"no": 3012, "label": "P12", "sec": "prop", "type": "单选", "lv": "真", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "关于我国同业拆借市场的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "交易双方必须是经批准的金融机构"}, {"k": "B", "t": "拆借期限最长不得超过 1 年"}, {"k": "C", "t": "主要用于弥补金融机构短期头寸不足"}, {"k": "D", "t": "任何企业均可直接参与同业拆借"}], "ans": "D", "kp": "第6章·同业拆借市场规则", "model": "选非题·市场准入", "chain": ["同业拆借是<b>金融机构之间</b>的资金融通，非金融机构不能参加", "准入：须经批准、具备资格的金融机构（银行、券商、财务公司等）", "用途：调剂<b>短期准备金头寸</b>与临时性资金余缺，最长期限 1 年", "逐项：A✓ B✓ C✓ D✗ → 选非只勾 D"], "fast": "⚡同业拆借＝<b>机构对机构</b>，企业一律不得直接进场。见「任何企业/个人均可」直接判 ❌。", "traps": ["选非题方向搞反，把正确表述当答案（E3）", "把企业委托金融机构办理的业务当成企业直接参与"], "mother": "准入类选非题：看见「<b>任何</b>主体均可参与」「不受限制」这类绝对化开放表述，通常就是那个 ❌。", "analysis": "<p>同业拆借是<b>金融机构之间</b>进行的短期资金融通，参加拆借的主体必须是经批准、具有拆借资格的金融机构，非金融企业和个人不得直接参与。</p><p>拆借资金主要用于弥补短期准备金头寸不足和临时性资金周转，期限最长不得超过 1 年。A、B、C 正确，D 错误，故选 <b>D</b>。</p>"}, {"no": 3013, "label": "P13", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 60, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>质押式回购</b>的说法，正确的是（　）。", "opts": [{"k": "A", "t": "债券所有权转移给资金融出方，由其自由处置"}, {"k": "B", "t": "债券仅作为质押物被冻结，所有权不发生转移"}, {"k": "C", "t": "回购期限最长不得超过 7 天"}, {"k": "D", "t": "只能在证券交易所市场进行"}], "ans": "B", "kp": "第6章·质押式回购 vs 买断式回购", "model": "相邻概念错位", "chain": ["两种回购一字之差，区别在<b>所有权是否转移</b>", "<b>质押式回购</b>：债券作为质押物<b>冻结</b>，所有权<b>不转移</b>，到期返还", "<b>买断式回购</b>：债券所有权<b>转移</b>给融出方，融出方可处置，到期买回（期限 1 天至 365 天）", "A 描述的是买断式 → 张冠李戴；C、D 均为无依据限制"], "fast": "⚡<b>质押 = 押着不卖（所有权不动）；买断 = 真卖（所有权转移）</b>。见「所有权转移」→ 一定说的是买断式。", "traps": ["把买断式的「所有权转移」安到质押式头上（相邻概念错位 E2）→ 选 A", "自行脑补期限/场所限制（C、D）"], "mother": "回购题只抓一条线：<b>所有权动没动</b>。没动＝质押式，动了＝买断式。", "analysis": "<p>质押式回购中，正回购方将债券<b>出质</b>给逆回购方融入资金，债券在回购期间被<b>冻结</b>，<b>所有权并不发生转移</b>，到期由正回购方返还本息、赎回债券。故 B 正确。</p><p>A 描述的是<b>买断式回购</b>（债券所有权转移、融出方可自由处置），属于典型相邻概念错位；C、D 的期限与场所限制均无依据，我国回购市场主要在银行间市场，买断式回购期限为 1 天至 365 天。故选 <b>B</b>。</p>"}, {"no": 3014, "label": "P14", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于我国金融市场<b>监管分工</b>的说法，正确的有（　）。", "opts": [{"k": "A", "t": "票据市场由中国人民银行监督管理"}, {"k": "B", "t": "证券交易所市场由中国证监会监管"}, {"k": "C", "t": "银行间市场的自律组织是中国银行间市场交易商协会"}, {"k": "D", "t": "期货市场由中国人民银行监督管理"}, {"k": "E", "t": "银行间债券市场的自律管理由中国证券业协会负责"}], "ans": "ABC", "kp": "第6章·金融市场监管分工", "model": "主体配对", "chain": ["<b>中国人民银行</b>：货币市场——同业拆借、<b>票据</b>、回购、外汇", "<b>中国证监会</b>：证券、<b>期货</b>市场 → D 把期货给央行 ❌", "<b>交易商协会</b>：银行间市场自律（拆借、债券、外汇）→ E 换成证券业协会 ❌", "三个坑全是<b>主体错位</b>：央行/证监会/两个协会别串"], "fast": "⚡配对口诀：<b>票据→央行</b>（货币市场一家亲）；<b>证券期货→证监会</b>；<b>银行间→交易商协会</b>。见「证券业协会管银行间」「央行管期货」直接划掉。", "traps": ["把期货市场归央行（应为证监会）→ D 多勾归零", "两个协会串台：证券业协会管证券、交易商协会管银行间"], "mother": "监管配对题先在草稿写<b>三行对应表</b>（央行—货币/票据；证监会—证券期货；交易商协会—银行间），再逐项对照。", "analysis": "<p>我国金融市场监管分工：<b>中国人民银行</b>负责货币市场（同业拆借、票据、回购、外汇等）的监督管理；<b>中国证监会</b>统一监管证券与期货市场；<b>中国银行间市场交易商协会</b>是银行间市场（拆借、债券、外汇等）的自律组织。</p><p>D 错误：期货市场由证监会监管，不归人民银行；E 错误：银行间债券市场的自律管理由交易商协会负责，中国证券业协会是证券行业的自律组织。故选 <b>ABC</b>。</p>"}, {"no": 3015, "label": "P15", "sec": "prop", "type": "多选", "lv": "真", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "金融市场的功能包括（　）。", "opts": [{"k": "A", "t": "价格发现"}, {"k": "B", "t": "提供流动性"}, {"k": "C", "t": "风险管理"}, {"k": "D", "t": "消除系统性风险"}, {"k": "E", "t": "决定货币政策取向"}], "ans": "ABC", "kp": "第6章·金融市场功能五件套", "model": "功能判断·防绝对化", "chain": ["功能五件套口诀「<b>价、配、信、流、险</b>」＝价格发现、资源配置、降低信息（交易）成本、提供流动性、风险管理", "A 价格发现✓ B 提供流动性✓ C 风险管理✓", "D「消除系统性风险」❌——市场只能<b>转移、分散</b>风险", "E 货币政策取向由<b>中央银行</b>决定，金融市场只是传导渠道 ❌"], "fast": "⚡功能口诀「<b>价配信流险</b>」；凡「<b>消除</b>风险」「<b>决定</b>政策」这类越权/绝对化表述一律不勾。", "traps": ["勾 D 或 E（半真半假长选项 + 绝对化收网，E4 归零）", "漏选「降低交易成本」类的正确项（漏选只丢 0.5/项，谨慎但不慌）"], "mother": "功能题红线：<b>「消除/不能/很难」先质疑</b>；市场只能转移风险、不能消灭风险，也不能替央行定政策。", "analysis": "<p>金融市场的功能可概括为五大方面：价格发现（形成资金价格）、资源配置（引导资金流向）、降低信息（交易）成本、提供流动性、风险管理（通过衍生品等工具转移风险）。</p><p>D 错误：金融市场只能<b>转移和分散</b>风险，无法消除系统性风险；E 错误：货币政策取向由中央银行决定，金融市场是政策传导的场所而非决策者。故选 <b>ABC</b>。</p>"}, {"no": 3016, "label": "P16", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "某汽车整车制造企业收购一家轮胎生产企业，按并购双方所处<b>行业关系</b>划分，该并购属于（　）。", "opts": [{"k": "A", "t": "横向并购"}, {"k": "B", "t": "纵向并购"}, {"k": "C", "t": "混合并购"}, {"k": "D", "t": "杠杆并购"}], "ans": "B", "kp": "第6章·并购类型", "model": "三种关系配对", "chain": ["<b>横向并购</b>：同行业、竞争关系（丰田收本田）", "<b>纵向并购</b>：同一产业链<b>上下游</b>（整车厂收轮胎/零部件厂）→ 本题", "<b>混合并购</b>：无关联行业（车企收食品厂）", "杠杆并购是按<b>融资方式</b>分的另一维度（借债收购）"], "fast": "⚡<b>同行=横，上下游=纵，不搭界=混合</b>。见「杠杆/现金/换股」→ 那是融资方式维度，直接排除。", "traps": ["见两个「制造」就判同行 → 选 A（没看是否同一环节）", "把按融资方式分的「杠杆并购」当行业关系分类（维度串了）"], "mother": "并购题先问维度：<b>按行业关系</b>（横/纵/混）还是<b>按融资方式</b>（杠杆/现金/换股）？维度不同别混答。", "analysis": "<p>按并购双方的行业关系，并购分为横向并购（同一行业、同一生产环节、竞争关系）、纵向并购（同一产业链的<b>上下游</b>企业之间）和混合并购（行业无关联）。</p><p>整车制造企业与轮胎生产企业处于同一产业链的<b>上下游</b>，属于纵向并购，故选 <b>B</b>。</p><p>D 杠杆并购是按<b>融资方式</b>划分的类型（主要依靠举债完成收购），与行业关系无关。</p>"}, {"no": 3017, "label": "P17", "sec": "prop", "type": "单选", "lv": "基", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "商业银行将已贴现但尚未到期的商业汇票，向<b>中央银行</b>再次转让融通资金，该行为属于（　）。", "opts": [{"k": "A", "t": "贴现"}, {"k": "B", "t": "转贴现"}, {"k": "C", "t": "再贴现"}, {"k": "D", "t": "回购"}], "ans": "C", "kp": "第6章·票据市场三级流转", "model": "主体配对", "chain": ["票据三级流转：<b>贴现</b>（企业→商业银行）、<b>转贴现</b>（商业银行→商业银行）、<b>再贴现</b>（商业银行→<b>中央银行</b>）", "看<b>对手方</b>：对手方是央行 → 一定是再贴现", "再贴现同时是央行的<b>货币政策工具</b>（调节基础货币与信贷结构）"], "fast": "⚡<b>对手方是央行 → 再贴现</b>；银行对银行 → 转贴现；企业给银行 → 贴现。只看钱从谁手里流向谁。", "traps": ["把转贴现与再贴现混淆（不看对手方，E2）", "见「贴现」二字就选最短的那个选项"], "mother": "票据流转题只抓一个变量：<b>对手方是谁</b>（企业/银行/央行）。", "analysis": "<p>票据市场的资金融通分三个层次：企业将未到期票据卖给商业银行叫<b>贴现</b>；商业银行之间互相转让叫<b>转贴现</b>；商业银行将已贴现未到期票据向<b>中央银行</b>再次转让融通资金叫<b>再贴现</b>。</p><p>本题的对手方是中央银行，故选 <b>C</b>。再贴现同时也是中央银行投放基础货币、引导信贷投向的政策工具。</p>"}, {"no": 3018, "label": "P18", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于金融衍生品<b>交易场所</b>的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "金融期货一般在交易所（场内）集中交易"}, {"k": "B", "t": "远期合约一般在场外市场（OTC）交易"}, {"k": "C", "t": "互换合约一般在场外市场交易"}, {"k": "D", "t": "期权合约只能在场外市场交易"}], "ans": "D", "kp": "第6章·衍生品交易场所（场内/场外）", "model": "选非题·绝对化", "chain": ["<b>场内（交易所）</b>：<b>期货</b>、<b>部分标准化期权</b>（交易所期权）", "<b>场外（OTC）</b>：<b>远期</b>、<b>互换</b>、非标准化期权", "D 说期权「<b>只能</b>」在场外 ❌——交易所期权（如股指期权、ETF 期权）就是场内品种", "凡是「只能/全部/一律」先找反例：找到一个反例即可判其错"], "fast": "⚡<b>期货=场内，远期/互换=场外，期权=两边都有</b>。见「期权<b>只能</b>场外」→ 立刻想到交易所期权，判 ❌。", "traps": ["把远期与期货的场所记反（远期场外、期货场内）→ 误选 A 或 B", "忽略「只能」这个绝对化词，直接认可 D"], "mother": "选非题见到<b>绝对化词（只能/全部/一律）</b>优先验伪：想得出一个反例，它就是答案。", "analysis": "<p>按交易场所划分：金融<b>期货</b>是标准化合约，一般在交易所（场内）集中竞价交易；<b>远期</b>与<b>互换</b>是非标准化协议，一般在场外市场（OTC）协商成交；<b>期权</b>既有交易所交易的标准化期权，也有场外非标准化期权。</p><p>D 称期权「<b>只能</b>」在场外交易，与交易所期权（如股指期权、ETF 期权）的客观存在相矛盾，故 D 错误，选 <b>D</b>。</p>"}, {"no": 3019, "label": "P19", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>股票与债券</b>区别的说法，正确的有（　）。", "opts": [{"k": "A", "t": "股票是所有权凭证，债券是债权债务凭证"}, {"k": "B", "t": "股票一般没有到期日，债券有确定的偿还期限"}, {"k": "C", "t": "股票收益不固定，债券收益一般事先约定"}, {"k": "D", "t": "股票持有人是公司的债权人，债券持有人是公司的所有者"}, {"k": "E", "t": "股票和债券都属于资本市场工具"}], "ans": "ABCE", "kp": "第6章·股票与债券比较", "model": "对比表·方向反转", "chain": ["股票＝<b>所有权</b>凭证（股东是所有者）；债券＝<b>债权</b>凭证（持有人是债权人）", "股票一般<b>无到期日</b>、收益不固定；债券<b>有期限</b>、收益一般固定", "两者都是<b>资本市场</b>工具（1 年以上）", "D 把两者<b>完全说反</b>：股东是所有者、债券持有人是债权人 ❌"], "fast": "⚡<b>股票=所有者（自己人）、债券=债权人（外人）</b>。见「股票持有人是债权人」→ 方向反了，立刻划掉。", "traps": ["D 半真半假（两个词都认识但位置互换）→ 多勾归零（E1+E4）", "漏选 E（以为股票属货币市场）"], "mother": "比较类多选：<b>身份先定死</b>——股票＝股东（所有者），债券＝债主（债权人），凡是身份对调的一律 ❌。", "analysis": "<p>股票是<b>所有权</b>凭证，持有人是公司的股东（所有者），一般无到期日，收益来自股息红利与资本利得，不固定；债券是<b>债权债务</b>凭证，持有人是公司的债权人，有确定的偿还期限，收益（利率）一般事先约定。</p><p>D 把两者的法律身份完全说反，故错误。股票和债券期限均在 1 年以上，同属资本市场工具，E 正确。故选 <b>ABCE</b>。</p>"}, {"no": 3020, "label": "P20", "sec": "prop", "type": "单选", "lv": "真", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "关于我国<b>外汇市场</b>的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "我国外汇市场的主体是银行间外汇市场"}, {"k": "B", "t": "外汇交易品种包括即期、远期、掉期和期权等"}, {"k": "C", "t": "中央银行一般不直接频繁参与交易，干预以稳定汇率为目的"}, {"k": "D", "t": "企业可不受结售汇制度约束，随意在市场上买卖外汇"}], "ans": "D", "kp": "第6章·外汇市场", "model": "选非题·绝对化开放表述", "chain": ["我国外汇市场＝<b>银行间外汇市场</b>为主 + 银行对客户市场", "交易品种：即期、远期、<b>掉期</b>、期权", "央行干预以<b>稳定汇率</b>为目的，一般不直接、频繁地参与（真题考点）", "D 称「可不受结售汇制度约束、随意买卖」❌——我国对外汇收支仍实行<b>结售汇管理</b>"], "fast": "⚡见「<b>不受约束 / 随意买卖</b>」必错：我国资本项目尚未完全可兑换，结售汇制度仍在。选非题直接勾它。", "traps": ["选非题方向搞反，把正确表述当答案（E3）", "把「央行一般不直接交易」误判为错误（这是教材原话）"], "mother": "外汇题防两头：一头「<b>完全自由</b>」过头，一头「<b>完全管制</b>」过头；真实状态是<b>有管理的浮动</b>。", "analysis": "<p>我国外汇市场由<b>银行间外汇市场</b>（主体）和银行对客户市场构成，交易品种包括即期、远期、掉期和期权等。</p><p>中央银行参与外汇市场的目的是<b>稳定汇率</b>、维护市场秩序，一般不直接、频繁地进行交易（真题考点）。</p><p>D 错误：我国仍实行<b>结售汇制度</b>与外汇收支管理，企业买卖外汇须通过银行办理并符合真实性审核要求，不能「不受约束、随意买卖」。故选 <b>D</b>。</p>"}]};
+const KEY  = 'fin_drill_ch06_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+<script>
+(function(){
+  var g=document.getElementById("skelGate");
+  var b=document.getElementById("skelGo");
+  if(!g||!b) return;
+  b.onclick=function(){ g.style.display="none"; try{ window.dispatchEvent(new Event("skelDone")); }catch(e){} window.scrollTo(0,0); };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第05章 · 证券与基金</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第05章 · 证券与基金<small id="sub">错题 21 题 + 自命题 12 题 ｜ 31 分钟 ｜ 满分 41</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第05章 证券与基金 · 即时判题训练卷", "totalMin": 31, "pass": 25, "full": 41, "nSingle": 25, "nMulti": 8, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 21 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 12 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "货币市场基金合计投资于现金、国债,中央银行票据、政策性金融债券占基金资产净值的比例合计不得低于（）", "opts": [{"k": "A", "t": "5%"}, {"k": "B", "t": "60%"}, {"k": "C", "t": "80%"}, {"k": "D", "t": "10%"}], "ans": "A", "kp": "第5章·货币市场基金投资比例（数字钉子）", "model": "数字规定型（不得低于）", "chain": ["《货币市场基金监督管理办法》第七条为流动性资产设了<b>两档</b>比例", "第（一）项：现金、国债、央行票据、政策性金融债券 ≥ <b>5%</b>", "第（二）项：上述四项 + 5 个交易日内到期的其他金融工具 ≥ <b>10%</b>", "题干列举的正是<b>不含\"5个交易日内到期\"</b>的四项 → 5%"], "fast": "⚡看题干枚举了几项：<b>只列四项 → 5%；多出「5个交易日内到期的其他金融工具」→ 10%</b>。本题只列四项 → A。这是出题人专门挖的\"差一项差 5 个百分点\"陷阱。", "traps": ["死记 10% 就选 D —— <b>10% 那一档必须带上\"5个交易日内到期的其他金融工具\"</b>", "60%、80% 是纯干扰数字"], "mother": "母题抽象：<b>货币基金比例三钉子</b> —— 流动性资产(四项)≥5%｜(四项+5日内到期)≥10%｜流动性受限资产 ≤10%（另有平均剩余期限 ≤120天、存续期 ≤240天）。", "analysis": "<p>《货币市场基金监督管理办法》第七条第（一）项规定：货币市场基金投资组合中，<b>现金、国债、中央银行票据、政策性金融债券占基金资产净值的比例合计不得低于 5%</b>。A 正确。</p><p>D（10%）对应的是同条第（二）项 —— 在上述四项之外再加上<b>五个交易日内到期的其他金融工具</b>，合计不得低于 10%。两组口径易混，本题题干只列四项，故为 5%。</p><p>（另：平均剩余期限不得超过 120 天、平均剩余存续期不得超过 240 天。）</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "甲基金将其85%的资产投资于股票，5%的资产投资于货币市场工具，10%的资产投资于债券()", "opts": [{"k": "A", "t": "基金中基金"}, {"k": "B", "t": "股票基金"}, {"k": "C", "t": "混合基金"}, {"k": "D", "t": "偏股型基金"}], "ans": "B", "kp": "第5章·基金类型判定（投资比例门槛）", "model": "比例判定型（给资产配置比例 → 判断基金类型）", "chain": ["题干：85% 投资股票、5% 货币市场工具、10% 债券", "教材口径：<b>80% 以上</b>资产投资于股票的，为<b>股票基金</b>", "85% ≥ 80% → 股票基金"], "fast": "⚡比例钉子：<b>股票基金 ≥ 80% 投股票；债券基金 ≥ 80% 投债券；货币基金 100% 投货币市场工具；基金中基金 ≥80% 投其他基金</b>。见\"XX% 投股票\"先和 80% 比 → 85% 过线 → 股票基金 = B。", "traps": ["看到还有 10% 债券就选\"混合基金\"—— 混合基金是<b>没有某一类达到 80%</b> 的情形", "「偏股型」是混合基金的子类（偏股但股票占比不到 80%），本题 85% 已达标"], "mother": "母题抽象：<b>基金分类的 80% 门槛</b>：股票基金(股票≥80%)、债券基金(债券≥80%)、基金中基金(基金≥80%)、货币市场基金(仅投货币工具)。<b>先算占比、再对门槛</b>，一步到位。", "analysis": "<p>根据基金分类规则，<b>80% 以上的基金资产投资于股票的，为股票基金</b>。甲基金 85% 的资产投资于股票，达到股票基金标准，属于<b>股票基金</b>。B 正确。</p><p>混合基金是指投资于股票、债券和货币市场工具，且各类资产比例<b>均未达到</b>股票基金、债券基金标准的基金；偏股型基金属混合基金中以股票为主但股票占比不足 80% 的子类；基金中基金（FOF）需 80% 以上资产投资于其他基金份额。</p>"}, {"no": 2003, "label": "R3", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "最可能对A基金收取托管费的机构有()", "opts": [{"k": "A", "t": "证券交易所"}, {"k": "B", "t": "基金销售机构"}, {"k": "C", "t": "商业银行"}, {"k": "D", "t": "基金公司"}], "ans": "C", "kp": "第5章·基金费用与当事人", "model": "主体归属型（谁收取托管费）", "chain": ["基金费用分两类：<b>基金管理人</b>收管理费，<b>基金托管人</b>收托管费", "我国基金托管人由依法设立并取得基金托管资格的<b>商业银行</b>或其他金融机构担任", "基金销售机构收申购/赎回费，交易所收交易费用，基金公司收管理费"], "fast": "⚡费用归属一句话：<b>管理费归基金公司、托管费归托管银行</b>。见「托管费」→ 找商业银行 = C。这是\"谁保管谁收钱\"的常识，5 秒可答。", "traps": ["把托管费和管理费混为一谈（一个给银行、一个给基金公司）", "基金销售机构只收销售服务费/申赎费，不收托管费"], "mother": "母题抽象：<b>基金费用归属表</b> —— 管理费(基金管理人/基金公司)｜托管费(托管人/商业银行)｜销售服务费(销售机构)｜交易费用(券商/交易所)｜申赎费(投资者承担，归销售机构)。", "analysis": "<p>基金托管费是支付给<b>基金托管人</b>的报酬。我国基金托管人由取得基金托管资格的<b>商业银行</b>（或中国证监会认可的其他金融机构）担任，负责安全保管基金财产、办理清算交割、监督投资运作等。C 正确。</p><p>基金管理人（基金公司）收取管理费等；证券交易所（A）与基金销售机构（B）均不收取托管费。</p>"}, {"no": 2004, "label": "R4", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "根据《证券公司股权管理规定》,证券公司主要股东指持有证券公司()以上股权的股东", "opts": [{"k": "A", "t": "5%"}, {"k": "B", "t": "50%"}, {"k": "C", "t": "10%"}, {"k": "D", "t": "15%"}], "ans": "A", "kp": "第5章·证券公司股东分类（数字钉子）", "model": "数字规定型（股权比例门槛）", "chain": ["《证券公司股权管理规定》按持股比例划分股东类别", "<b>主要股东</b>：持有证券公司 <b>5% 以上</b>股权的股东", "控股股东：持股 50% 以上或虽不足 50% 但足以对股东会/股东大会决议产生重大影响"], "fast": "⚡证券股东比例钉子：<b>主要股东 ≥ 5%｜控股股东 ≥ 50%（或实际支配）｜</b>。题干「主要股东」→ 5% → A。50% 是控股股东那条线，别串。", "traps": ["把「主要股东 5%」与「控股股东 50%」记串（B 项就是等你串）", "10%、15% 是干扰数字"], "mother": "母题抽象：<b>金融机构股东认定数字墙</b> —— 证券公司主要股东 5%、控股股东 50%；商业银行主要股东 5%；保险公司主要股东（战略类）15%、控制类 1/3。按机构分类记忆，别跨机构串。", "analysis": "<p>根据《证券公司股权管理规定》，证券公司的<b>主要股东</b>是指持有证券公司 <b>5% 以上</b>股权的股东；控股股东则指持有 50% 以上股权，或虽不足 50% 但其表决权足以对股东会、股东大会决议产生重大影响的股东。A 正确。</p>"}, {"no": 2005, "label": "R5", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "证券公司以()的身份接受客户委托，进行证券买卖，提高交易效率，稳定了交易秩序，使交易活动得以顺利进行。", "opts": [{"k": "A", "t": "经纪商"}, {"k": "B", "t": "做市商"}, {"k": "C", "t": "自营商"}, {"k": "D", "t": "承销商"}], "ans": "A", "kp": "第5章·证券公司的职能身份", "model": "身份归属型（给业务描述 → 找身份）", "chain": ["题干关键句：<b>「接受客户委托，进行证券买卖」</b>", "受人之托、代人买卖、收佣金 = <b>经纪商</b>", "做市商：用自己的账户双边报价、提供流动性；自营商：用自有资金自己炒；承销商：帮发行人卖新证券"], "fast": "⚡身份判定靠\"钱是谁的、替谁做\"：<b>替客户做=经纪商；用自己的钱做=自营商；两边报价做流动性=做市商；帮发行人卖=承销商</b>。题干\"接受客户委托\" → 经纪商 = A。", "traps": ["题干后半句\"提高交易效率、稳定交易秩序\"容易让人联想到做市商 —— 但<b>接受客户委托</b>才是判据", "经纪业务不占用券商自有资金、不承担价格风险，这是与自营的分水岭"], "mother": "母题抽象：<b>券商四身份</b> —— 经纪(代客买卖·收佣金)｜自营(自有资金·自担风险)｜做市(双边报价·提供流动性)｜承销(一级市场卖新券)。先找\"谁的钱 + 替谁做\"，身份立刻确定。", "analysis": "<p>证券公司以<b>经纪商</b>身份接受客户委托，按照客户指令代理买卖证券，收取佣金，不承担交易的价格风险，从而提高交易效率、稳定交易秩序。A 正确。</p><p>做市商以自有资金和证券持续双边报价维持市场流动性；自营商以自有资金自行买卖、自担损益；承销商在一级市场为发行人销售证券。</p>"}, {"no": 2006, "label": "R6", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABCDE", "src": "真题错题", "stem": "我国证券公司计划承销Z公司股票。Y证券公司可选择的承销方式有()", "opts": [{"k": "A", "t": "外销"}, {"k": "B", "t": "代销"}, {"k": "C", "t": "包销"}, {"k": "D", "t": "联营销售"}, {"k": "E", "t": "余额包销"}], "ans": "BCE", "kp": "第5章·证券承销方式", "model": "多选 · 方式列举型", "chain": ["我国证券承销的法定方式只有两类：<b>代销</b>与<b>包销</b>", "包销又分<b>全额包销</b>（先买断再发售）与<b>余额包销</b>（承销期末认购未售出部分）", "故 B（代销）、C（包销）、E（余额包销）正确；A 外销、D 联营销售不是承销方式"], "fast": "⚡承销就两类：<b>代销 + 包销</b>；包销再拆<b>全额 / 余额</b>。凡是\"外销、联营销售、经销\"这类词都是干扰 → <b>BCE</b>。判断标准很简单：未售出证券<b>退给发行人</b>=代销，<b>券商自己吃下</b>=包销。", "traps": ["\"包销\"与\"余额包销\"同时出现时二者都要选（余额包销是包销的子类）", "A「外销」、D「联营销售」是生造的销售方式名词"], "mother": "母题抽象：<b>承销方式二分法</b> —— 看风险归谁：代销(风险归发行人) vs 包销(风险归承销商)。<b>记住\"只有这两种\"，其余名词一律排除。</b>", "analysis": "<p>我国证券承销方式分为<b>代销</b>（B，承销期满将未售出证券退还发行人）与<b>包销</b>（C，承销商购入或认购未售出证券）；包销进一步分为全额包销与<b>余额包销</b>（E）。故选 <b>BCE</b>。</p><p>A「外销」、D「联营销售」不属于法定的证券承销方式。</p><p><b>⚠ 本题原卷答案键标为 AC，与教材口径不符（A 非承销方式、遗漏 B、E），已按教材校正为 BCE。</b></p>"}, {"no": 2007, "label": "R7", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ACE", "src": "真题错题", "stem": "根据《证券投资基金法》，基金托管人的职责有（）。", "opts": [{"k": "A", "t": "对基金财务会计报告、中期和年度基金报告出具意见"}, {"k": "B", "t": "安全保管基金财产"}, {"k": "C", "t": "按照基金合同的约定，根据基全管理人的投资指令，及时办理清算、交割事宜"}, {"k": "D", "t": "按照规定监督基金管理人的投资运作并确保兑现收益"}, {"k": "E", "t": "办理与基金财产管理业务活动有关的信息披露事项"}], "ans": "ABCE", "kp": "第5章·基金托管人职责", "model": "多选 · 职责列举型", "chain": ["A 对基金财务会计报告、中期和年度基金报告出具意见 → <b>选</b>（托管人的监督职责）", "B 安全保管基金财产 → <b>选</b>（托管人最基本的职责）", "C 按基金合同约定、根据管理人投资指令及时办理清算交割 → <b>选</b>", "D 监督投资运作并<b>确保兑现收益</b>？托管人<b>不保证收益</b> → <b>不选</b>", "E 办理与基金财产管理业务活动有关的信息披露事项 → <b>选</b>"], "fast": "⚡托管人职责四句话：<b>保管财产、办理清算交割、监督投资运作、出具意见与信息披露</b>。凡出现\"<b>确保/保证收益</b>\"（D）一律不选 —— 这是基金合规的红线表述。→ ABCE。", "traps": ["D 的前半句\"监督投资运作\"是对的，但后半句\"确保兑现收益\"错 —— <b>半真半假</b>是最强的干扰形态", "基金公司、托管人、销售机构三方职责别串"], "mother": "母题抽象：<b>基金当事人职责三分</b> —— 管理人(投资决策·收取管理费)｜托管人(保管·清算·监督·披露·收托管费)｜销售机构(销售·收申赎费)。<b>凡\"保证收益\"都是违规表述。</b>", "analysis": "<p>基金托管人的职责包括：<b>安全保管基金财产</b>（B）、按照基金合同约定并根据基金管理人的投资指令<b>及时办理清算、交割</b>事宜（C）、对基金财务会计报告及中期和年度基金报告<b>出具意见</b>（A）、办理与基金财产管理业务活动有关的<b>信息披露</b>事项（E）、监督基金管理人的投资运作等。故选 <b>ABCE</b>。</p><p>D 错误：托管人负责<b>监督</b>投资运作，但不得也无力\"确保兑现收益\" —— 基金不得承诺保本保收益。</p>"}, {"no": 2008, "label": "R8", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABCDE", "src": "真题错题", "stem": "证券公司内部控制的原则包括()", "opts": [{"k": "A", "t": "独立性原则"}, {"k": "B", "t": "制衡性原则"}, {"k": "C", "t": "合理性原则"}, {"k": "D", "t": "盈利性原则"}, {"k": "E", "t": "健全性原则"}], "ans": "ABCE", "kp": "第5章·证券公司内部控制原则", "model": "多选 · 原则列举型", "chain": ["证券公司内部控制原则：<b>健全性原则</b>（E）、<b>合理性原则</b>（C）、<b>制衡性原则</b>（B）、<b>独立性原则</b>（A）", "D 盈利性原则 → <b>不选</b>（内控管的是风险不是赚钱）"], "fast": "⚡内控原则四件套「<b>健全、合理、制衡、独立</b>」→ ABCE。内控里<b>永远不会出现\"盈利性\"</b>（那是经营目标），见到直接划掉。", "traps": ["把\"经营原则\"（盈利性、流动性、安全性）与\"内控原则\"混记", "独立性原则容易被漏选（它指内控部门独立于业务部门）"], "mother": "母题抽象：<b>内控原则通用模板</b> —— 健全(覆盖完整) + 合理(成本效益) + 制衡(相互制约) + 独立(监督独立)。商业银行与证券公司内控原则高度相似，可合并记忆（商行多\"审慎\"\"相匹配\"，券商多\"健全\"\"合理\"\"独立\"）。", "analysis": "<p>证券公司内部控制的原则包括<b>独立性原则</b>（A，内控部门与业务部门相互独立）、<b>制衡性原则</b>（B）、<b>合理性原则</b>（C，控制措施与业务规模、风险状况相适应且讲求成本效益）、<b>健全性原则</b>（E，覆盖所有业务、部门和岗位）。故选 <b>ABCE</b>。</p><p>D「盈利性原则」是经营目标，不属于内部控制原则。</p>"}, {"no": 2009, "label": "R9", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "基金的资金来源和用途看，在本国募集资金并投资于本国证券市场的基金是（）", "opts": [{"k": "A", "t": "在岸基金"}, {"k": "B", "t": "主动型基金"}, {"k": "C", "t": "离岸基金"}, {"k": "D", "t": "被动型基金"}], "ans": "A", "kp": "第5章·证券投资基金分类（按资金来源与用途）", "model": "", "chain": ["按资金来源和用途：在岸基金（本国募集 → 投资本国市场）｜离岸基金（一国基金组织在他国发售 → 投资本国或第三国）｜国际基金（国内资本 → 投资国外，如 QDII）→ 本题「本国募集 + 投资本国」= 在岸基金"], "fast": "⚡「本国→本国」在岸｜「他国发售→本国/第三国」离岸｜「本国资本→国外」国际（QDII）", "traps": ["<b>⚠ 答案键校正：</b>本题题库答案键标 C（离岸基金），与教材口径不符。中基协官方定义：「在岸基金是指在本国募集资金并投资于本国证券市场的证券投资基金」，故正确答案为 <b>A（在岸基金）</b>。"], "mother": "母题抽象：<b>基金地理三分法</b>——两头都在国内=在岸；发售在国外=离岸；钱出国外=国际基金（QDII）。", "analysis": "<p>根据基金的资金来源和用途，在本国募集资金并投资于本国证券市场的基金是<b>在岸基金</b>；离岸基金是在他国发售份额并将资金投资于本国或第三国市场。依据教材口径本题应选 <b>A</b>（⚠ 原答案键 C 有误，已校正）。</p>"}, {"no": 2010, "label": "R10", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "根据《证券公司监督管理条例》，我国负责对证券公司的退出实施监管的机构是（）", "opts": [{"k": "A", "t": "国家工商行政管理机构"}, {"k": "B", "t": "沪深证券交易所"}, {"k": "C", "t": "中国证券业协会"}, {"k": "D", "t": "国务院证券监督管理机构"}], "ans": "D", "kp": "第5章·证券公司监管（市场退出监管）", "model": "", "chain": ["《证券公司监督管理条例》第 15 条：证券公司<b>停业、解散或破产</b>，应当经<b>国务院证券监督管理机构</b>批准 → 退出监管主体 = 证监会"], "fast": "⚡「退出/停业/解散/破产 + 证券公司」→ 国务院证券监督管理机构；「协会」是自律组织无审批权", "traps": ["<b>⚠ 答案键校正：</b>题库答案键标 C（中国证券业协会）。协会仅承担自律管理职责，无市场退出审批权；依据《证券公司监督管理条例》，正确答案为 <b>D（国务院证券监督管理机构）</b>。", "A 工商登记机关只办注销登记，不是退出监管主体"], "mother": "母题抽象：<b>证券市场三层管理</b>——证监会（准入/退出/行为监管）｜交易所（一线自律）｜证券业协会（行业自律）。凡涉\"许可/批准/退出\"必归证监会。", "analysis": "<p>依据《证券公司监督管理条例》，证券公司停业、解散或破产（市场退出）须经<b>国务院证券监督管理机构</b>批准并由其实施监管。本题应选 <b>D</b>（⚠ 原答案键 C 有误，已校正）。</p>"}, {"no": 2011, "label": "R11", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "我国基金管理人的说法，正确的是（）", "opts": [{"k": "A", "t": "基金管理人可以由财务公司总经理担任"}, {"k": "B", "t": "基金管理人是基金存续期内基金的所有者"}, {"k": "C", "t": "基金管理人可以参与基金收益分配"}, {"k": "D", "t": "基金管理人可以由依法成立的基金管理公司担任"}], "ans": "C", "kp": "第5章·基金管理人", "model": "", "chain": ["逐项验伪：A 由财务公司总经理担任 ❌（基金管理人由依法设立的基金管理公司担任）；B 基金所有者 ❌（所有者 = 基金份额持有人）；C 管理人可参与基金收益分配 ✅（收取管理费，符合约定时可参与收益分配/业绩报酬）；D「可以由依法成立的基金管理公司担任」——教材表述为「由依法<b>设立</b>的基金管理公司担任」，且是\"应当\"而非\"可以\"，措辞失真"], "fast": "⚡基金四方权利钉子：持有人=所有者｜管理人=经营＋收费｜托管人=保管｜「谁所有」一票否决 B", "traps": ["B 是最典型干扰：所有者是持有人，管理人只是受托经营", "D 与 C 的取舍：D 的「可以 + 成立」两处措辞与法条不符"], "mother": "母题抽象：<b>基金治理四主体权责表</b>——持有人（所有+收益）｜管理人（投资运作+管理费）｜托管人（保管+监督）。", "analysis": "<p>基金份额持有人是基金的所有者；基金管理人由依法设立的基金管理公司担任，负责基金财产的投资运作，并<b>可以参与基金收益分配</b>（收取管理费及按约定参与业绩分成）。故选 C。</p>"}, {"no": 2012, "label": "R12", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "根据《国际货币基金协定》，一国货币可兑换主要是指()", "opts": [{"k": "A", "t": "资本项目可兑换"}, {"k": "B", "t": "经常项目可兑换"}, {"k": "C", "t": "货币完全可兑换"}, {"k": "D", "t": "有条件可兑换"}], "ans": "B", "kp": "第10章·货币可兑换（IMF 协定）", "model": "", "chain": ["《国际货币基金协定》第八条款：不得限制经常性国际交易支付与转移、不得实行歧视性货币措施/复汇率、应购回对方持有的经常性交易本币结存 → 成员国接受第八条款义务 = 经常项目可兑换 → IMF 语境的\"货币可兑换\"主要指<b>经常项目可兑换</b>"], "fast": "⚡钉子：IMF 协定谈可兑换 = 经常项目；「完全可兑换 = 经常 + 资本」是学术口径，不是协定口径", "traps": ["<b>⚠ 答案键校正：</b>题库答案键标 C（货币完全可兑换）。本题为 2020 真题原题，官方答案为<b>经常项目可兑换</b>；教材明确「IMF 对可兑换的要求主要指经常项目可兑换」。本题应选 <b>B</b>。"], "mother": "母题抽象：<b>可兑换三档</b>——经常项目可兑换（IMF 第八条款）→ 资本项目可兑换 → 完全可兑换（两者叠加）；我国 1996 年 12 月实现经常项目可兑换。", "analysis": "<p>根据《国际货币基金协定》（第八条款），一国货币可兑换主要是指<b>经常项目可兑换</b>——对经常性国际交易支付和资金转移不得施加限制。本题应选 <b>B</b>（⚠ 原答案键 C 有误，已按真题官方答案与教材口径校正）。</p>"}, {"no": 2013, "label": "R13", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "资产管理人从事特定客户资产管理业务，推介具体资产管理计划时可以借助的媒体渠道是（）", "opts": [{"k": "A", "t": "基金销售机构网站"}, {"k": "B", "t": "中央广播电台"}, {"k": "C", "t": "经济日报"}, {"k": "D", "t": "中国证券报"}], "ans": "A", "kp": "第5章·私募资产管理业务（推介渠道限制）", "model": "", "chain": ["特定客户资管业务是私募性质 → <b>不得公开宣传</b> → 推介只能向特定对象进行：基金销售机构网站（设置特定对象确认程序）可以；中央广播电台、经济日报、中国证券报均为公开媒体 ❌"], "fast": "⚡「私募 + 公开媒体」必错；「官网 + 特定对象确认」是唯一合法渠道", "traps": ["别选「中国证券报」——财经专业报 ≠ 特定对象渠道，公开发行的报纸都是公开宣传"], "mother": "母题抽象：<b>公募 vs 私募推介红线</b>——公募：广告、报纸随便宣传；私募：仅特定对象、设置确认程序，公开媒体一律禁。", "analysis": "<p>资产管理人推介具体资产管理计划属私募行为，不得向不特定对象公开宣传。可通过设置特定对象确认程序的<b>基金销售机构网站</b>推介；通过报刊、广播等公开媒体宣传均被禁止。故选 A。</p>"}, {"no": 2014, "label": "R14", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "根据《证券公司监督管理条例》，须取得任职资格的人员不包括()", "opts": [{"k": "A", "t": "监事"}, {"k": "B", "t": "分支机构部门负责人"}, {"k": "C", "t": "董事"}, {"k": "D", "t": "首席财务官"}], "ans": "B", "kp": "第5章·证券公司高管任职资格", "model": "", "chain": ["《证券公司监督管理条例》：董事、监事、高级管理人员（含合规负责人、首席风险官、首席财务官等）任职须核准 → 「分支机构部门负责人」不在任职资格核准之列"], "fast": "⚡「董监高 + 首席××官」要核准；「部门负责人 / 分支机构部门负责人」不要", "traps": ["B 是干扰主角：部门负责人属于内部管理岗位，不属高管任职资格范围"], "mother": "母题抽象：<b>任职资格范围钉子</b>——董、监、高（经理层+合规/风控/财务负责人）须核准；部门经理、营业部总经理以下不需要。", "analysis": "<p>依据《证券公司监督管理条例》，证券公司的董事、监事、高级管理人员（含首席财务官等）任职须取得任职资格核准；<b>分支机构部门负责人</b>不属于须核准范围。故选 B。</p>"}, {"no": 2015, "label": "R15", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "资产管理计划初始募集金额不得低于()", "opts": [{"k": "A", "t": "1000万元"}, {"k": "B", "t": "50万元"}, {"k": "C", "t": "100万元"}, {"k": "D", "t": "500万元"}], "ans": "A", "kp": "第5章·私募资管计划设立要求", "model": "", "chain": ["《证券期货经营机构私募资产管理计划运作管理规定》：资产管理计划<b>初始募集金额不得低于 1000 万元</b>"], "fast": "⚡数字钉子：资管计划初始募集 ≥1000 万｜封闭式期限 ≥90 天｜固定收益类 30 万/混合 40 万/权益类 100 万", "traps": ["与专户合格投资者门槛（30 万起）混——一个是\"计划规模下限\"，一个是\"单客户投资下限\""], "mother": "母题抽象：<b>私募资管三组数字</b>——计划层面：1000 万起；产品期限：90 天起；客户层面：30/40/100 万分层。", "analysis": "<p>依据《证券期货经营机构私募资产管理计划运作管理规定》，资产管理计划<b>初始募集金额不得低于 1000 万元</b>。故选 A。</p>"}, {"no": 2016, "label": "R16", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "根据《证券期货经营机构私募资产管理计划运作管理规定》，封闭式资产管理计划的期限不得低于()。", "opts": [{"k": "A", "t": "180天"}, {"k": "B", "t": "360天"}, {"k": "C", "t": "30天"}, {"k": "D", "t": "90天"}], "ans": "D", "kp": "第5章·私募资管计划运作要求", "model": "", "chain": ["《证券期货经营机构私募资产管理计划运作管理规定》：封闭式资产管理计划<b>期限不得低于 90 天</b>（防短期化、通道化）"], "fast": "⚡90 天钉子：封闭式资管 ≥90 天；产品滚动开放间隔 ≥90 天", "traps": ["180/360 天都是编造放大值；30 天太短"], "mother": "母题抽象：<b>\"90 天\"双钉子</b>——封闭式计划期限 ≥90 天；开放式计划所有权期限/滚动间隔亦 ≥90 天（资管新规防期限错配精神）。", "analysis": "<p>依据《证券期货经营机构私募资产管理计划运作管理规定》，<b>封闭式资产管理计划的期限不得低于 90 天</b>。故选 D。</p>"}, {"no": 2017, "label": "R17", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "国内某证券投资基金管理公司发行了一个公募货币市场基金，该基金产品属于()。", "opts": [{"k": "A", "t": "封闭式基金"}, {"k": "B", "t": "公司型基金"}, {"k": "C", "t": "契约型基金"}, {"k": "D", "t": "混合类基金"}], "ans": "C", "kp": "第5章·证券投资基金组织形式", "model": "", "chain": ["我国公募基金（含货币市场基金）依据《证券投资基金法》以信托原理设立，通过基金合同约束各方 → 属<b>契约型基金</b>（我国公募基金全部为契约型）"], "fast": "⚡我国公募 = 契约型；公司型是美式（如美国共同基金公司形态）", "traps": ["B「公司型基金」：依据公司法设立、持有人是股东——我国公募基金不是", "D「混合类基金」是投资标的分类（固收/权益/混合），维度错位"], "mother": "母题抽象：<b>组织形式两分法</b>——契约型（信托/合同，我国主流）vs 公司型（法人实体，美国主流）；与开放式/封闭式（运作方式）、公募/私募（募集方式）三个维度别混。", "analysis": "<p>我国公募货币市场基金依据基金合同设立，基金管理人、托管人与持有人以信托契约连接，属<b>契约型基金</b>。故选 C。</p>"}, {"no": 2018, "label": "R18", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "基金管理公司的专户业务下，合格投资者投资于单只固定收益类资产管理计划的金额不低于()万元。", "opts": [{"k": "A", "t": "30"}, {"k": "B", "t": "40"}, {"k": "C", "t": "50"}, {"k": "D", "t": "100"}], "ans": "A", "kp": "第5章·基金专户（合格投资者门槛）", "model": "", "chain": ["基金管理公司专户业务：合格投资者投资于单只资产管理计划的金额——<b>固定收益类 ≥30 万</b>｜混合类 ≥40 万｜权益类、商品及衍生品类 ≥100 万"], "fast": "⚡数字阶梯「固 30 / 混 40 / 权 100」——风险越高门槛越高", "traps": ["别把 100 万（权益类）当统一门槛", "与私募证券基金 100 万门槛区分：资管计划按类型分层"], "mother": "母题抽象：<b>门槛随风险递增</b>——固收 30 → 混合 40 → 权益/衍生品 100，记忆锚「三四一」。", "analysis": "<p>合格投资者投资于单只<b>固定收益类</b>资产管理计划的金额不低于 <b>30 万元</b>（混合类 40 万、权益类及商品衍生品类 100 万）。故选 A。</p>"}, {"no": 2019, "label": "R19", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "融资租赁有基础功能和扩展功能，其中扩展功能指()", "opts": [{"k": "A", "t": "信用与贸易"}, {"k": "B", "t": "产品促销与资产管理"}, {"k": "C", "t": "融资与投资"}, {"k": "D", "t": "产品推广与供应链管理"}], "ans": "B", "kp": "第6章·租赁（融资租赁功能）", "model": "", "chain": ["融资租赁基础功能：<b>融资 + 投资</b>（以融物实现融资，租赁公司投资购置设备）；扩展功能：<b>产品促销 + 资产管理</b>（厂商借租赁促销产品、承租人实现资产管理）"], "fast": "⚡「基础 = 融资/投资，扩展 = 促销/资产管理」—— 见\"信用与贸易\"等混搭词划掉", "traps": ["A「信用与贸易」是把业务特征当功能", "C 是基础功能放错位置"], "mother": "母题抽象：<b>融资租赁功能两层</b>——基础层（融资、投资）是金融属性；扩展层（促销、资产管理）是产业属性。", "analysis": "<p>融资租赁的基础功能是融资与投资；在此基础上衍生的<b>扩展功能是产品促销与资产管理</b>——厂商通过租赁促进销售，企业通过租赁优化资产配置。故选 B。</p>"}, {"no": 2020, "label": "R20", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "该证券公司拟开展证券投资咨询业务，根据《证券、期货投资咨询管理暂行办法》，该公司取得证券投资咨询从业资格的专职人员数量应当有()名以上。", "opts": [{"k": "A", "t": "20"}, {"k": "B", "t": "15"}, {"k": "C", "t": "5"}, {"k": "D", "t": "2"}], "ans": "C", "kp": "第5章·证券投资咨询业务准入", "model": "", "chain": ["《证券、期货投资咨询管理暂行办法》：从事证券投资咨询业务的机构，须有<b>5 名以上</b>取得证券投资咨询从业资格的专职人员"], "fast": "⚡钉子：投资咨询专职持证 ≥5 人（高管/一般从业另有口径，别混）", "traps": ["「该证券公司拟开展」是案例引语，材料要点已自含在题干问句中", "20/15 是证券公司从事投行业务等别的口径放大值"], "mother": "母题抽象：<b>证券机构人数钉子</b>——投资咨询机构：5 名持证专职人员｜登记结算：……；数字题先想\"5\"。", "analysis": "<p>依据《证券、期货投资咨询管理暂行办法》，开展证券投资咨询业务的机构应有不少于 <b>5 名</b>取得证券投资咨询从业资格的专职人员。故选 C。</p>"}, {"no": 2021, "label": "R21", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "AD", "src": "真题错题", "stem": "可申请从事基金销售的机构有()", "opts": [{"k": "A", "t": "证券投资咨询机构"}, {"k": "B", "t": "消费金融机构"}, {"k": "C", "t": "独立基金销售机构"}, {"k": "D", "t": "证券公司"}, {"k": "E", "t": "商业银行"}], "ans": "ACDE", "kp": "第5章·基金销售机构", "model": "", "chain": ["可申请基金销售业务资格：商业银行（含外资行）、证券公司、期货公司、保险公司、保险经纪/代理公司、证券投资咨询机构、独立基金销售机构 → 消费金融公司 ❌（不在名单内）"], "fast": "⚡名单题「银行 + 券商 + 期货 + 保险 + 咨询 + 独立销」——\"消费金融\"是凑数的外来户", "traps": ["B 消费金融公司主营放贷，无基金销售牌照通道"], "mother": "母题抽象：<b>牌照名单题解法</b>——先背名单再排除陌生主体；陌生且业务属性不符的（消费金融、小贷）基本是干扰。", "analysis": "<p>证券投资咨询机构、独立基金销售机构、证券公司、商业银行均可申请注册取得基金销售业务资格；<b>消费金融机构不在基金销售机构范围内</b>。故选 ACDE。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "某公募基金募集资金 20 亿元，基金成立后这笔资金应当存放和管理于（　）。", "opts": [{"k": "A", "t": "基金管理公司的自有资金账户"}, {"k": "B", "t": "基金托管人（商业银行）开立的基金托管账户"}, {"k": "C", "t": "基金管理公司开立的募集专户，长期存放"}, {"k": "D", "t": "证券交易所的结算备付金账户"}], "ans": "B", "kp": "第5章·基金三主体·财产保管", "model": "三主体职责归属", "chain": ["基金三主体＝<b>基金份额持有人</b>（投资者，所有者）｜<b>基金管理人</b>（基金管理公司，投资运作）｜<b>基金托管人</b>（商业银行，保管财产）", "基金财产<b>独立于</b>管理人和托管人的固有财产，管理人<b>不得</b>接触基金资产，只下达投资指令", "托管人须<b>独立开设托管账户</b>，安全保管基金财产并按管理人指令办理清算交割", "本题问”钱在哪”→ 只能是托管人开立的托管账户"], "fast": "⚡问「钱在哪 / 谁保管」→ <b>托管人（商业银行）</b>。管理人只下指令、不碰钱。<b>管钱的不动脑，动脑的不碰钱</b>。", "traps": ["看见”基金管理公司”就选（管理人负责投资运作，依法不得保管基金财产）→ A", "把募集期专户当成最终存放地（募集专户只是设立阶段的过渡账户，成立后资金进托管账户）→ C"], "mother": "三主体题一律问「<b>谁干什么</b>」：所有者→持有人；下指令→管理人；管钱→托管人。", "analysis": "<p>证券投资基金的三方当事人职责法定切分：<b>基金份额持有人</b>是基金财产的所有者；<b>基金管理人</b>（基金管理公司）负责募集、投资运作、信息披露与收益分配；<b>基金托管人</b>（我国以商业银行为主）负责安全保管基金财产、开设账户、复核净值、监督投资运作、办理清算交割。</p><p>基金财产具有独立性，<b>独立于管理人、托管人的固有财产</b>，也不属于其债务清偿财产，因此只能存放于托管人开立的托管账户。故选 <b>B</b>。</p><p>A、C 均把资金置于管理人控制之下，违反”管理人不得保管基金财产”的强制规定；D 备付金账户用于证券交易的结算，不是基金财产的保管账户。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 60, "wasWrong": false, "src": "自命题·仿真", "stem": "某基金前一日基金资产净值为 20 亿元，管理费年费率 1.5%，按基金合同约定逐日计提、按月支付。该基金当日应计提的管理费约为（　）。", "opts": [{"k": "A", "t": "8.22 万元"}, {"k": "B", "t": "82.2 万元"}, {"k": "C", "t": "3000 万元"}, {"k": "D", "t": "30 万元"}], "ans": "A", "kp": "第5章·基金费用·管理费计提（2026新增）", "model": "费用日计提计算", "chain": ["管理费计提公式：<b>每日应计提 ＝ 前一日基金资产净值 × 年费率 ÷ 365</b>（逐日计提、<b>按月支付</b>）", "先算全年：20 亿 × 1.5% ＝ <b>3000 万元/年</b>", "再摊到每一天：3000 万 ÷ 365 ≈ <b>8.22 万元/日</b>", "分母固定为 <b>365</b>（不是 360，不是当月天数）；托管费、销售服务费同样照此口径"], "fast": "⚡管理费/托管费日计提 → <b>净值 × 年费率 ÷ 365</b>。答案先估量级：20 亿 × 1.5% ÷ 365 必然是<b>「几万元」</b>级，凡出现百万、千万级的直接划掉。", "traps": ["算出全年 3000 万就停手，漏掉 ÷365 → C（这是最高频的错法）", "按 360 天算得 8.33 万，选项给 82.2 万让你小数点错位 → B", "把 1.5% 当 0.15 或直接乘净值不看费率 → D"], "mother": "费用计算三问：<b>基数</b>（前一日资产净值，不是当日、不是资产总值）｜<b>费率</b>（年化）｜<b>分母</b>（365）。三步写完再落笔，别跳步。", "analysis": "<p>按基金费用计提规则，管理费、托管费、销售服务费均<b>按前一日基金资产净值乘以年费率，逐日计提、按月支付</b>。</p><p>本题：20 亿元 × 1.5% ＝ 3000 万元/年；3000 万 ÷ 365 ≈ <b>8.22 万元/日</b>。故选 <b>A</b>。</p><p>B 是小数点错位；C 只算到全年、忘了逐日摊；D 无对应算式。</p><p>延伸记忆：<b>管理费付给基金管理公司、托管费付给托管银行</b>，两者都从基金财产中列支；申购费、赎回费属<b>一次性</b>费用，不按日计提。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "根据基金托管人市场准入的有关规定，下列不属于基金托管人准入条件的是（　）。", "opts": [{"k": "A", "t": "设有专门的基金托管部门"}, {"k": "B", "t": "取得基金从业资格的人员不少于法定人数"}, {"k": "C", "t": "最近 3 年无重大违法违规记录"}, {"k": "D", "t": "持有基金管理公司 51% 以上股权"}], "ans": "D", "kp": "第5章·基金托管人·市场准入（2026新增）", "model": "准入条件选非", "chain": ["托管人准入七要件：资本充足率等指标达标｜<b>设有专门的基金托管部门</b>｜取得基金从业资格人员不少于法定人数、核心岗位有资质｜具备安全保管财产的条件（独立托管与清算系统）｜有符合要求的营业场所和<b>独立监控系统</b>｜<b>最近 3 年无重大违法违规记录</b>｜经<b>中国证监会会同国务院银行业监督管理机构核准</b>", "托管人与管理人是<b>相互制衡</b>关系，法律并不要求二者存在股权关系，反而强调财产独立、职责分离", "D 的”持股 51%”既非准入条件，也与制衡架构相悖 → 本题选非即选 D"], "fast": "⚡托管人准入＝「<b>专门部门、够人、有系统场地、3 年无违规、双头核准</b>」。凡要求具体<b>持股比例、注册资本数额</b>的，基本是编的。", "traps": ["嫌”最近 3 年无重大违法违规记录”太细不像条件而划掉 → 错选 C（它确实是法定条件）", "以为托管人与管理人必须是关联方 → 错选 D 之外的项（实际法律强调的是相互独立、相互监督）"], "mother": "准入类选非题的打法：先默写「<b>人、财、物、记录、审批</b>」五字（人员资质/资本指标/场所系统/合规记录/核准机关），凡超出这五类的具体数字条件多为干扰。", "analysis": "<p>基金托管人的市场准入条件围绕<b>资质、人员、设施、合规记录与核准程序</b>展开：设有专门的基金托管部门；取得基金从业资格人员不少于法定人数；具备安全保管基金财产的条件与独立清算系统；最近 3 年无重大违法违规记录；并经中国证监会会同国务院银行业监督管理机构核准。</p><p>D「持有基金管理公司 51% 以上股权」不属于准入条件——法律要求托管人与管理人<b>相互独立、相互制衡</b>，并不要求股权控制关系。故选 <b>D</b>。</p><p>⚠️ 本题为选非题：A、B、C 均为法定准入条件，是”正确表述”，不可选。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "关于证券投资基金的特点，下列说法错误的是（　）。", "opts": [{"k": "A", "t": "集合理财、专业管理"}, {"k": "B", "t": "组合投资、分散风险"}, {"k": "C", "t": "保本保收益，亏损由基金管理人承担"}, {"k": "D", "t": "独立托管、财产独立"}], "ans": "C", "kp": "第5章·证券投资基金·五大特点", "model": "特点选非·绝对化收网", "chain": ["基金五大特点：集合理财专业管理｜组合投资分散风险｜<b>利益共享、风险共担</b>｜独立托管财产独立｜严格监管信息透明", "“利益共享、风险共担”的法律含义是<b>基金不保本、不保收益</b>，投资风险由<b>份额持有人</b>按持有份额承担", "管理人只收取管理费、履行受托职责，<b>不对投资亏损兜底</b>——这是基金与存款、保险产品的本质区别", "C 把”风险共担”改成”管理人兜底”，方向反转 → 本题选非即选 C"], "fast": "⚡基金特点凡出现「<b>保本 / 保收益 / 管理人兜底 / 承诺最低收益</b>」→ 一律是错项，秒选。基金、信托、理财都不保本，只有存款保险和保险合同才有”保”的性质。", "traps": ["把”利益共享、风险共担”误读成”收益有保障” → 放过 C", "觉得”独立托管”太技术不像特点 → 错划 D"], "mother": "金融产品”保不保本”是必考分界线：<b>存款（保险保障）｜保险（合同给付）｜基金·信托·理财（不保本，卖者尽责买者自负）</b>。", "analysis": "<p>证券投资基金的五大特点：集合理财、专业管理；组合投资、分散风险；<b>利益共享、风险共担</b>；独立托管、财产独立；严格监管、信息透明。</p><p>其中”利益共享、风险共担”意味着基金<b>不保本、不保收益</b>，投资风险由基金份额持有人承担，基金管理人依约收取管理费、履行受托义务，<b>不承担投资亏损</b>。C 将其改为”保本保收益、亏损由管理人承担”，与基金的法律性质相反。故选 <b>C</b>。</p><p>⚠️ 本题为选非题：A、B、D 均为教材列举的基金特点。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "关于我国公募证券投资基金的组织形式，下列说法正确的是（　）。", "opts": [{"k": "A", "t": "我国公募基金均为契约型基金"}, {"k": "B", "t": "我国公募基金均为公司型基金"}, {"k": "C", "t": "由基金管理人自行选择契约型或公司型"}, {"k": "D", "t": "以公司型为主、契约型为辅"}], "ans": "A", "kp": "第5章·基金分类·组织形式", "model": "分类维度·国别口径", "chain": ["按<b>组织形式</b>分：<b>契约型</b>（依基金合同设立，无法人资格）与<b>公司型</b>（依公司法设立，具法人资格，设董事会）", "我国《证券投资基金法》框架下，公募基金<b>全部为契约型</b>，由基金管理人、托管人、持有人三方以基金合同联结", "公司型基金是<b>美国共同基金</b>的主流形态，不能搬到我国口径上", "凡出现”我国均为公司型 / 可自由选择 / 公司型为主”→ 全错"], "fast": "⚡「<b>我国公募基金</b>」+「组织形式」→ <b>契约型</b>，一字不差。公司型出现在选项里就是给美国准备的干扰项。", "traps": ["把美国的公司型共同基金当我国主流 → B/D", "以为基金公司可以自主选择组织形式（组织形式由法律框架限定，不是合同自由事项）→ C"], "mother": "分类题先分清<b>四个维度</b>：运作方式（封闭/开放）｜组织形式（契约/公司）｜募集方式（公募/私募）｜投资对象（股/债/货币）。维度一混，答案必错。", "analysis": "<p>按组织形式，证券投资基金分为<b>契约型基金</b>与<b>公司型基金</b>。契约型基金依据基金合同设立，不具有法人资格，由管理人、托管人、持有人三方通过信托契约联结；公司型基金依据公司法设立，具有法人资格，设有董事会。</p><p>我国公募证券投资基金<b>均为契约型基金</b>，故选 <b>A</b>。公司型基金是美国共同基金的主流形式，B、C、D 均与我国实际不符。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "某证券公司对某只债券持续向市场报出买入价与卖出价，并接受投资者按其所报价格成交，以此维持该债券的流动性。该证券公司此时的身份是（　）。", "opts": [{"k": "A", "t": "证券经纪商"}, {"k": "B", "t": "证券自营商"}, {"k": "C", "t": "做市商"}, {"k": "D", "t": "证券承销商"}], "ans": "C", "kp": "第5章·证券公司·四大身份", "model": "身份题眼配对", "chain": ["证券公司四大身份：<b>经纪商</b>（代客买卖、收佣金、不承担价格风险）｜<b>自营商</b>（自有资金自己买卖、赚差价、不对市场持续报价）｜<b>做市商</b>（<b>持续双向报价、随时按报价成交、为市场提供流动性</b>）｜<b>承销商</b>（代发行人发售证券）", "题眼三段：①<b>持续</b>报出买卖<b>双向</b>价 ②<b>接受按报价成交</b> ③<b>维持流动性</b> → 三点同时出现只能是做市商", "经纪商虽也报价，但报的是<b>客户委托</b>，不承担库存与价格风险；自营商有库存但不承担持续报价义务"], "fast": "⚡见「<b>持续（双向）报价 + 随时成交 + 提供流动性</b>」→ 做市商。只代客不持库存→经纪商；自有资金单向买卖赚差价→自营商。", "traps": ["见”按报价成交”就选经纪商（经纪商是撮合客户委托，不承诺随时成交）→ A", "见”自有资金买债券”就选自营商（自营商没有持续双向报价义务）→ B"], "mother": "四身份一句话切分：<b>替客买</b>→经纪；<b>自己买</b>→自营；<b>报价让人买</b>→做市；<b>帮人卖新股</b>→承销。", "analysis": "<p>证券公司的四大身份按”服务对象 + 是否报价 + 是否承担价格风险”区分：</p><p><b>做市商</b>的特征是持续向市场报出<b>双向报价</b>（买价与卖价），并承诺按报价与投资者成交，以维持特定证券的流动性、活跃交易并发挥价格发现功能——与本题描述完全吻合，故选 <b>C</b>。</p><p>A 经纪商是接受客户委托代为买卖、收取佣金，不承诺随时成交；B 自营商以自有资金买卖证券赚取差价，不承担持续报价义务；D 承销商是代发行人发售证券（代销、包销）。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于基金管理人与基金托管人的职责划分，下列说法错误的是（　）。", "opts": [{"k": "A", "t": "基金管理人负责基金的投资运作"}, {"k": "B", "t": "基金托管人负责复核、审查基金资产净值"}, {"k": "C", "t": "基金管理人负责安全保管基金财产"}, {"k": "D", "t": "基金托管人负责监督基金管理人的投资运作"}], "ans": "C", "kp": "第5章·基金三主体·职责边界", "model": "职责边界选非", "chain": ["管理人职责：依法<b>募集</b>基金、办理份额登记、<b>投资运作</b>、<b>信息披露</b>、<b>收益分配</b>（口诀：募、投、披、分）", "托管人职责：<b>安全保管基金财产</b>、开设账户、<b>复核审查净值与申赎价格</b>、<b>监督投资运作</b>、办理清算交割、保存资料、信息披露", "“安全保管基金财产”是托管人的核心法定职责，管理人依法<b>不得</b>保管基金财产 → C 为主体错位，是错误表述", "这构成基金的<b>相互制衡</b>机制：管钱的不动脑，动脑的不碰钱"], "fast": "⚡看到「<b>保管基金财产 / 开设账户 / 清算交割</b>」→ 一律归<b>托管人</b>；看到「<b>投资运作 / 收益分配 / 募集</b>」→ 一律归<b>管理人</b>。主体错位即错项。", "traps": ["把”复核净值”误记成管理人的活（净值由管理人计算、托管人复核，复核属托管人）→ 放过 B", "把”监督投资运作”误记成管理人的自律义务（监督权在托管人手中）→ 放过 D"], "mother": "职责边界题只记一句话：<b>管理人动脑不碰钱，托管人碰钱不动脑</b>。任何把”保管”给管理人的选项都是错项。", "analysis": "<p>基金的管理人与托管人是<b>相互制衡</b>的两方：</p><p><b>基金管理人</b>负责基金的募集、份额登记、投资运作、信息披露与收益分配；<b>基金托管人</b>负责安全保管基金财产、开设托管账户、复核审查基金资产净值与申赎价格、监督基金管理人的投资运作、办理清算交割。</p><p>「安全保管基金财产」是托管人的法定核心职责，管理人不得保管基金财产。故 C 主体错位，为错误表述，本题选 <b>C</b>。A、B、D 均符合法定职责划分。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 60, "wasWrong": false, "src": "自命题·仿真", "stem": "某基金资产总值 10 亿元，其中投资于股票 7.5 亿元、债券 2 亿元、货币市场工具 0.5 亿元。按我国基金分类标准，该基金属于（　）。", "opts": [{"k": "A", "t": "股票型基金"}, {"k": "B", "t": "债券型基金"}, {"k": "C", "t": "混合型基金"}, {"k": "D", "t": "货币市场基金"}], "ans": "C", "kp": "第5章·基金分类·投资对象判据", "model": "80% 门槛比例判定", "chain": ["投资对象分类的硬门槛：<b>80% 以上</b>资产投股票 → 股票型；<b>80% 以上</b>投债券 → 债券型；仅投货币市场工具 → 货币市场基金", "计算比例：股票 7.5 / 10 ＝ <b>75%</b>，未达 80% 门槛 → 不能称股票型", "债券 2 / 10 ＝ 20%，同样未达 80% → 不能称债券型；货币工具仅 5% → 不构成货币市场基金", "三个专项门槛都未达到 → 只能归入<b>混合型基金</b>"], "fast": "⚡先算比例再定名：<b>80% 是硬门槛</b>。占比最大的资产只有 75%，差 5 个点就不能叫股票型，一律归混合型。", "traps": ["看见”股票占大头（75%）”就直接选股票型 → A（本题正设此坑；注意套1 那道”85% 投股票”才是真股票型）", "把”含 5% 货币市场工具”当成货币市场基金 → D（货币市场基金要求<b>仅</b>投货币市场工具）"], "mother": "基金类型计算题就三步：<b>算占比 → 对门槛（80%）→ 定名称</b>。门槛是二值判断，没有”差不多”的余地。", "analysis": "<p>按投资对象划分，我国基金的量化判据为：<b>80% 以上</b>的基金资产投资于股票的为股票型基金；<b>80% 以上</b>投资于债券的为债券型基金；仅投资于货币市场工具的为货币市场基金；不符合上述任一标准的为混合型基金。</p><p>本题股票占比 7.5/10 ＝ 75%（＜80%），债券占比 20%（＜80%），货币市场工具仅 5%，三项门槛均未达到，故属于<b>混合型基金</b>，选 <b>C</b>。</p><p>易错提示：教材中”85% 投股票”的案例确为股票型，但要注意那是超过 80% 门槛；本题故意设为 75%，考的是<b>门槛意识</b>而非”哪个占比最大”。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "根据《证券投资基金法》，下列属于基金管理人职责的有（　）。", "opts": [{"k": "A", "t": "依法募集基金，办理基金份额的发售和登记事宜"}, {"k": "B", "t": "对所管理的不同基金分别管理、分别记账"}, {"k": "C", "t": "安全保管基金财产"}, {"k": "D", "t": "按照基金合同的约定确定基金收益分配方案"}, {"k": "E", "t": "办理与基金财产管理业务活动有关的信息披露事项"}], "ans": "ABDE", "kp": "第5章·基金三主体·管理人职责", "model": "职责归属·主体错位干扰", "chain": ["管理人四件事：<b>募</b>（募集、份额发售与登记）、<b>投</b>（投资运作、分别管理分别记账）、<b>披</b>（信息披露）、<b>分</b>（收益分配）", "A 属”募”，B 属”投”（不同基金分别管理、分别记账是防止利益输送的基本要求），D 属”分”，E 属”披” → <b>ABDE 全对</b>", "C「安全保管基金财产」是<b>托管人</b>的法定职责，管理人依法不得保管基金财产 → 主体错位，<b>不勾</b>", "多选验证：逐个字母落笔 √×，C 打 × 的理由写得出（保管权属托管人），故答案锁定 ABDE"], "fast": "⚡管理人＝<b>募、投、披、分</b>四字。凡「<b>保管财产、开设账户、清算交割</b>」出现 → 那是托管人的活，立刻划掉。", "traps": ["把”安全保管基金财产”当成管理人的当然义务 → 多勾 C，全题归零（E4）", "漏勾 B”分别管理、分别记账”（觉得这是会计细节，其实它是防止关联交易与利益输送的法定职责）→ 漏选（E5）"], "mother": "多选归属题：先把选项按「<b>募投披分 / 保管清算</b>」两类分队，再逐个落笔 √×。<b>√ 要理由，× 也要理由</b>。", "analysis": "<p>基金管理人的法定职责包括：依法募集基金、办理份额的发售与登记（A）；对所管理的不同基金<b>分别管理、分别记账</b>（B）；进行基金投资运作；确定基金收益分配方案（D）；办理信息披露事项（E）。故正确项为 <b>ABDE</b>。</p><p>C「安全保管基金财产」属于<b>基金托管人</b>的法定职责，管理人不得保管基金财产，该项主体错位，不可选。</p><p>提示：B 常被漏勾。不同基金分别管理、分别记账是防止管理人挪用基金财产、在不同基金间输送利益的制度基础，是教材明确列举的管理人义务。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 80, "wasWrong": false, "src": "自命题·仿真", "stem": "关于证券投资基金费用的计提与支付，下列说法正确的有（　）。", "opts": [{"k": "A", "t": "管理费由基金财产承担，支付给基金管理公司"}, {"k": "B", "t": "托管费由基金财产承担，支付给基金托管人"}, {"k": "C", "t": "管理费、托管费通常按前一日基金资产净值乘以年费率除以 365 逐日计提"}, {"k": "D", "t": "管理费和托管费一般按月支付"}, {"k": "E", "t": "申购费、赎回费按投资者持有基金的天数逐日计提"}], "ans": "ABCD", "kp": "第5章·基金费用·计提与支付（2026新增）", "model": "费用归属·计提方式辨析", "chain": ["管理费：从<b>基金财产</b>列支，付给<b>基金管理公司</b>（A 对）", "托管费：从<b>基金财产</b>列支，付给<b>基金托管人</b>（B 对）", "计提口径：<b>前一日基金资产净值 × 年费率 ÷ 365</b>，<b>逐日计提、按月支付</b>（C、D 均对）", "申购费、赎回费属<b>一次性</b>费用：申购时按申购金额一定比例收取，赎回时按赎回金额收取（赎回费率随持有期延长而递减，但费用本身不是按日计提）→ E 错"], "fast": "⚡记两句：<b>逐日计提、按月支付</b>（管的是管理费/托管费）；<b>申购赎回一次性</b>（不按天算）。E 混了”持有天数”与”按日计提”两个概念。", "traps": ["把”赎回费率随持有期递减”误读成”赎回费按日计提” → 多勾 E，全题归零（E4）", "以为管理费由管理人自掏腰包（实际从基金财产列支，由持有人共同承担）→ 漏勾 A"], "mother": "费用题两问：<b>谁出钱</b>（基金财产）、<b>给谁</b>（管理费→基金公司；托管费→托管行；销售服务费→销售机构）。", "analysis": "<p>证券投资基金的费用结构与计提规则：</p><p>① <b>管理费</b>从基金财产中列支，支付给基金管理公司；② <b>托管费</b>从基金财产中列支，支付给基金托管人；③ 二者均按<b>前一日基金资产净值 × 年费率 ÷ 365 逐日计提、按月支付</b>；④ <b>申购费、赎回费</b>为投资者在申购、赎回时<b>一次性</b>支付的费用，赎回费率通常随持有期限延长而递减，但费用本身不按日计提。</p><p>故 A、B、C、D 正确，E 错误，答案为 <b>ABCD</b>。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "多选", "lv": "基", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "根据《证券法》，证券公司经国务院证券监督管理机构核准，可以经营的业务有（　）。", "opts": [{"k": "A", "t": "证券经纪"}, {"k": "B", "t": "证券承销与保荐"}, {"k": "C", "t": "证券自营"}, {"k": "D", "t": "证券资产管理"}, {"k": "E", "t": "吸收公众存款"}], "ans": "ABCD", "kp": "第5章·证券公司·业务范围", "model": "业务范围·牌照错位干扰", "chain": ["证券公司法定业务：证券<b>经纪</b>、证券<b>承销与保荐</b>、证券<b>自营</b>、证券<b>资产管理</b>、<b>融资融券</b>、证券投资咨询、代销金融产品、IB（介绍业务）", "A、B、C、D 均在其中 → 正确", "E「吸收公众存款」是<b>商业银行</b>的专属牌照，属分业经营的红线，证券公司一律不得吸收公众存款 → 主体错位，不勾", "我国金融业<b>分业经营、分业监管</b>的基本格局决定了这类”跨业牌照”选项必错"], "fast": "⚡证券公司八件事：<b>经纪、承销保荐、自营、资管、两融、投顾、代销、IB</b>。<b>「吸收公众存款」是银行专属，见即划掉</b>。", "traps": ["见”证券公司与客户之间的资金往来”就联想到存款 → 多勾 E，全题归零（E4）", "漏勾 D 资产管理（觉得资管是基金公司的专属业务，其实证券公司也可开展资管）→ 漏选（E5）"], "mother": "跨业牌照题：<b>存款＝银行｜贷款＝银行｜保险＝保险公司｜信托＝信托公司｜证券经纪承销自营＝证券公司</b>。谁的牌照谁用，混用即错。", "analysis": "<p>依据《证券法》，证券公司经核准可以经营的业务包括：证券经纪；证券投资咨询；与证券交易、证券投资活动有关的财务顾问；证券承销与保荐；证券自营；证券资产管理；融资融券；代销金融产品等。故 A、B、C、D 均正确。</p><p>E「吸收公众存款」是<b>商业银行</b>的专属业务，属我国分业经营体制下的牌照红线，证券公司不得从事，故选 <b>ABCD</b>。</p>"}, {"no": 3012, "label": "P12", "sec": "prop", "type": "多选", "lv": "真", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "证券投资基金可以按下列哪些标准进行分类（　）。", "opts": [{"k": "A", "t": "按运作方式，分为封闭式基金与开放式基金"}, {"k": "B", "t": "按组织形式，分为契约型基金与公司型基金"}, {"k": "C", "t": "按募集方式，分为公募基金与私募基金"}, {"k": "D", "t": "按投资对象，分为股票型、债券型、货币市场型、混合型等"}, {"k": "E", "t": "按基金管理公司的注册资本规模，分为大型、中型、小型基金"}], "ans": "ABCD", "kp": "第5章·基金分类·四大维度", "model": "分类标准体系", "chain": ["基金分类的四个法定维度：<b>运作方式</b>（封闭式/开放式）、<b>组织形式</b>（契约型/公司型）、<b>募集方式</b>（公募/私募）、<b>投资对象</b>（股票型/债券型/货币市场型/混合型等）", "A、B、C、D 分别对应这四个维度，全部正确", "E 以管理人的<b>注册资本规模</b>分类不是基金的分类标准——基金分类针对的是<b>基金本身</b>的运作与投资属性，不是管理人的规模", "凡把”公司注册资本、管理资产规模、成立年限”当分类标准的，均为编造干扰项"], "fast": "⚡四个分类维度口诀：<b>运作、组织、募集、投对象</b>。第五个冒出来的标准（注册资本、规模、年限）一律不勾。", "traps": ["把”公募/私募”误当组织形式（它是募集方式）→ 犹豫后错划 C", "见 E 表述像那么回事就勾上 → 多勾归零（E4）"], "mother": "分类题先默写四维度再逐项对照，<b>维度对不上的一律 ×</b>；写不出”它属于哪个维度”的理由就不勾。", "analysis": "<p>证券投资基金的分类体系包含四个维度：<b>按运作方式</b>分为封闭式与开放式；<b>按组织形式</b>分为契约型与公司型；<b>按募集方式</b>分为公募与私募；<b>按投资对象</b>分为股票型、债券型、货币市场型、混合型等。</p><p>A、B、C、D 分别对应上述四个维度，均正确。E 以基金管理公司的注册资本规模分类，混淆了”基金的属性”与”管理人的规模”，不属于基金的分类标准。故选 <b>ABCD</b>。</p>"}]};
+const KEY  = 'fin_drill_ch05_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+</body>
+</html>

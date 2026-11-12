@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>金融 · 考前秒记锦囊（真题实证版）</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1a1d21; --ink2:#5b6470; --line:#e3e6ea;
+  --red:#c0392b; --redbg:#fdf0ee; --blue:#1d6fb8; --bluebg:#eef5fc;
+  --gold:#a6761d; --goldbg:#fdf7e8; --green:#1e7d5a; --greenbg:#eaf6f1;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171a; --card:#1c2024; --ink:#eef1f4; --ink2:#9aa4b0; --line:#2c3238;
+    --red:#ff8a7a; --redbg:#2a1c1a; --blue:#7bb8ee; --bluebg:#16232e;
+    --gold:#e0b25c; --goldbg:#2a2317; --green:#6cd3a8; --greenbg:#152420;
+  }
+}
+*{box-sizing:border-box;-webkit-text-size-adjust:100%}
+body{margin:0;padding:0 0 60px;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.72;font-size:16px}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header{padding:26px 0 14px;border-bottom:2px solid var(--ink);margin-bottom:18px}
+h1{font-size:23px;margin:0 0 6px;letter-spacing:-.3px}
+.sub{font-size:13.5px;color:var(--ink2);line-height:1.6}
+h2{font-size:17px;margin:26px 0 12px;padding-left:10px;border-left:4px solid var(--ink);line-height:1.35}
+h3{font-size:15.5px;margin:22px 0 10px;line-height:1.5;font-weight:700}
+h3 .badge{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:2px 9px;
+  background:var(--goldbg);color:var(--gold);margin-left:6px;vertical-align:middle;letter-spacing:0;
+  font-variant-numeric:tabular-nums}
+p{margin:10px 0;font-size:15px}
+b{font-weight:700}
+.hit{color:var(--red);font-weight:700;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;background:var(--bluebg);color:var(--blue);border-radius:6px;
+  padding:1px 7px;font-size:12.5px;font-weight:700;margin:1px 2px;font-variant-numeric:tabular-nums}
+.lead{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin:0 0 14px}
+blockquote{margin:10px 0;background:var(--bluebg);border-left:4px solid var(--blue);
+  border-radius:0 10px 10px 0;padding:11px 13px;font-size:14.5px;color:var(--ink)}
+blockquote.warn{background:var(--redbg);border-left-color:var(--red)}
+blockquote.tip{background:var(--greenbg);border-left-color:var(--green)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:8px 0;
+  border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:100%}
+th{text-align:left;font-weight:700;color:var(--ink2);font-size:12px;padding:8px 7px;
+  border-bottom:2px solid var(--line);letter-spacing:.4px;white-space:nowrap;background:var(--card)}
+td{padding:8px 7px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:700;color:var(--blue);white-space:nowrap}
+td .hit{color:var(--red)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;
+  font-size:12.5px;line-height:1.9;overflow-x:auto;margin:10px 0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
+ul,ol{margin:8px 0;padding-left:22px;font-size:15px}
+li{margin:5px 0}
+hr{border:none;border-top:1px solid var(--line);margin:22px 0}
+.foot{text-align:center;font-size:12.5px;color:var(--ink2);padding:22px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>金融专业 · 考前秒记锦囊</h1>
+<div class="sub">真题实证版｜每章挂你做过的真题战绩：题号 / 考点 / 正解 / 错次<br>215 道真题 + 338 道章卷题 → 189 道错题 → 8 轮回炉归零</div></header>
+<blockquote><b>用法</b>：考前 1 小时通读一遍（约 25 分钟）→ 进场前 5 分钟只看最后一页。 <b>来源</b>：与《金融·终极秒杀版》F-01～F-125 同一口径，数字与主体一字未改；每章另挂 <b>你亲手做过的真题战绩</b>（题号／考点／正解／错次），全部可回溯到具体的卷子和页码。 <b>铁律</b>：题号 <span class="chip">R</span> 类＝真题，<span class="chip">P</span> 类＝按 2026 大纲出的自命题仿真题，两者不混称；<span class="chip">首套Q59</span> 指第一套真题模考卷第 59 题。 <b>读法</b>：<span class="chip">🎯错×N</span> ＝ 这道题在你面前出现过 N 轮、你错了 N 次（总复测算第 1 轮）。少数跨章题按<b>原卷章节</b>编号（如 03-R27 原在第 3 章卷内，考点属第 6 章·金融市场功能）。 <b>一句话原则</b>：能推理的靠推理，不能推理的（数字、归属、分类）只有背。</blockquote>
+<h2>零、进考场前 6 条铁律（救分最多，先看这个）</h2>
+<div class="scroll"><table>
+<tr><th>#</th><th>铁律</th><th>为什么</th></tr>
+<tr><td>1</td><td><b>单选绝不空着</b></td><td>四选一蒙对 25%，交白卷 0%</td></tr>
+<tr><td>2</td><td><b>多选宁缺毋滥</b></td><td>全对 2 分、少选每项 0.5、<b>错选归零</b>——多勾一个字母，前面全白干</td></tr>
+<tr><td>3</td><td><b>选非题先圈「错误」</b></td><td>逐项标 ✅❌，<b>只勾 ❌</b>。方向反了，越懂越错</td></tr>
+<tr><td>4</td><td><b>绝对化词先找反例</b></td><td>只能 / 必须 / 全部 / 任何 / 就 / 意味着 → 找到反例就划</td></tr>
+<tr><td>5</td><td><b>数字题先问「谁的数」</b></td><td>数字对、主体错，是最像正确答案的干扰项</td></tr>
+<tr><td>6</td><td><b>计算题先估数量级</b></td><td>算完不在选项里，是公式错不是算错，换式子</td></tr>
+</table></div>
+<h2>〇·五、你的真题战绩总账（全部来自你做过的题，不是泛泛而谈）</h2>
+<blockquote>数据口径：两套金融真题模考卷共 <b>215 道</b>真题 + 12 份章卷 <b>338 道</b>题，你累计踩出 <b>189 道错题</b>；经 8 轮回炉（总复测→二刷→三刷→四刷→五刷→六刷→七刷→变式/判定）<b>已全部销账归零</b>。 下表「错题」只统计<b>真题</b>（题号 R 类）；「自命题」是照着 2026 大纲补的仿真题（题号 P 类），两者不混称。</blockquote>
+<div class="scroll"><table>
+<tr><th>章</th><th>章名</th><th>做过真题</th><th>错真题</th><th>失分率</th><th>自命题错</th><th>合计错</th><th>状态</th></tr>
+<tr><td>01</td><td>金融学基础</td><td>27</td><td><b>11</b></td><td>41%</td><td>3</td><td>14</td><td>✅ 已清零</td></tr>
+<tr><td>02</td><td>金融体系</td><td>12</td><td><b>2</b></td><td>17%</td><td>6</td><td>8</td><td>✅ 已清零</td></tr>
+<tr><td>03</td><td>商业银行</td><td>46</td><td><b>25</b></td><td>54%</td><td>8</td><td>33</td><td>✅ 已清零</td></tr>
+<tr><td>04</td><td>保险公司</td><td>13</td><td><b>4</b></td><td>31%</td><td>7</td><td>11</td><td>✅ 已清零</td></tr>
+<tr><td>05</td><td>证券与基金</td><td>26</td><td><b>15</b></td><td>58%</td><td>5</td><td>20</td><td>✅ 已清零</td></tr>
+<tr><td>06</td><td>金融市场与工具</td><td>19</td><td><b>7</b></td><td>37%</td><td>2</td><td>9</td><td>✅ 已清零</td></tr>
+<tr><td>07</td><td>金融资产定价</td><td>8</td><td><b>5</b></td><td>62%</td><td>10</td><td>15</td><td>✅ 已清零</td></tr>
+<tr><td>08</td><td>公司治理与风险管理</td><td>5</td><td><b>2</b></td><td>40%</td><td>4</td><td>6</td><td>✅ 已清零</td></tr>
+<tr><td>09</td><td>货币供求与均衡</td><td>17</td><td><b>8</b></td><td>47%</td><td>13</td><td>21</td><td>✅ 已清零</td></tr>
+<tr><td>10</td><td>开放经济均衡</td><td>18</td><td><b>9</b></td><td>50%</td><td>10</td><td>19</td><td>✅ 已清零</td></tr>
+<tr><td>11</td><td>中央银行与金融调控</td><td>22</td><td><b>11</b></td><td>50%</td><td>12</td><td>23</td><td>✅ 已清零</td></tr>
+<tr><td>12</td><td>金融监管</td><td>2</td><td><b>2</b></td><td>100%</td><td>8</td><td>10</td><td>✅ 已清零</td></tr>
+<tr><td>—</td><td><b>合计</b></td><td><b>215</b></td><td><b>101</b></td><td><b>47%</b></td><td><b>88</b></td><td><b>189</b></td><td>✅</td></tr>
+</table></div>
+<p><b>8 轮归零曲线（题量 → 得分率）</b></p>
+<pre>189 → 107 → 49 → 27 → 20 → 10 → 5 → 1 → 0
+ 48%   57%   49%   48%   48%   50%  55%  80% 100%</pre>
+<p><b>三条判读（比任何口诀都值钱）</b></p>
+<ol><li><b>失分最厚的三章</b>：第03章（错 25 道真题）、第05章（15）、第01章（11）——这三章占了你全部真题失分的 50%。考场上这三章的选择题，多花 10 秒。</li><li><b>最顽固的不是知识，是题型</b>：错 5 次以上的 19 道里，<b>18 道是多选</b>。你的问题从来不是「不知道」，是「多勾了一个字母」。</li><li><b>第 3 次错之后，重复做题没用</b>：11-P18 连错 7 次，第 8 次靠「逐条判一句话对错」才拿下——换问法才是破局手段，原题重做只会背字母。</li></ol>
+<h2>一、数字钉子总表（不能推理，只能记）</h2>
+<h3>1. 资金与资本类</h3>
+<div class="scroll"><table>
+<tr><th>数字</th><th>是什么</th><th>记法</th></tr>
+<tr><td><b>5% / 6% / 8%</b></td><td>资本充足率三档：核心一级 5%、一级 6%、总资本 8%</td><td>「五六八，一级一级往上加」 <span class="chip">🎯03-R3</span></td></tr>
+<tr><td><b>15% / 10%</b></td><td>单一集团客户授信集中度 15%、单一客户 10%</td><td>「集团大、单一小」——分母都是<b>资本净额</b> <span class="chip">🎯03-R10</span></td></tr>
+<tr><td><b>5% / 4%</b></td><td>不良贷款率 5%、不良资产率 4%</td><td>「贷款 5、资产 4」——<b>四五对调是坑</b></td></tr>
+<tr><td><b>50% / 30% / 30% / 100%</b></td><td>金融租赁：关联度 50%、单一关联 30%、单一租赁 30%、同业拆入 100%</td><td>「关 50、单关 30、单租 30、拆入 100」 <span class="chip">🎯03-R12</span></td></tr>
+<tr><td><b>45%</b></td><td>商业银行成本收入比监管上限</td><td>「四五」——成本收入比 45% <span class="chip">🎯03-R14</span></td></tr>
+<tr><td><b>1000 万</b></td><td>私募理财合格<b>法人</b>投资者门槛</td><td>「1 千万起步、90 天起锁、固 30 混 40 权 100」 <span class="chip">🎯03-R2</span></td></tr>
+<tr><td><b>5%</b></td><td>证券公司主要股东持股起点</td><td>「券商主要股东 5% 起」 <span class="chip">🎯05-R4</span></td></tr>
+</table></div>
+<h3>2. 期限与比例类</h3>
+<div class="scroll"><table>
+<tr><th>数字</th><th>是什么</th><th>记法</th></tr>
+<tr><td><b>1 年</b></td><td>同业拆借最长期限</td><td>「银行 1 年、租汽保 3 月、证信 7 天」</td></tr>
+<tr><td><b>365 天</b></td><td>买断式回购期限封顶</td><td>「一年封顶」</td></tr>
+<tr><td><b>90 天</b></td><td>私募理财最短封闭期</td><td>「90 天起锁」</td></tr>
+<tr><td><b>5%</b></td><td>货币市场基金高流动性资产下限</td><td>现金+国债+央票+政策性金融债<b>合计 ≥5%</b> <span class="chip">🎯05-R1</span></td></tr>
+<tr><td><b>80%</b></td><td>基金类型身份判据</td><td>「80% 定身份」；都不足 80% 才是混合基金 <span class="chip">🎯05-R2</span></td></tr>
+<tr><td><b>5 人</b></td><td>证券投资咨询机构准入人数</td><td>「咨询 5 人」 <span class="chip">🎯首套Q59</span></td></tr>
+</table></div>
+<h3>3. 宏观与国际类</h3>
+<div class="scroll"><table>
+<tr><th>数字</th><th>是什么</th><th>记法</th></tr>
+<tr><td><b>10% / 两位数 / 三位数</b></td><td>通胀分级：温和 &lt;10%、奔腾两位数、恶性三位数</td><td>「10%+ 选奔腾、存不了钱选超级」 <span class="chip">🎯09-R3</span></td></tr>
+<tr><td><b>5 币</b></td><td>SDR 货币篮子：美元、欧元、人民币、日元、英镑</td><td>「美欧人民币日英」——<b>无瑞郎</b> <span class="chip">🎯10-R6</span></td></tr>
+<tr><td><b>1 年 / 3 月 / 7 天</b></td><td>拆借期限分档（同上）</td><td>与资金类同记</td></tr>
+<tr><td><b>100 万</b></td><td>村镇银行注册资本（县级）</td><td>「县 100 万、有发起行、外资可入、服务三农」 <span class="chip">🎯03-R8</span></td></tr>
+</table></div>
+<h3>4. 三条成对易混数字（考试最爱设）</h3>
+<div class="scroll"><table>
+<tr><th>三兄弟</th><th>谁决定</th><th>一句话</th></tr>
+<tr><td><b>法定准备金率</b></td><td><b>央行</b>定</td><td>法定的看央行 <span class="chip">🎯09-R4</span></td></tr>
+<tr><td><b>超额准备金率</b></td><td><b>商业银行</b>自己定</td><td>超额的看银行 <span class="chip">🎯09-P13</span></td></tr>
+<tr><td><b>现金漏损率</b></td><td><b>储户（老百姓）</b>决定</td><td>漏损看储户的手 <span class="chip">🎯09-P13</span></td></tr>
+</table></div>
+<blockquote>三者的方向一致：<b>漏得少、锁得少、乘得多</b>——三个比率越低，货币乘数越大、货币供给越多。</blockquote>
+<h2>二、12 章骨架口诀（每章一张小卡）</h2>
+<h3>第 01 章 金融学基础<span class="badge">🎯 错 11/27 道（41%）</span></h3>
+<p><b>总纲</b>：利率是价格，汇率是比价，国际货币体系是规则。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>利率市场化「<b>先市场、后存贷</b>」</td><td>货币市场、债券市场利率先放开；存贷款利率风险外溢最大，放最后</td><td>见「先放开存贷款」直接划</td></tr>
+<tr><td>下一程「<b>自律、合理、调控、传导</b>」</td><td>改革方向是打破协同、允许差异化定价</td><td>见「协同定价 / 一致定价」直接划</td></tr>
+<tr><td>利率决定三大家「<b>古典=储投、凯恩斯=货币、可贷=综合</b>」</td><td>古典看储蓄投资、凯恩斯看货币供求、可贷资金两者都看</td><td>「利率由什么决定」的四种问法</td></tr>
+<tr><td>期限结构三理论「<b>预、分、流</b>」</td><td>预期理论、分割市场理论、流动性溢价理论</td><td>见「流动性陷阱 / 古典」直接划（那是别的概念）</td></tr>
+<tr><td>风险结构三件套「<b>违约、流动、税</b>」</td><td>同一期限不同债券的利差来源</td><td>见「手续费 / 增值税」直接划 <span class="hit">🎯错×3</span>（01-R6）</td></tr>
+<tr><td>汇率按制度性质「<b>固定 vs 浮动</b>」</td><td>这是唯一按"制度"分的角度</td><td>名义/实际、买入/卖出、有效汇率是另外三套</td></tr>
+<tr><td>国际货币体系三核心「<b>调节、储备、汇率</b>」</td><td>国际收支怎么调、储备用什么、汇率怎么定</td><td>见「基准利率 / 账户开放」不入列</td></tr>
+<tr><td>时间价值四因「<b>利、险、胀、机会</b>」</td><td>利息、风险、通胀、机会成本</td><td>汇率不掺和</td></tr>
+<tr><td>购买力平价「<b>← 一价定律</b>」</td><td>一物一价推出一国物价与汇率的关系</td><td>绝对购买力平价的基础</td></tr>
+</table></div>
+<p><b>金本位 vs 布雷顿森林（必考对比）</b></p>
+<div class="scroll"><table>
+<tr><th></th><th>国际金本位制</th><th>布雷顿森林体系</th></tr>
+<tr><td>中心</td><td><b>黄金</b>中心</td><td><b>美元</b>中心</td></tr>
+<tr><td>汇率</td><td><b>固定</b>（死汇率）</td><td><b>可调整</b>的固定汇率</td></tr>
+<tr><td>关键词</td><td>「<b>自发</b>」形成</td><td>「<b>可调整</b>」平价</td></tr>
+<tr><td>五要素</td><td>金自由、金储备、自动调、死汇率、锚铸币</td><td>双挂钩（美元挂黄金、他国挂美元）</td></tr>
+</table></div>
+<blockquote>记忆钩：<b>"自发"是金本位的词，"可调整"是布雷顿的专利</b>。看到"黄金在国际间自由流动不受限制"——对，这是金本位。</blockquote>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>27</b> 道真题，错 <b>11</b> 道（失分率 41%）；另有自命题仿真错 3 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>01-R6</td><td>利率的风险结构</td><td><b>BCE</b></td><td><b>×3</b></td></tr>
+<tr><td>01-R10</td><td>货币时间价值</td><td><b>ABDE</b></td><td>×2</td></tr>
+<tr><td>01-R15</td><td>购买力平价理论</td><td><b>D</b></td><td>×2</td></tr>
+<tr><td>01-R9</td><td>国际货币体系的核心内容</td><td><b>ABD</b></td><td>×2</td></tr>
+<tr><td>01-R11</td><td>汇率制度分类（IMF 划分）</td><td><b>B</b></td><td>×1</td></tr>
+<tr><td>01-R12</td><td>IS-LM 模型（区域判断）</td><td><b>C</b></td><td>×1</td></tr>
+<tr><td>01-R13</td><td>利率期限结构（预期理论）</td><td><b>C</b></td><td>×1</td></tr>
+<tr><td>01-R17</td><td>资本资产定价模型（CAPM / β 系数）</td><td><b>A</b></td><td>×1</td></tr>
+<tr><td>01-R18</td><td>布雷顿森林体系</td><td><b>ACDE</b></td><td>×1</td></tr>
+<tr><td>01-R7</td><td>国际金本位制的特征</td><td><b>BCD</b></td><td>×1</td></tr>
+<tr><td>01-R8</td><td>利率市场化改革的后续任务</td><td><b>ACDE</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>利率的风险结构</b>（×3）、<b>货币时间价值</b>（×2）、<b>购买力平价理论</b>（×2） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：汇率变动的经济影响 ×1、汇率分类（按衡量对象的总体/个体） ×1、国际货币体系三阶段 ×1</blockquote>
+<h3>第 02 章 金融体系<span class="badge">✅ 错 2/12 道（17%，全卷最稳）</span></h3>
+<p><b>总纲</b>：谁吸存、谁放贷、谁监管、谁服务——按牌照分。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>能吸存「<b>银行、信用社、财务公司</b>」</td><td>只有这三类能吸收公众存款</td><td>消金、证券、保险、信托一律不能</td></tr>
+<tr><td>金融市场三要素「<b>人、物、价</b>」</td><td>主体、客体（工具）、价格</td><td>「三要素」的标准问法</td></tr>
+<tr><td>审慎经营四规则「<b>质量、内控、关联、风控</b>」</td><td>资产质量、内控、关联交易、风险控制</td><td>见「客户营销」直接划</td></tr>
+<tr><td>银行业协会 = <b>会员共同利益</b></td><td>它是行业自律组织，不是监管者</td><td>见「监管 / 保护储户」必错 <span class="hit">🎯错×1</span>（02-R7）</td></tr>
+<tr><td>政策性银行三职能「<b>倡、补、服</b>」</td><td>倡导、补充、服务</td><td>「监管」不属于它的职能</td></tr>
+<tr><td>货币经纪 = <b>润滑剂</b>；债转股 = <b>AIC</b></td><td>货币经纪撮合交易；AIC 专做债转股</td><td>坏账 = AMC、理财 = 理财子（三家别串）</td></tr>
+<tr><td>五篇大文章「<b>科绿普养数</b>」</td><td>科技、绿色、普惠、养老、数字金融</td><td>2026 新增，必考</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>12</b> 道真题，错 <b>2</b> 道（失分率 17%）；另有自命题仿真错 6 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>02-R7</td><td>其他非银行金融机构（货币经纪公司）</td><td><b>A</b></td><td>×1</td></tr>
+<tr><td>02-R8</td><td>金融体系（中央金融工作会议）</td><td><b>D</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>六大体系·金融调控体系</b>（自命题）（×2）、<b>金融机构体系·政策性银行</b>（自命题）（×2）、<b>五大监管·行为监管</b>（自命题）（×1） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：六大体系·金融调控体系 ×2、金融机构体系·政策性银行 ×2、五大监管·行为监管 ×1</blockquote>
+<h3>第 03 章 商业银行<span class="badge">🔴 错 25/46 道（54%）· 全卷失分第一</span></h3>
+<p><b>总纲</b>：唯一能吸活期存款、创造信用货币的金融机构。<b>这一章是全书分值最厚的，逐条背。</b></p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>三最「<b>最悠久、吸活期创信用、盈利企业</b>」</td><td>历史最久、资本最雄厚、体系最庞大；明显特征是吸活期+创信用货币</td><td>见「所有者权益也是货币供给」直接划（只有存款才是） <span class="hit">🎯错×5</span>（03-R13）</td></tr>
+<tr><td>三性「<b>安全性、流动性、盈利性</b>」= <b>对立统一</b></td><td>三者互相制约，不能同时最大化</td><td>见「同一 / 完全一致」先划</td></tr>
+<tr><td>资本充足「<b>5、6、8</b>」</td><td>核心一级 5%、一级 6%、总 8%</td><td>见数字先问「哪一档」</td></tr>
+<tr><td>核心一级资本「<b>股 + 公积 + 留存 + 其他综合收益</b>」</td><td>股本、资本公积、留存收益、其他综合收益</td><td>「超额准备」不在这里，去二级资本</td></tr>
+<tr><td>资本扣减「<b>商誉、无形、递延税</b>」</td><td>这三项从资本里扣</td><td>准备金是<b>进项</b>不是扣项</td></tr>
+<tr><td>负债四路「<b>存款、同业、央行、发债</b>」</td><td>—</td><td>理财是表外、同业不是主力 <span class="hit">🎯错×5</span>（03-R23）</td></tr>
+<tr><td>四自原则「<b>经营、担险、盈亏、约束</b>」</td><td>自主经营、自担风险、自负盈亏、自我约束</td><td>「四自」标准四问</td></tr>
+<tr><td>商行内控「<b>制衡、审慎、全覆盖、相匹配</b>」</td><td>—</td><td>券商内控是「健全、合理、制衡、独立」，两套别串</td></tr>
+<tr><td>缺口分析「<b>正缺口怕降息、负缺口怕升息</b>」</td><td>资产 &gt; 负债才叫正缺口</td><td>利率上升，正缺口受益</td></tr>
+<tr><td>商行内控四则（同）、成本收入比 <b>45%</b></td><td>—</td><td>数字题</td></tr>
+</table></div>
+<p><b>关于「存款经营」</b>：影响因素 = <b>支付、创造、监管</b>。LPR 是贷款的事，别往存款上贴。</p>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>46</b> 道真题，错 <b>25</b> 道（失分率 54%）；另有自命题仿真错 8 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>03-R13</td><td>商业银行的特征</td><td><b>ABC</b></td><td><b>×5</b></td></tr>
+<tr><td>03-R23</td><td>商业银行负债业务</td><td><b>ABCD</b></td><td><b>×5</b></td></tr>
+<tr><td>03-R27</td><td>金融市场功能</td><td><b>BDE</b></td><td><b>×5</b></td></tr>
+<tr><td>03-R10</td><td>信用风险监管核心指标（数字钉子）</td><td><b>CDE</b></td><td><b>×3</b></td></tr>
+<tr><td>03-R22</td><td>商业银行资本（核心一级资本构成）</td><td><b>A</b></td><td><b>×3</b></td></tr>
+<tr><td>03-R26</td><td>资产负债管理（缺口分析）</td><td><b>BD</b></td><td><b>×3</b></td></tr>
+<tr><td>03-R9</td><td>商业银行内部控制原则</td><td><b>BCDE</b></td><td><b>×3</b></td></tr>
+<tr><td>03-R11</td><td>董事与高管任职资格</td><td><b>ABCE</b></td><td>×2</td></tr>
+<tr><td>03-R12</td><td>金融租赁公司监管指标（数字钉子）</td><td><b>BCDE</b></td><td>×2</td></tr>
+<tr><td>03-R14</td><td>商业银行经营（成本收入比监管）</td><td><b>C</b></td><td>×2</td></tr>
+<tr><td>03-R15</td><td>商业银行市场营销</td><td><b>D</b></td><td>×2</td></tr>
+<tr><td>03-R20</td><td>商业银行资产管理</td><td><b>D</b></td><td>×2</td></tr>
+<tr><td>03-R21</td><td>商业银行市场风险（黄金的归属）</td><td><b>C</b></td><td>×2</td></tr>
+<tr><td>03-R7</td><td>投资银行的特征</td><td><b>BE</b></td><td>×2</td></tr>
+<tr><td>03-R8</td><td>村镇银行的设立与定位</td><td><b>ACD</b></td><td>×2</td></tr>
+<tr><td>03-R1</td><td>货币供给与存款准备金</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>03-R17</td><td>商业银行资本管理（资本扣减项）</td><td><b>B</b></td><td>×1</td></tr>
+<tr><td>03-R18</td><td>存款经营的影响因素</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>03-R19</td><td>商业银行法（经营原则）</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>03-R2</td><td>理财业务投资者门槛（数字钉子）</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>03-R24</td><td>商业银行风险管理流程</td><td><b>ABCE</b></td><td>×1</td></tr>
+<tr><td>03-R3</td><td>资本充足率三层指标（数字钉子）</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>03-R4</td><td>凯恩斯货币需求理论（流动性陷阱）</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>03-R5</td><td>商业银行经营三性原则</td><td><b>B</b></td><td>×1</td></tr>
+<tr><td>03-R6</td><td>商业银行柜台市场业务</td><td><b>ABDE</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>商业银行的特征</b>（×5）、<b>商业银行负债业务</b>（×5）、<b>金融市场功能</b>（×5） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：三大业务·资产业务 ×4、资本充足率三档 + 杠杆率 ×2、资产负债管理·利率敏感性缺口 ×2</blockquote>
+<h3>第 04 章 保险公司<span class="badge">🎯 错 4/13 道（31%）</span></h3>
+<p><b>总纲</b>：保险保风险，信托管财产，两个牌照、两套规则。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>保险主体「<b>保险人签字、投保人掏钱、被保险人被保、受益人收钱</b>」</td><td>保险人=保险公司；掏钱的是投保人</td><td>四类主体别混</td></tr>
+<tr><td>再保险三安排「<b>临时、合同、预约</b>」</td><td>—</td><td>见「代理再保险 / 委托再保险」直接选（选非题里它就是答案）</td></tr>
+<tr><td>再保险两分类「<b>比例 vs 非比例</b>」</td><td><b>按保额分＝比例（成数、溢额）；按赔款/赔付率分＝非比例（超额赔款、赔付率超赔）</b></td><td>见「溢额属非比例」「赔付率超赔属比例」= 分类对调 <span class="hit">🎯错×7</span>（04-P5）</td></tr>
+<tr><td>信托三方「<b>委托、受托、受益</b>」</td><td>委托人、受托人、受益人</td><td>监督人、账管、托管都不算当事人</td></tr>
+<tr><td>信托财产「<b>名义在受托人、权利归受托人</b>」</td><td>受益人只拿钱，不掌权</td><td>「信托装权不装债」</td></tr>
+<tr><td>险资三投「<b>公债、国债、股票</b>」</td><td>保险资金运用限于此三类</td><td>不炒房、不放贷</td></tr>
+<tr><td>财富管理服务信托「<b>家、保、遗嘱</b>」</td><td>家族信托、保险金信托、遗嘱信托</td><td>慈善归慈善、资产证券化归金融服务</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>13</b> 道真题，错 <b>4</b> 道（失分率 31%）；另有自命题仿真错 7 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>04-R10</td><td>信托业务分类（财富管理服务信托）</td><td><b>ABE</b></td><td><b>×3</b></td></tr>
+<tr><td>04-R7</td><td>保险资金运用</td><td><b>ACE</b></td><td>×2</td></tr>
+<tr><td>04-R9</td><td>保险合同主体</td><td><b>C</b></td><td>×2</td></tr>
+<tr><td>04-R6</td><td>信托当事人</td><td><b>ABD</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>再保险·业务种类</b>（自命题）（×7）、<b>保险四大原则·近因原则</b>（自命题）（×3）、<b>保险合同·主体</b>（自命题）（×3） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：再保险·业务种类 ×7、保险四大原则·近因原则 ×3、保险合同·主体 ×3</blockquote>
+<h3>第 05 章 证券公司与基金管理公司<span class="badge">🔴 错 15/26 道（58%）· 失分率第二</span></h3>
+<p><b>总纲</b>：投行不吸存、券商管身份、基金看 80%。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>投行「<b>自己发债票、能直投；不吸存、不靠贷</b>」</td><td>投资银行能做直投，不能吸收存款</td><td>业务综合</td></tr>
+<tr><td>券商四身份「<b>代客=经纪、自己=自营、报价=做市、发新股=承销</b>」</td><td>—</td><td>四组动作对四个名词</td></tr>
+<tr><td>承销两型「<b>代销、包销（全额/余额）</b>」</td><td>代销卖不掉退还；包销自己吃下</td><td>见「外销 / 联营 / 联合销售」直接划</td></tr>
+<tr><td>基金 80% 判据</td><td>某类资产 ≥80% 就定身份</td><td>都不足 80% 才是混合基金</td></tr>
+<tr><td>托管 vs 管理「<b>托管费→托管银行、管理费→基金公司</b>」</td><td>托管四活：管钱、出意见、办清算、披露；<b>不保收益</b></td><td>保管基金财产也是托管行的活 <span class="hit">🎯错×2</span>（05-R3）</td></tr>
+<tr><td>中国公募 = <b>契约型</b></td><td>我国公募基金一律契约型</td><td>公司型是美国的</td></tr>
+<tr><td>券商内控「<b>健全、合理、制衡、独立</b>」</td><td>—</td><td>商行内控是「制衡、审慎、全覆盖、相匹配」</td></tr>
+<tr><td>卖基金「<b>银证期保咨独</b>」</td><td>银行、证券、期货、保险、咨询、独立销售机构</td><td><b>没消金</b></td></tr>
+<tr><td>券商主要股东 <b>5%</b> 起；咨询 <b>5 人</b></td><td>—</td><td>数字题</td></tr>
+<tr><td>市场退出监管 = <b>证监会</b></td><td>「生死大事找证监会」</td><td>别选央行</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>26</b> 道真题，错 <b>15</b> 道（失分率 58%）；另有自命题仿真错 5 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>05-R4</td><td>证券公司股东分类（数字钉子）</td><td><b>A</b></td><td><b>×4</b></td></tr>
+<tr><td>05-R21</td><td>基金销售机构</td><td><b>ACDE</b></td><td><b>×3</b></td></tr>
+<tr><td>05-R6</td><td>证券承销方式</td><td><b>BCE</b></td><td><b>×3</b></td></tr>
+<tr><td>05-R1</td><td>货币市场基金投资比例（数字钉子）</td><td><b>A</b></td><td>×2</td></tr>
+<tr><td>05-R12</td><td>货币可兑换（IMF 协定）</td><td><b>B</b></td><td>×2</td></tr>
+<tr><td>05-R17</td><td>证券投资基金组织形式</td><td><b>C</b></td><td>×2</td></tr>
+<tr><td>05-R3</td><td>基金费用与当事人</td><td><b>C</b></td><td>×2</td></tr>
+<tr><td>05-R8</td><td>证券公司内部控制原则</td><td><b>ABCE</b></td><td>×2</td></tr>
+<tr><td>05-R10</td><td>证券公司监管（市场退出监管）</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>05-R11</td><td>基金管理人</td><td><b>C</b></td><td>×1</td></tr>
+<tr><td>05-R13</td><td>私募资产管理业务（推介渠道限制）</td><td><b>A</b></td><td>×1</td></tr>
+<tr><td>05-R14</td><td>证券公司高管任职资格</td><td><b>B</b></td><td>×1</td></tr>
+<tr><td>05-R2</td><td>基金类型判定（投资比例门槛）</td><td><b>B</b></td><td>×1</td></tr>
+<tr><td>05-R7</td><td>基金托管人职责</td><td><b>ABCE</b></td><td>×1</td></tr>
+<tr><td>05-R9</td><td>证券投资基金分类（按资金来源与用途）</td><td><b>A</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>证券公司股东分类（数字钉子）</b>（×4）、<b>基金费用·计提与支付（2026新增）</b>（自命题）（×3）、<b>基金销售机构</b>（×3） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：基金费用·计提与支付（2026新增） ×3、证券公司·四大身份 ×2、基金三主体·职责边界 ×2</blockquote>
+<h3>第 06 章 金融市场与金融工具<span class="badge">🎯 错 7/19 道（37%）</span></h3>
+<p><b>总纲</b>：分场（场内/场外）、分工具（货币/资本/衍生）、分功能。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>银行间三市场「<b>拆借、票据、外汇</b>」</td><td>银行间是场外、机构之间、报价驱动</td><td>期货、交易所是场内 <span class="hit">🎯错×6</span>（06-R5）</td></tr>
+<tr><td>衍生四性「<b>跨期、联动、杠杆、高风险</b>」</td><td>—</td><td>见「稳定性」直接划</td></tr>
+<tr><td>远期 vs 期货「<b>远期=场外、非标、险大、无盯市；期货全反过来</b>」</td><td>—</td><td>五维表必考</td></tr>
+<tr><td>股票分类 <b>两维度别串</b></td><td>按投资主体：国家、法人、公众、外资；按权利：普通、优先</td><td>「按主体」不等于「按权利」</td></tr>
+<tr><td>在岸 vs 离岸「<b>在岸=家门口（本国募、本国投）</b>」</td><td>离岸 = 两头都在外（非居民玩）</td><td>欧洲货币 = 非居民</td></tr>
+<tr><td>国际债券「<b>币≠地=欧洲债；人民币在华=熊猫</b>」</td><td>币种与发行地不一致＝欧洲债券</td><td>熊猫债＝境外机构在境内发人民币债</td></tr>
+<tr><td>兼并 vs 收购「<b>兼并=整体吞并、法人消失；收购=买股权、法人还在</b>」</td><td>—</td><td>看被并方法人是否存续</td></tr>
+<tr><td>市场功能「<b>价、配、信、流、险</b>」</td><td>价格发现、资源配置、信息传递、资金流动、风险管理</td><td>见「不能 / 很难」先质疑 <span class="hit">🎯错×5</span>（03-R27）</td></tr>
+<tr><td>票据归 <b>央行</b></td><td>票据市场属货币市场，货币市场一家亲</td><td>别选证监会</td></tr>
+<tr><td>买断式回购 <b>365 天</b></td><td>一年封顶</td><td>数字题</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>19</b> 道真题，错 <b>7</b> 道（失分率 37%）；另有自命题仿真错 2 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>06-R5</td><td>银行间市场自律组织</td><td><b>ACE</b></td><td><b>×6</b></td></tr>
+<tr><td>06-R11</td><td>金融衍生品市场交易主体</td><td><b>B</b></td><td>×2</td></tr>
+<tr><td>06-R12</td><td>金融远期与金融期货比较</td><td><b>ADE</b></td><td>×2</td></tr>
+<tr><td>06-R2</td><td>欧洲货币市场</td><td><b>D</b></td><td>×2</td></tr>
+<tr><td>06-R4</td><td>金融衍生品的特征</td><td><b>ABDE</b></td><td>×2</td></tr>
+<tr><td>06-R10</td><td>商业票据发行价格计算</td><td><b>C</b></td><td>×1</td></tr>
+<tr><td>06-R3</td><td>中央银行的外汇市场操作</td><td><b>C</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>银行间市场自律组织</b>（×6）、<b>股票按投资主体分类</b>（自命题）（×2）、<b>金融衍生品市场交易主体</b>（×2） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：股票按投资主体分类 ×2、质押式回购 vs 买断式回购 ×1</blockquote>
+<h3>第 07 章 金融资产定价<span class="badge">🔴 错 5/8 道（62%）· 失分率最高但题少</span></h3>
+<p><b>总纲</b>：三个模型（CAPM、APT、B-S）+ 两条曲线（有效边界、期权价值结构）。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>期权五因子「<b>标价、执价、期限、波动、无风险利率</b>」</td><td>标的价、执行价、期限、波动率、无风险利率</td><td>见「<b>预期收益率 / 风险度</b>」直接划——期权是无套利定价，跟预期收益无关 <span class="hit">🎯错×6</span>（07-R4）</td></tr>
+<tr><td>期权价值 = <b>内在价值 + 时间价值</b></td><td>到期时<b>时间价值 = 0</b>，只剩内在价值</td><td>波动↑、期限↑ → 价值↑ <span class="hit">🎯错×7</span>（07-P14）</td></tr>
+<tr><td>看涨买方「<b>下有底、上无限</b>」</td><td>最大损失＝期权费；卖方反过来</td><td>见「最大收益＝期权费」→ 那是<b>卖方</b></td></tr>
+<tr><td>CAPM vs APT</td><td>两者都是均衡模型；<b>CAPM 是 APT 的单因子特例</b>（因子＝市场组合）；<b>APT 不要求以市场组合为定价因子</b></td><td>见「APT 假设均衡时仍存在无风险套利机会」直接判错 <span class="hit">🎯错×7</span>（07-P10）</td></tr>
+<tr><td>β 计算「<b>β = 超额收益 ÷ 超额市场</b>」</td><td>分子分母<b>同减无风险利率</b></td><td>忘了减无风险必错</td></tr>
+<tr><td>组合 β 判据「<b>要低波 → β 全 ≤1，超 1 踢出</b>」</td><td>问「不可能入选」就勾大的（1.5、1.3）</td><td>—</td></tr>
+<tr><td>有效边界「<b>光滑上凸、右上倾斜、不凹陷</b>」</td><td>—</td><td>选非题里「凹陷」就是答案</td></tr>
+<tr><td>股利固定增长「<b>先长后除：D₁ = D₀(1+g) ÷ (r−g)</b>」</td><td>看到「永久保持 g%」必用此式</td><td>分子先乘（1+g）再除</td></tr>
+<tr><td>金融工程四法「<b>积木、状态价、风险中性、套利</b>」</td><td>—</td><td>见「利差定价」在选非题里直接勾</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>8</b> 道真题，错 <b>5</b> 道（失分率 62%）；另有自命题仿真错 10 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>07-R4</td><td>期权价值的决定因素</td><td><b>BCE</b></td><td><b>×6</b></td></tr>
+<tr><td>07-R1</td><td>金融工程的分析方法</td><td><b>C</b></td><td>×2</td></tr>
+<tr><td>07-R3</td><td>资产组合的有效边界</td><td><b>C</b></td><td>×2</td></tr>
+<tr><td>07-R5</td><td>资产组合 β 的计算与应用</td><td><b>BD</b></td><td>×2</td></tr>
+<tr><td>07-R2</td><td>股票内在价值（戈登股利增长模型）</td><td><b>A</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>CAPM vs APT</b>（自命题）（×7）、<b>期权价值结构（2026新增）</b>（自命题）（×7）、<b>期权价值的决定因素</b>（×6） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：CAPM vs APT ×7、期权价值结构（2026新增） ×7、期权定价方法（B-S） ×5</blockquote>
+<h3>第 08 章 公司治理与风险管理<span class="badge">🎯 错 2/5 道（40%）</span></h3>
+<p><b>总纲</b>：风险分四类（信用、市场、操作、流动性），各自有管理体系。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>见「<b>多米诺、连锁、传染、挤兑</b>」→ <b>系统性风险</b></td><td>一家倒一片倒</td><td>兜底靠<b>最后贷款人</b></td></tr>
+<tr><td>操作风险要素「<b>董高、架构、政策程序</b>」</td><td>董事会高管、组织架构、政策与程序</td><td><b>监事会不入列</b>（选非题里它是答案）</td></tr>
+<tr><td>信用风险三机制「<b>审、授、额</b>」</td><td>审查、授信、限额</td><td>「支付」是流动性风险的事 <span class="hit">🎯错×3</span>（08-R3）</td></tr>
+<tr><td>风险管理「<b>流程=识、计、量、控；对冲是策略</b>」</td><td>流程与策略是两个层次</td><td>见「对冲属于流程」判错</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>5</b> 道真题，错 <b>2</b> 道（失分率 40%）；另有自命题仿真错 4 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>08-R3</td><td>信用风险管理机制</td><td><b>B</b></td><td><b>×3</b></td></tr>
+<tr><td>08-R1</td><td>系统性风险与监管处置</td><td><b>C</b></td><td>×2</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>信用风险管理机制</b>（×3）、<b>操作风险边界（含法律不含声誉战略）</b>（自命题）（×2）、<b>系统性风险与监管处置</b>（×2） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：操作风险边界（含法律不含声誉战略） ×2、风险治理架构 ×1、全面风险管理七要素 ×1</blockquote>
+<h3>第 09 章 货币供求与货币均衡<span class="badge">🟠 错 8/17 道（47%）</span></h3>
+<p><b>总纲</b>：需求三动机 → 供给乘数 → 均衡（IS-LM）→ 通胀。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>凯恩斯三动机「<b>交易预防看收入、投机看利率（反向）</b>」</td><td>利率一升，投机需求就降</td><td>利率出现就往投机上配对</td></tr>
+<tr><td>流动性陷阱「<b>利率极低 → 需求无穷 → 货币政策失效</b>」</td><td>图形上是<b>水平</b>（横轴）段</td><td>陷阱＝躺平</td></tr>
+<tr><td>弗里德曼 vs 凯恩斯「<b>恒久收入=弗里德曼；利率敏感=凯恩斯</b>」</td><td>弗里德曼用恒久收入，利率不敏感</td><td>双标签题必考</td></tr>
+<tr><td>货币乘数「<b>漏得少、锁得少、乘得多</b>」</td><td>三个负相关：现金漏损率、超额准备金率、法定准备金率</td><td>三兄弟决定主体：央行/银行/储户</td></tr>
+<tr><td>IS-LM「<b>IS 上产剩、LM 上钱剩</b>」</td><td>IS 曲线右侧＝产品市场供给过剩；LM 右侧＝货币供给过剩</td><td>四区域必考</td></tr>
+<tr><td>货币层次「<b>M1=现金+单位活期；定期储蓄在 M2、大额存单在 M3</b>」</td><td>M3 独有成员＝大额存单</td><td>层次题必考</td></tr>
+<tr><td>通胀分级「<b>温和&lt;10%、奔腾两位数、恶性三位数</b>」</td><td>超级通胀＝货币失去价值尺度职能</td><td>「10%+」选奔腾</td></tr>
+<tr><td>通胀成因「<b>原料涨=成本推；需求旺=需求拉</b>」</td><td>—</td><td>看谁先动</td></tr>
+<tr><td>供给学派治理「<b>减税、简政、削福利、适度给钱</b>」</td><td>增加供给，不压需求</td><td>见「增税 / 扩支 / 限购」划 <span class="hit">🎯错×5</span>（09-R6）</td></tr>
+<tr><td>基础货币三渠道「<b>国债、银行债、外汇</b>」</td><td>央行买国债、再贷款/再贴现、收外汇</td><td>三渠道题</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>17</b> 道真题，错 <b>8</b> 道（失分率 47%）；另有自命题仿真错 13 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>09-R6</td><td>供给学派的治理政策</td><td><b>BCDE</b></td><td><b>×5</b></td></tr>
+<tr><td>09-R3</td><td>通货膨胀的类型（按严重程度）</td><td><b>D</b></td><td><b>×3</b></td></tr>
+<tr><td>09-R12</td><td>基础货币投放渠道（多选版）</td><td><b>ABC</b></td><td>×2</td></tr>
+<tr><td>09-R7</td><td>紧缩性货币政策工具</td><td><b>BCD</b></td><td>×2</td></tr>
+<tr><td>09-R2</td><td>凯恩斯货币需求三动机</td><td><b>D</b></td><td>×1</td></tr>
+<tr><td>09-R4</td><td>货币乘数变量的决定主体</td><td><b>C</b></td><td>×1</td></tr>
+<tr><td>09-R8</td><td>货币乘数的影响因素</td><td><b>BCD</b></td><td>×1</td></tr>
+<tr><td>09-R9</td><td>通货膨胀成因</td><td><b>D</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>通货膨胀治理（紧缩货币）</b>（自命题）（×6）、<b>存款货币创造两前提</b>（自命题）（×5）、<b>供给学派的治理政策</b>（×5） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：通货膨胀治理（紧缩货币） ×6、存款货币创造两前提 ×5、货币乘数三变量的决定主体（F-93 补全） ×3</blockquote>
+<h3>第 10 章 开放经济均衡<span class="badge">🟠 错 9/18 道（50%）</span></h3>
+<p><b>总纲</b>：国际收支 → 储备与负债 → 汇率制度 → 三元悖论。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>国际收支「<b>利降钱走、价涨差扩、收增进口</b>」</td><td>利率降资本外流；物价涨出口竞争力降、逆差扩大</td><td>三类影响方向题</td></tr>
+<tr><td>储备功能：债权人看「<b>资信</b>」；本国看「<b>逆差、汇率、物价</b>」</td><td>对外是偿债能力证明</td><td>两视角别混</td></tr>
+<tr><td><b>FDI 不是债</b></td><td>外商直接投资是股权，不是外债</td><td>见「人民币计价外债」→ <b>不消耗外汇储备</b></td></tr>
+<tr><td>BP 曲线「<b>弹性大→平坦；资本完全流动→水平；斜率正</b>」</td><td>纵轴是<b>利率</b>不是汇率</td><td>曲线题必考 <span class="hit">🎯错×4</span>（10-R2）</td></tr>
+<tr><td>汇率制度弹性「<b>局 → 传 → 爬 → 浮</b>」</td><td>货币局、传统钉住、爬行钉住、浮动</td><td>越往右越灵活</td></tr>
+<tr><td>三元悖论：<b>货币局制下汇率没得选，剩两个挑一个</b></td><td>汇率稳定 + 资本流动 ⇒ 放弃货币政策独立</td><td>三选二的问法</td></tr>
+<tr><td>IMF 谈可兑换 = <b>经常项目</b>可兑换</td><td>不管资本项目</td><td>见「资本项目可兑换」判错</td></tr>
+<tr><td>国际收支平衡表「<b>成交价 + 复式记账</b>」</td><td>—</td><td>计价原则题</td></tr>
+<tr><td>SDR 五币「<b>美、欧、人民币、日、英</b>」</td><td><b>无瑞郎</b></td><td>「白给、记账、花不出去」 <span class="hit">🎯错×1</span>（10-R6）</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>18</b> 道真题，错 <b>9</b> 道（失分率 50%）；另有自命题仿真错 10 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>10-R2</td><td>BP 曲线（国际收支均衡线）</td><td><b>B</b></td><td><b>×4</b></td></tr>
+<tr><td>10-R11</td><td>特别提款权（SDR）</td><td><b>BD</b></td><td><b>×3</b></td></tr>
+<tr><td>10-R10</td><td>三元悖论（政策组合选择）</td><td><b>B</b></td><td>×2</td></tr>
+<tr><td>10-R3</td><td>外债与外汇储备</td><td><b>B</b></td><td>×1</td></tr>
+<tr><td>10-R4</td><td>外债的构成</td><td><b>ACDE</b></td><td>×1</td></tr>
+<tr><td>10-R5</td><td>上市公司股票的分类</td><td><b>BCDE</b></td><td>×1</td></tr>
+<tr><td>10-R6</td><td>特别提款权（SDR）货币篮子</td><td><b>ACDE</b></td><td>×1</td></tr>
+<tr><td>10-R7</td><td>国际债券分类</td><td><b>B</b></td><td>×1</td></tr>
+<tr><td>10-R8</td><td>国际收支平衡表编制原则</td><td><b>B</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>外债管理政策（2026 大纲要求）</b>（自命题）（×5）、<b>BP 曲线（国际收支均衡线）</b>（×4）、<b>国际收支失衡成因（方向）</b>（自命题）（×3） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：外债管理政策（2026 大纲要求） ×5、国际收支失衡成因（方向） ×3、国际储备规模管理（2026 大纲要求） ×2</blockquote>
+<h3>第 11 章 中央银行与金融调控<span class="badge">🟠 错 11/22 道（50%）· 铁钉最多</span></h3>
+<p><b>总纲</b>：央行三职能 → 三大法宝 → 双支柱（货币 + 审慎）。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>三大法宝「<b>准、贴、市</b>」</td><td>存款准备金率、再贴现、公开市场操作</td><td>再贷款、窗口指导<b>一律不进</b> <span class="hit">🎯错×5</span>（11-P16）</td></tr>
+<tr><td>抗通胀三招「<b>卖债、提准、提息</b>」</td><td>收紧银根</td><td>买债、降贴＝放水，直接划</td></tr>
+<tr><td>宽松「<b>降、降、买</b>」</td><td>降准、降息、买债</td><td>紧缩全反过来</td></tr>
+<tr><td>逆回购 = <b>公开市场操作 = 一般性工具</b></td><td>别把它当宏观审慎工具</td><td>窗口指导才是间接指导</td></tr>
+<tr><td>新型工具「<b>SLF / MLF / TMLF / PSL / SLO / CBS / 民企债券支持</b>」</td><td>基准利率是<b>职能</b>不是工具</td><td>工具清单题</td></tr>
+<tr><td>央行组织「<b>一元一制</b>」</td><td>中国是一元式单一制；美国二元、欧盟跨国</td><td>三国对比</td></tr>
+<tr><td><b>国债归财政、钞票归央行</b></td><td>央行只能买卖国债，<b>不能发行国债</b></td><td>见「央行发行国债」判错</td></tr>
+<tr><td>「<b>储备国库＝国家的银行；最后贷款人＝银行的银行</b>」</td><td>央行三职能各有对应事</td><td><b>发行权才是基本标志</b> <span class="hit">🎯错×5</span>（11-R13）</td></tr>
+<tr><td>央行资产负债表「<b>放款记资产、吸收记负债</b>」</td><td>资产：政府债券、再贷款；负债：<b>钞票、准备金、国库存款</b></td><td>别把持有的国债记负债 <span class="hit">🎯错×4</span>（11-R12）</td></tr>
+<tr><td><b>双支柱：货币管总量物价、审慎管杠杆传染、互补不替代</b></td><td>货币管<b>水位</b>，审慎管<b>哪家在裸泳</b></td><td>见「替代」「就意味着」判错 <span class="hit">🎯错×8</span>（11-P18）</td></tr>
+<tr><td>MPA 七面「<b>资本杠杆、资产负债、流动性、定价、资产质量、跨境融资、信贷政策</b>」</td><td>都是"银行自己的风险与行为"</td><td>见「金融机构评级 / 国家战略落实」划 <span class="hit">🎯错×7</span>（11-R8）</td></tr>
+<tr><td>宏观审慎工具「<b>MPA、逆周期资本缓冲、LTV、附加资本、LCR/NSFR</b>」</td><td>见「逆回购 / 准备金率 / 再贴现」＝货币政策三大法宝，<b>两支柱别串门</b></td><td>工具归属题 <span class="hit">🎯错×6</span>（11-P17）</td></tr>
+<tr><td>货币政策性质「<b>宏观、总需、间接、长短兼</b>」</td><td>—</td><td>四条性质题</td></tr>
+<tr><td>再贷款「<b>比重越来越小；PSL 是再贷款变体</b>」</td><td>—</td><td>判断题 <span class="hit">🎯错×6</span>（11-R11）</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>22</b> 道真题，错 <b>11</b> 道（失分率 50%）；另有自命题仿真错 12 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>11-R8</td><td>宏观审慎评估体系（MPA）</td><td><b>ABC</b></td><td><b>×7</b></td></tr>
+<tr><td>11-R11</td><td>再贷款</td><td><b>A</b></td><td><b>×6</b></td></tr>
+<tr><td>11-R13</td><td>中央银行职能（综合判断）</td><td><b>ABE</b></td><td><b>×5</b></td></tr>
+<tr><td>11-R12</td><td>结构性货币政策工具（资产负债表定位）</td><td><b>C</b></td><td><b>×4</b></td></tr>
+<tr><td>11-R3</td><td>创新型货币政策工具</td><td><b>B</b></td><td><b>×4</b></td></tr>
+<tr><td>11-R6</td><td>宽松货币政策的操作</td><td><b>ACE</b></td><td><b>×3</b></td></tr>
+<tr><td>11-R9</td><td>中央银行业务（资产负债表定位）</td><td><b>D</b></td><td><b>×3</b></td></tr>
+<tr><td>11-R10</td><td>货币政策性质（与 88 题同考点换皮）</td><td><b>D</b></td><td>×2</td></tr>
+<tr><td>11-R4</td><td>中央银行的组织形式</td><td><b>D</b></td><td>×2</td></tr>
+<tr><td>11-R1</td><td>中央银行资产负债表</td><td><b>C</b></td><td>×1</td></tr>
+<tr><td>11-R5</td><td>中央银行的职能</td><td><b>B</b></td><td>×1</td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>双支柱调控框架（2026 新增）</b>（自命题）（×8）、<b>宏观审慎评估体系（MPA）</b>（×7）、<b>宏观审慎政策关键工具</b>（自命题）（×6） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：双支柱调控框架（2026 新增） ×8、宏观审慎政策关键工具 ×6、货币政策工具分类（选择性工具） ×5</blockquote>
+<h3>第 12 章 金融监管<span class="badge">⚠️ 真题池仅 2 道（均错），靠自命题补</span></h3>
+<p><b>总纲</b>：为什么管（理论）→ 管什么（分业/功能）→ 出事了怎么办（危机与处置）。</p>
+<div class="scroll"><table>
+<tr><th>口诀</th><th>人话</th><th>题眼</th></tr>
+<tr><td>公共利益论 = <b>市场失灵</b>；社会选择论 = <b>公众选择视角</b></td><td>前者说市场会失灵所以要管；后者说监管是各方博弈的结果</td><td>见「只能」先找反例</td></tr>
+<tr><td>金融危机三害「<b>货币政策难使、经济受抑、机构陷困</b>」</td><td>—</td><td>见「财政盈余」是鬼话</td></tr>
+<tr><td>分业监管内容（2026 重点）</td><td>依法监管、适度竞争、<b>内部监管与自律并重</b></td><td>别把「公开公正 / 效率 / 独立 / 协调」当分业监管原则 <span class="hit">🎯错×5</span>（12-P19）</td></tr>
+<tr><td>巴塞尔：<b>三支柱</b> = 最低资本要求、监督检查、市场约束</td><td>资本充足率是<b>第一支柱</b>，不是全部</td><td>支柱归属题 <span class="hit">🎯错×3</span>（12-P14）</td></tr>
+</table></div>
+<p><b>【🎯 本章真题实证】</b> 做过 <b>2</b> 道真题，错 <b>2</b> 道（失分率 100%）；另有自命题仿真错 8 道</p>
+<div class="scroll"><table>
+<tr><th>真题号</th><th>考点</th><th>正解</th><th>错次</th></tr>
+<tr><td>12-R2</td><td>金融危机的危害</td><td><b>ABE</b></td><td><b>×4</b></td></tr>
+<tr><td>12-R1</td><td>金融监管理论</td><td><b>C</b></td><td><b>×3</b></td></tr>
+</table></div>
+<blockquote class="warn"><b>本章最痛</b>：<b>分业监管内容（选非 + 行业错位）</b>（自命题）（×5）、<b>金融危机的危害</b>（×4）、<b>杠杆率数字钉（我国 vs 巴塞尔）</b>（自命题）（×3） —— 这 3 条在考前 2 分钟再过一遍，其余可以放。</blockquote>
+<blockquote class="tip">自命题补漏（P 类）：分业监管内容（选非 + 行业错位） ×5、杠杆率数字钉（我国 vs 巴塞尔） ×3、系统性金融危机的判定 ×2</blockquote>
+<h2>二·五、TOP 20 钉子题榜（错 3 次以上，考前 10 分钟只扫这张表）</h2>
+<blockquote>「错次」＝这道题在你面前出现过并被你做错的轮数（总复测算 1 次，之后每刷一遍累加）。错 5 次以上＝知识没进去；错 3-4 次＝勾选流程病。</blockquote>
+<div class="scroll"><table>
+<tr><th>#</th><th>题号</th><th>类型</th><th>考点</th><th>正解</th><th>错次</th><th>诊断</th></tr>
+<tr><td>1</td><td>11-P18</td><td>多选</td><td>双支柱调控框架（2026 新增）</td><td><b>ABC</b></td><td><b>×8</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>2</td><td>04-P5</td><td>多选</td><td>再保险·业务种类</td><td><b>ABC</b></td><td><b>×7</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>3</td><td>07-P10</td><td>多选</td><td>CAPM vs APT</td><td><b>ABCE</b></td><td><b>×7</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>4</td><td>07-P14</td><td>多选</td><td>期权价值结构（2026新增）</td><td><b>ABCE</b></td><td><b>×7</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>5</td><td>11-R8</td><td>多选</td><td>宏观审慎评估体系（MPA）</td><td><b>ABC</b></td><td><b>×7</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>6</td><td>06-R5</td><td>多选</td><td>银行间市场自律组织</td><td><b>ACE</b></td><td><b>×6</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>7</td><td>07-R4</td><td>多选</td><td>期权价值的决定因素</td><td><b>BCE</b></td><td><b>×6</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>8</td><td>09-P19</td><td>多选</td><td>通货膨胀治理（紧缩货币）</td><td><b>ABC</b></td><td><b>×6</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>9</td><td>11-P17</td><td>多选</td><td>宏观审慎政策关键工具</td><td><b>ABCD</b></td><td><b>×6</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>10</td><td>11-R11</td><td>单选</td><td>再贷款</td><td><b>A</b></td><td><b>×6</b></td><td>🔴 铁钉（换问法才破）</td></tr>
+<tr><td>11</td><td>03-R13</td><td>多选</td><td>商业银行的特征</td><td><b>ABC</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>12</td><td>03-R23</td><td>多选</td><td>商业银行负债业务</td><td><b>ABCD</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>13</td><td>03-R27</td><td>多选</td><td>金融市场功能</td><td><b>BDE</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>14</td><td>07-P19</td><td>多选</td><td>期权定价方法（B-S）</td><td><b>ABCD</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>15</td><td>09-P12</td><td>单选</td><td>存款货币创造两前提</td><td><b>C</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>16</td><td>09-R6</td><td>多选</td><td>供给学派的治理政策</td><td><b>BCDE</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>17</td><td>10-P16</td><td>多选</td><td>外债管理政策（2026 大纲要求）</td><td><b>ABCE</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>18</td><td>11-P16</td><td>多选</td><td>货币政策工具分类（选择性工具）</td><td><b>ABCD</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>19</td><td>11-R13</td><td>多选</td><td>中央银行职能（综合判断）</td><td><b>ABE</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+<tr><td>20</td><td>12-P19</td><td>多选</td><td>分业监管内容（选非 + 行业错位）</td><td><b>CD</b></td><td><b>×5</b></td><td>🔴 重钉</td></tr>
+</table></div>
+<blockquote class="tip"><b>怎么用</b>：这张表 20 行，遮住「正解」列，只看考点自问答案，答不上的才回头看正文。20 行全过＝金融科的选择题你已经没有盲区了。</blockquote>
+<h2>三、易混对比速查（考试就爱在这里设坑）</h2>
+<div class="scroll"><table>
+<tr><th>#</th><th>A</th><th>B</th><th>一句话分野</th></tr>
+<tr><td>1</td><td>法定准备金率</td><td>超额准备金率</td><td>法定的看<b>央行</b>，超额的看<b>银行</b></td></tr>
+<tr><td>2</td><td>现金漏损率</td><td>上面两个</td><td>漏损看<b>储户</b></td></tr>
+<tr><td>3</td><td>商业银行内控</td><td>证券公司内控</td><td>商行「制衡、审慎、全覆盖、相匹配」；券商「健全、合理、制衡、独立」</td></tr>
+<tr><td>4</td><td>AIC</td><td>AMC</td><td>债转股＝AIC；坏账＝AMC；理财＝理财子</td></tr>
+<tr><td>5</td><td>金本位</td><td>布雷顿森林</td><td>黄金中心/自发 ｜ 美元中心/可调整</td></tr>
+<tr><td>6</td><td>在岸</td><td>离岸</td><td>本国募本国投 ｜ 两头都在外（非居民）</td></tr>
+<tr><td>7</td><td>欧洲债券</td><td>熊猫债</td><td>币≠地 ｜ 人民币在境内</td></tr>
+<tr><td>8</td><td>兼并</td><td>收购</td><td>法人<b>消失</b> ｜ 法人<b>还在</b></td></tr>
+<tr><td>9</td><td>金融远期</td><td>金融期货</td><td>场外、非标、无盯市 ｜ 场内、标准、盯市</td></tr>
+<tr><td>10</td><td>代销</td><td>包销</td><td>卖不掉退还 ｜ 自己吃下（全额/余额）</td></tr>
+<tr><td>11</td><td>基金托管人</td><td>基金管理人</td><td>托管费→托管银行（管钱、清算）｜ 管理费→基金公司（投资）</td></tr>
+<tr><td>12</td><td>货币政策</td><td>宏观审慎</td><td>总量物价 ｜ 杠杆传染</td></tr>
+<tr><td>13</td><td>凯恩斯</td><td>弗里德曼</td><td>利率敏感、投机动机 ｜ 恒久收入、利率不敏感</td></tr>
+<tr><td>14</td><td>需求拉动</td><td>成本推动</td><td>需求先旺 ｜ 原料先涨</td></tr>
+<tr><td>15</td><td>IS 曲线</td><td>LM 曲线</td><td>IS 右侧＝产品供给过剩 ｜ LM 右侧＝货币供给过剩</td></tr>
+<tr><td>16</td><td>M1</td><td>M2 / M3</td><td>M1 现金+单位活期 ｜ M3 独有大额存单</td></tr>
+<tr><td>17</td><td>看涨期权买方</td><td>卖方</td><td>下有底上无限 ｜ 最大收益＝期权费</td></tr>
+<tr><td>18</td><td>CAPM</td><td>APT</td><td>单因子（市场组合）｜ 多因子，不要求市场组合</td></tr>
+<tr><td>19</td><td>比例再保险</td><td>非比例再保险</td><td>按<b>保额</b>分（成数、溢额）｜ 按<b>赔款/赔付率</b>分</td></tr>
+<tr><td>20</td><td>央行（国家的银行）</td><td>央行（银行的银行）</td><td>经理国库、保管储备 ｜ 最后贷款人</td></tr>
+<tr><td>21</td><td>政策性原则（政策性银行）</td><td>安全性原则（商业银行）</td><td>倡、补、服 ｜ 三性统一</td></tr>
+<tr><td>22</td><td>名义汇率</td><td>实际汇率</td><td>实际＝名义×（外国物价/本国物价），剔除物价差</td></tr>
+</table></div>
+<h2>四、选非题高频错项清单（看到就划，19 条）</h2>
+<blockquote>这些是"看着对、其实教材没写"的表述，在选非题里它们就是答案。</blockquote>
+<div class="scroll"><table>
+<tr><th>领域</th><th>见到这个说法 → 划掉</th></tr>
+<tr><td>商业银行三性</td><td>「三性完全一致 / 同一」</td></tr>
+<tr><td>期限结构</td><td>「流动性陷阱」「古典利率理论」（那是别的概念）</td></tr>
+<tr><td>风险结构</td><td>「手续费」「增值税」</td></tr>
+<tr><td>货币体系核心内容</td><td>「基准利率的确定」「金融账户开放方式」</td></tr>
+<tr><td>货币时间价值</td><td>「汇率」</td></tr>
+<tr><td>金融衍生品特征</td><td>「稳定性」</td></tr>
+<tr><td>商业银行审慎规则</td><td>「客户营销管理」</td></tr>
+<tr><td>银行业协会宗旨</td><td>「监管职能」「保护存款人利益」</td></tr>
+<tr><td>政策性银行职能</td><td>「金融监管」</td></tr>
+<tr><td>操作风险要素</td><td>「监事会」</td></tr>
+<tr><td>MPA 考核内容</td><td>「金融机构评级」「国家重大战略落实情况」</td></tr>
+<tr><td>宏观审慎工具</td><td>「公开市场逆回购」「存款准备金率」「再贴现」</td></tr>
+<tr><td>期权价值因素</td><td>「预期收益率」「风险度」</td></tr>
+<tr><td>承销方式</td><td>「外销」「联营」「联合销售」</td></tr>
+<tr><td>再保险安排方式</td><td>「代理再保险」「委托再保险」</td></tr>
+<tr><td>信托当事人</td><td>「信托监督人」「账户管理人」「托管人」</td></tr>
+<tr><td>金融工程分析方法</td><td>「利差定价法」</td></tr>
+<tr><td>有效边界形状</td><td>「凹陷」</td></tr>
+<tr><td>金融危机危害</td><td>「财政盈余增加」</td></tr>
+</table></div>
+<h2>五、最后一页：进场前 5 分钟只看这些</h2>
+<pre>【铁律】单选不空着 · 多选宁缺毋滥 · 选非只勾❌ · 绝对化先找反例
+
+【数字】资本充足 5/6/8 · 集中度 集团15 单一10 · 不良 贷款5 资产4
+        租赁 关50 单关30 单租30 拆入100 · 成本收入比45%
+        拆借 银行1年/租汽保3月/证信7天 · 买断式回购365天
+        私募法人1000万 · 货基高流动性5% · 基金身份80%
+        咨询5人 · 券商主要股东5% · 村镇银行县100万 · SDR五币无瑞郎
+
+【三兄弟】法定看央行 · 超额看银行 · 漏损看储户 → 都越低，乘数越大
+
+【双支柱】货币管总量物价 · 审慎管杠杆传染 · 互补不替代（见&quot;替代&quot;判错）
+
+【三大法宝】准、贴、市（再贷款、窗口指导不进）
+【抗通胀】卖债、提准、提息（买债、降贴 = 放水）
+
+【期权五因子】标价、执价、期限、波动、无风险利率（见&quot;预期收益率&quot;划）
+【期权价值】内在 + 时间；到期时间价值=0；波动↑期限↑价值↑
+
+【CAPM vs APT】CAPM 是 APT 单因子特例；APT 不要求市场组合
+【有效边界】光滑上凸、右上倾斜、不凹陷
+【股利增长】D₁=D₀(1+g)÷(r−g) · 【β】超额收益÷超额市场
+
+【M1】现金+单位活期 · M2 加定期储蓄 · M3 独有大额存单
+【流动性陷阱】利率极低→需求无穷→货币政策失效（水平段）
+【IS-LM】IS 上产剩 · LM 上钱剩
+
+【FDI 不是债】人民币外债不消耗外汇储备
+【汇率制度】局→传→爬→浮（越爬越活）
+【BP 曲线】纵轴是利率不是汇率；资本完全流动→水平
+
+【四张手卡】降降买/卖提提 · FDI不是债 · 两支柱分家 · 数字先圈主语
+
+【你错最多的 5 道（真题/自命题榜，遮住右边自测）】
+11-P18 双支柱        → ABC   见&quot;替代&quot;、&quot;就意味着&quot;一律判错
+11-R8  MPA 七方面    → ABC   不含&quot;国家重大战略落实情况&quot;
+04-P5  再保险分类    → ABC   比例＝按保额；非比例＝按赔款/赔付率
+07-P10 CAPM vs APT   → ABCE  APT 不要求市场组合、不假设均衡时仍有套利
+07-P14 期权价值结构  → ABCE  内在+时间；到期时间价值=0；波动↑期限↑价值↑</pre>
+<p><b>最后一句</b>：这份锦囊里的每一条都来自你已经做过的题和教材口径，不是新知识。考场上认出来就是你的分。</p>
+<p><b>做题节奏</b>：单选 ≤50 秒，多选 ≤75 秒，超时就跳。多选一旦勾满 4 个字母，回头再看一遍 D——D 位是出题人最爱放绝对化诱饵的地方。</p>
+<div class="foot">货币管水位，审慎管谁在裸泳。<br>稳住，BOSS。</div>
+</div></body></html>

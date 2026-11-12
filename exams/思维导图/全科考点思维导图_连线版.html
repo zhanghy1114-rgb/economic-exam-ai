@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>中级经济师（金融）2026 · 连线版思维导图</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #f7f8fb;
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+  #stage { display: block; width: 100vw; height: 100vh; cursor: grab; }
+  #stage.dragging { cursor: grabbing; }
+  .bar {
+    position: fixed; top: 12px; left: 12px; z-index: 10;
+    background: #ffffffee; border: 1px solid #dcdfe6; border-radius: 10px;
+    padding: 10px 14px; font-size: 13px; color: #303133; line-height: 1.75;
+    box-shadow: 0 3px 14px #0000001a; max-width: 360px;
+  }
+  .bar b { color: #b03a2e; }
+  .bar button {
+    margin: 6px 6px 0 0; padding: 4px 10px; font-size: 12px; cursor: pointer;
+    border: 1px solid #c8ccd4; border-radius: 6px; background: #fff; color: #303133;
+  }
+  .bar button:hover { background: #eef3fb; border-color: #7fa8d8; }
+  .legend { margin-top: 6px; font-size: 12px; color: #606266; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:4px; }
+  text { user-select: none; pointer-events: none; }
+  .node-hit { cursor: pointer; }
+  .node-hit:hover .box { stroke: #b03a2e; stroke-width: 2; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>中级经济师（金融）2026 · 连线版</b><br>
+  🖱 拖动画布 · 滚轮缩放 · <b>点节点</b>展开/收起<br>
+  <button onclick="expandTo(99)">全部展开</button>
+  <button onclick="expandTo(2)">只到板块</button>
+  <button onclick="expandTo(3)">展开到章</button>
+  <button onclick="fit()">适应宽度</button>
+  <div class="legend">
+    <span class="dot" style="background:#1f6fb2"></span>金融实务 12 章
+    <span class="dot" style="background:#b03a2e;margin-left:10px"></span>经济基础 37 章
+    <br>★＝2026 新增/大改　⚠️＝两科易串
+  </div>
+</div>
+<svg id="stage"></svg>
+
+<script>
+/* ============ 1. 数据：科目 → 板块 → 章 → 考点 ============ */
+const DATA = ["中级经济师（金融）2026 · 全科考点", [
+
+["金融专业知识和实务 12 章 · 140分", [
+  ["① 基础与体系", [
+    ["第1章 金融学基础", [
+      "单利/复利/现值：FV=PV(1+i)^n",
+      "利率决定：古典·凯恩斯·可贷资金",
+      "期限结构：预期·市场分割·流动性偏好",
+      "汇率：直接标价 1外币=X本币，数字↑=贬值"
+    ]],
+    ["第2章 金融体系 ★整章重写", [
+      "六大体系：机构·市场·工具·调控·监管·基础设施",
+      "基础设施四锚：钱走清算·人看征信·账走登记·场在交易",
+      "五篇大文章：科绿普养数",
+      "五大监管：机构·行为·功能·穿透·持续"
+    ]]
+  ]],
+  ["② 金融机构", [
+    ["第3章 商业银行", [
+      "三大业务：负债/资产/表外",
+      "四原则：三性+审慎+分业+创新",
+      "巴Ⅲ：总8·核心一级4.5·一级6·杠杆3·LCR100",
+      "我国更严：核心一级5/一级6/总8"
+    ]],
+    ["第4章 保险公司", [
+      "财产险 vs 人身险；代位求偿仅财产险",
+      "承保→理赔：报案·查勘·定损·核赔·赔付",
+      "再保险：成数·溢额 / 险位·事故·赔付率超赔",
+      "资金运用铁律：安全>流动>收益"
+    ]],
+    ["第5章 证券公司与基金管理公司", [
+      "券商业务：经纪·承销·自营·资管·两融·做市",
+      "基金风险：股票>混合>债券>货币",
+      "费用：管理费·托管费·销售服务费（按日从净值扣）",
+      "当事人：管理人·托管人·持有人"
+    ]]
+  ]],
+  ["③ 市场与定价", [
+    ["第6章 金融市场与金融工具", [
+      "货币市场≤1年：拆借·回购·票据·存单",
+      "资本市场>1年：股票·债券·基金",
+      "四功能：资金融通·价格发现·风险管理·流动性",
+      "一级发行 vs 二级流通"
+    ]],
+    ["第7章 金融资产定价 ★★★核心大改", [
+      "夏普=(Rp−Rf)/σp（总风险）",
+      "特雷诺=(Rp−Rf)/βp（系统风险）",
+      "詹森α=Rp−[Rf+β(Rm−Rf)]",
+      "CAPM / APT / 因素模型",
+      "债券估值+久期；戈登 P=D1/(r−g)",
+      "期权：内在+时间价值；平价 C+PV(K)=P+S"
+    ]]
+  ]],
+  ["④ 治理与货币", [
+    ["第8章 公司治理与风险管理", [
+      "治理模式：英美·德日·家族",
+      "三会一层；股权/期权激励",
+      "全面风险八要素+三道防线",
+      "策略：规避·降低·分担·承受"
+    ]],
+    ["第9章 货币供求与货币均衡 ★新增IS-LM", [
+      "费雪 MV=PT（交易量T）",
+      "剑桥 M=kPY（k=1/V）",
+      "凯恩斯 L=L1(Y)+L2(i)（只他管利率）",
+      "弗里德曼 M/P=f(yp)（恒久收入）",
+      "IS右下LM右上｜货币乘数两科口径不同⚠️",
+      "通胀三型：需求拉动·成本推进·结构型"
+    ]]
+  ]],
+  ["⑤ 开放与调控监管", [
+    ["第10章 开放经济均衡 ★新增", [
+      "国际收支四账户；三种调节方式",
+      "储备四构成：外汇最主要；SDR不能支付",
+      "三元悖论：三者取二",
+      "米德冲突+IS-LM-BP"
+    ]],
+    ["第11章 中央银行与金融调控 ★新增", [
+      "三职能：发行的/银行的/政府的银行",
+      "三大法宝：准备金(猛药)·再贴现(温和)·公开市场(灵活)",
+      "买入=放水，卖出=收水",
+      "结构性工具：兼具总量+结构双重功能",
+      "双支柱=货币政策+宏观审慎"
+    ]],
+    ["第12章 金融监管", [
+      "脆弱性→挤兑→传染→危机",
+      "四类危机：债务·货币·流动性·综合",
+      "体制：分业(一行一局一会)·统一·双峰",
+      "国际规则：巴塞尔Ⅰ/Ⅱ/Ⅲ"
+    ]]
+  ]]
+]],
+
+["经济基础知识 37 章 · 6部分 · 140分", [
+  ["第一部分 经济学基础 1-10", [
+    ["第1章 社会主义基本经济制度", [
+      "公有制=国有+集体+混合中的国有集体成分",
+      "主体=公有资产占优势；国有控命脉主导",
+      "分配：按劳为主+按要素；初次/再/第三次",
+      "体制：市场决定性作用+政府；价格供求竞争"
+    ]],
+    ["第2章 市场需求供给与均衡价格", [
+      "需求七因素：偏好·收入·自身价·替代价·互补价·预期·其他",
+      "供给六因素：价·本·术·期·关·素",
+      "保护价高→过剩→收购；限价低→短缺→配给",
+      "Ed>1降价增收；供给弹性唯一反派=生产周期"
+    ]],
+    ["第3章 生产和成本理论", [
+      "企业本质=科斯（省交易费用）",
+      "TP·AP·MP：MP交AP于最高点",
+      "MC交AC、AVC于最低点",
+      "机会成本·隐成本·经济利润"
+    ]],
+    ["第4章 市场结构理论", [
+      "四类：竞争·垄断竞争·寡头·完全垄断",
+      "完全竞争 P=AR=MR，需求线水平",
+      "完全垄断 MR<P，无供给曲线",
+      "倾斜度=竞争程度（平=竞争 陡=垄断）"
+    ]],
+    ["第5章 生产要素市场理论", [
+      "要素需求=引致需求；VMP=MP×P",
+      "原则 VMP=MFC（2026删除MRP旧口径）",
+      "劳动供给后弯（工资效应vs替代效应）",
+      "地租·利息·利润"
+    ]],
+    ["第6章 市场失灵和政府的干预", [
+      "帕累托最优=资源最优配置",
+      "负外部性→庇古税=边际外部成本",
+      "科斯定理：产权明确+零交易成本",
+      "公共物品：非竞争+非排他→搭便车",
+      "逆向选择(事前) vs 道德风险(事后)"
+    ]],
+    ["第7章 国民收入核算与宏观模型", [
+      "GDP国土原则 / GNI国民原则",
+      "支出法C+I+G+(X−M)；收入法四块",
+      "I=S；MPC<APC",
+      "乘数：购买1/(1−b)；税收−b/(1−b)；平衡预算=1"
+    ]],
+    ["第8章 经济增长和经济发展理论", [
+      "增长(量) vs 发展(质)；全要素生产率=索洛余值",
+      "新发展理念：创新协调绿色开放共享",
+      "新发展格局：双循环；高质量发展",
+      "★新质生产力（2026新增，掌握级）"
+    ]],
+    ["第9章 价格总水平和就业失业", [
+      "价格总水平：CPI·PPI·GDP平减指数",
+      "失业四型：摩擦·结构·周期·季节",
+      "奥肯定律：GDP与失业反向",
+      "菲利普斯：短期替代·长期垂直"
+    ]],
+    ["第10章 国际贸易理论和政策", [
+      "绝对优势(斯密)·比较优势(李嘉图)·H-O",
+      "倾销三类；反倾销三条件",
+      "关税 vs 非关税壁垒",
+      "高水平开放：自贸区·一带一路"
+    ]]
+  ]],
+  ["第二部分 财政 11-17", [
+    ["第11章 公共物品与财政职能", [
+      "公共物品：非竞争+非排他；需求垂直加总",
+      "财政三职能：资源配置·收入分配·经济稳定"
+    ]],
+    ["第12章 财政支出", [
+      "购买性 vs 转移性（公务员工资=购买性）",
+      "四理论：瓦格纳·皮魏·马斯格雷夫·鲍莫尔",
+      "效益分析：成本—效益法·最低成本法"
+    ]],
+    ["第13章 财政收入", [
+      "税收三特征：强制·无偿·固定",
+      "税负转嫁：前转·后转·消转·资本化（弹性小者担）",
+      "国债三指标：依存÷支出｜偿债÷收入｜负担÷GDP"
+    ]],
+    ["第14章 税收制度 ★★最大变动", [
+      "增值税新法(2026.1.1)：13/9/6%，进项抵扣",
+      "消费税15税目：生产·进口·委托加工",
+      "企业所得税25/20/15；个税3-45与5-35",
+      "视同应税交易=货进消费了"
+    ]],
+    ["第15章 政府预算", [
+      "六原则（含公开性）",
+      "人大批预算｜常委会批决算与调整｜政府动预备费",
+      "四本账：一般公共·政府性基金·国资经营·社保"
+    ]],
+    ["第16章 财政管理体制", [
+      "中央税3=关消车；共享4=增值税50:50·所得税60:40·资源税",
+      "转移支付：一般性(含均衡性) vs 专项",
+      "事权三方向：加强中央·减少共同·保障地方"
+    ]],
+    ["第17章 财政政策", [
+      "自动稳定 vs 相机抉择；扩张/紧缩/中性",
+      "乘数：购买>转移=∣税收∣；平衡预算=1",
+      "时滞：内部(认识·行政)｜外部(决策·执行·效果)"
+    ]]
+  ]],
+  ["第三部分 货币与金融 18-22", [
+    ["第18章 货币供求与货币均衡", [
+      "四理论：费雪·剑桥·凯恩斯·弗里德曼",
+      "M0/M1/M2；准货币=M2−M1",
+      "基础货币=现金+准备金；K=1/(准备金率+结构比率)",
+      "派生存款三制约：准备金·取现·缴税",
+      "均衡三特征：大体·动态·反映 ⚠️本章无IS-LM"
+    ]],
+    ["第19章 中央银行与货币政策 ★", [
+      "三职能：发行的·银行的·政府的银行",
+      "货币发行=最主要负债",
+      "三层目标：操作→中介→最终",
+      "三大法宝+结构性工具+非常规(QE)",
+      "五篇大文章·金融强国·数字人民币·LPR"
+    ]],
+    ["第20章 商业银行与金融市场", [
+      "负债/资产/表外；三性原则",
+      "存款保险：偿付+处置",
+      "直接融资 vs 间接融资"
+    ]],
+    ["第21章 金融风险与金融监管", [
+      "四风险：信用·市场(利率属此)·操作·流动性",
+      "监管四方式 ⚠️金融第2章是五种",
+      "巴塞尔：8/4.5/6/3/100",
+      "★宏观审慎管理（2026新增必考）"
+    ]],
+    ["第22章 对外金融关系与政策", [
+      "直接标价：数字↑=本币贬值",
+      "储备四构成：外汇最主要；SDR不能支付",
+      "布雷顿森林→牙买加；IMF份额"
+    ]]
+  ]],
+  ["第四部分 统计 23-27", [
+    ["第23章 统计与数据科学 ★标题改", [
+      "总体配参数 / 样本配统计量",
+      "计量尺度四级：定类·定序·定距·定比",
+      "大数据5V：量速样值真",
+      "分类(已知) vs 聚类(未知)"
+    ]],
+    ["第24章 描述统计", [
+      "均值/中位数/众数适用范围",
+      "离散系数=相对数；方差最广",
+      "r∈[−1,1]；R²∈[0,1]",
+      "标准分数Z：跨分布比较"
+    ]],
+    ["第25章 抽样调查", [
+      "概率：简单随机·分层·系统(间隔K)·整群·多阶段",
+      "非概率：方便·判断·自愿·配额",
+      "误差：抽样 vs 非抽样(框·无回答·计量)",
+      "估计量：无偏·有效·一致"
+    ]],
+    ["第26章 回归分析", [
+      "β0截距·β1斜率（X前的数=斜率）",
+      "OLS最小二乘",
+      "R²决定系数；t/F检验"
+    ]],
+    ["第27章 时间序列分析", [
+      "四因素：趋势·季节·循环·不规则",
+      "水平指标 vs 速度指标",
+      "平滑预测：移动平均·指数平滑",
+      "季节指数"
+    ]]
+  ]],
+  ["第五部分 会计 28-32", [
+    ["第28章 会计概论", [
+      "四前提；六要素（3静态+3动态）",
+      "计量五属性：历重可现公",
+      "信息质量：可靠·相关·可比·及时"
+    ]],
+    ["第29章 会计循环", [
+      "借贷记账：资产费用借增，负债权益收入贷增",
+      "凭证→账簿→报表",
+      "账务处理程序三型"
+    ]],
+    ["第30章 会计报表", [
+      "资产负债表时点｜利润表现金流量表时期",
+      "现金流量三活动：经营·投资·筹资",
+      "编制要求+附注"
+    ]],
+    ["第31章 财务报表分析", [
+      "偿债：流动→速动→现金，越来越苛刻",
+      "营运：存货周转用营业成本",
+      "盈利：毛利·净利·ROE·ROA"
+    ]],
+    ["第32章 政府会计", [
+      "双功能·双基础·双分录·双报告",
+      "决算=收付实现制｜财务=权责发生制",
+      "★综合报告 vs 部门报告（2026新增）"
+    ]]
+  ]],
+  ["第六部分 法律 33-37", [
+    ["第33章 法律对经济关系的调整", [
+      "法律调整机制；民事·行政·刑事",
+      "调整经济的主要法律种类",
+      "2026删除：优化营商环境"
+    ]],
+    ["第34章 物权法律制度", [
+      "物权五特征；三原则：法定·一物一权·公示",
+      "用益物权；建设用地只能抵押",
+      "居住权：登记设立·不得转让继承",
+      "担保物权：抵押·质押·留置(法定)"
+    ]],
+    ["第35章 合同法律制度", [
+      "要约到达生效；承诺内容一致",
+      "三筐：无效5·可撤销4·效力待定2",
+      "三抗辩权：同时·先履行·不安",
+      "定金≤20%，实践合同，与违约金择一"
+    ]],
+    ["第36章 公司法律制度", [
+      "有限股东1-50｜股份发起人1-200；5年实缴",
+      "董事会≥3人；监事会≥3人(职工≥1/3，可不设)",
+      "代表诉讼180日+1%；异议回购60/90日",
+      "股份转让：每年25%·离职半年·上市1年",
+      "清算义务人=董事（新法）"
+    ]],
+    ["第37章 其他法律制度 ★★只剩3部", [
+      "劳动合同：必备9项；试用期3/1/2/6月",
+      "消保：九项权利；7日无理由(四例外)",
+      "退一赔三，不足500补500",
+      "反不正当竞争六种：蹭贿吹偷奖骂；有奖销售≤5万"
+    ]]
+  ]]
+]]
+];
+
+/* ============ 2. 构建节点树 ============ */
+let root;
+function build(node, depth, parentName) {
+  if (typeof node === "string") return { name: node, children: [], depth, leaf: true };
+  const name = node[0];
+  const kids = (node[1] || []).map(c => build(c, depth + 1, name));
+  return { name, children: kids, depth, parentName };
+}
+root = build(DATA, 0, "");
+
+// 默认：展开到「章」（depth<=2 展开），章以下折叠
+(function setDefault(n) {
+  if (n.depth >= 3) n.collapsed = true;
+  n.children.forEach(setDefault);
+})(root);
+
+/* ============ 3. 布局 ============ */
+const ROW = 30, COL = 250, FONT = 13;
+function textWidth(s) {
+  let w = 0;
+  for (const ch of s) w += /[\u4e00-\u9fa5\u3000-\u303f★⚠️①-⑩]/.test(ch) ? FONT : FONT * 0.56;
+  return w;
+}
+let maxDepth = 0, xof = [0], maxW = [];
+function layout() {
+  let row = 0;
+  maxDepth = 0;
+  maxW = [];
+  // 第一遍：算宽度、行号（y）
+  (function walk(n) {
+    maxDepth = Math.max(maxDepth, n.depth);
+    n.w = Math.min(textWidth(n.name) + 22, 460);
+    maxW[n.depth] = Math.max(maxW[n.depth] || 0, n.w);
+    if (n.collapsed || n.children.length === 0) {
+      n.y = row * ROW; row++;
+    } else {
+      n.children.forEach(walk);
+      n.y = (n.children[0].y + n.children[n.children.length - 1].y) / 2;
+    }
+  })(root);
+  // 第二遍：列位置按每层最宽的节点累加，避免长名字压到子节点
+  xof = [0];
+  for (let d = 1; d <= maxDepth; d++) xof[d] = xof[d - 1] + (maxW[d - 1] || 210) + 58;
+  (function setX(n) {
+    n.x = xof[n.depth] || 0;
+    n.children.forEach(setX);
+  })(root);
+  return row;
+}
+
+/* ============ 4. 绘制 ============ */
+const svg = document.getElementById("stage");
+const NS = "http://www.w3.org/2000/svg";
+const viewport = document.createElementNS(NS, "g");
+svg.appendChild(viewport);
+
+const COLOR = {
+  "金融专业知识和实务 12 章 · 140分": "#1f6fb2",
+  "经济基础知识 37 章 · 6部分 · 140分": "#b03a2e"
+};
+const SUB = ["#1e8449", "#b7950b", "#7d3c98", "#148f77", "#ca6f1e"];
+
+function fillOf(n) {
+  if (n.depth === 0) return { bg: "#2c3e50", fg: "#fff", stroke: "#2c3e50" };
+  if (n.depth === 1) { const c = COLOR[n.name] || "#2c3e50"; return { bg: c, fg: "#fff", stroke: c }; }
+  if (n.depth === 2) { const c = SUB[n.y / ROW % SUB.length | 0] || "#7d3c98"; return { bg: "#fff", fg: c, stroke: c }; }
+  if (n.depth === 3) return { bg: "#f2f5fa", fg: "#303133", stroke: "#9aa7b8" };
+  return { bg: "#fff", fg: "#555", stroke: "#cfd6e0" };
+}
+
+function visibleNodes() {
+  const out = [];
+  (function walk(n, show) {
+    if (!show) return;
+    out.push(n);
+    if (!n.collapsed) n.children.forEach(c => walk(c, true));
+  })(root, true);
+  return out;
+}
+
+function path(p, c) {
+  const x1 = p.x + p.w, y1 = p.y, x2 = c.x - 12, y2 = c.y;
+  const mx = (x1 + x2) / 2;
+  return `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
+}
+
+function render() {
+  const rows = layout();
+  while (viewport.firstChild) viewport.removeChild(viewport.firstChild);
+  const nodes = visibleNodes();
+
+  // 连线
+  nodes.forEach(n => {
+    if (n.collapsed) return;
+    n.children.forEach(c => {
+      const p = document.createElementNS(NS, "path");
+      p.setAttribute("d", path(n, c));
+      p.setAttribute("fill", "none");
+      p.setAttribute("stroke", n.depth === 0 ? "#8899a8" : (COLOR[root.children[0].name] && n.depth === 1 ? COLOR[n.name] : "#c2cbd6"));
+      p.setAttribute("stroke-width", n.depth <= 1 ? 2.2 : 1.4);
+      p.setAttribute("stroke-linecap", "round");
+      viewport.appendChild(p);
+    });
+  });
+
+  // 节点
+  nodes.forEach(n => {
+    const c = fillOf(n);
+    const g = document.createElementNS(NS, "g");
+    g.setAttribute("class", "node-hit");
+    g.setAttribute("transform", `translate(${n.x},${n.y})`);
+
+    const rect = document.createElementNS(NS, "rect");
+    rect.setAttribute("class", "box");
+    rect.setAttribute("x", 0);
+    rect.setAttribute("y", -13);
+    rect.setAttribute("width", n.w);
+    rect.setAttribute("height", 26);
+    rect.setAttribute("rx", 8);
+    rect.setAttribute("fill", c.bg);
+    rect.setAttribute("stroke", c.stroke);
+    rect.setAttribute("stroke-width", 1.4);
+    g.appendChild(rect);
+
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", 11);
+    t.setAttribute("y", 4.5);
+    t.setAttribute("font-size", FONT + (n.depth <= 1 ? 1 : 0));
+    t.setAttribute("font-weight", n.depth <= 1 ? "700" : (n.depth === 2 ? "600" : "400"));
+    t.setAttribute("fill", c.fg);
+    t.textContent = n.name.length > 34 ? n.name.slice(0, 33) + "…" : n.name;
+    g.appendChild(t);
+
+    if (n.children.length) {
+      const badge = document.createElementNS(NS, "circle");
+      badge.setAttribute("cx", n.w - 9);
+      badge.setAttribute("cy", 0);
+      badge.setAttribute("r", 6.5);
+      badge.setAttribute("fill", n.collapsed ? "#b03a2e" : "#fff");
+      badge.setAttribute("stroke", n.collapsed ? "#b03a2e" : "#9aa7b8");
+      badge.setAttribute("stroke-width", 1.2);
+      g.appendChild(badge);
+      const sign = document.createElementNS(NS, "text");
+      sign.setAttribute("x", n.w - 9);
+      sign.setAttribute("y", 4);
+      sign.setAttribute("text-anchor", "middle");
+      sign.setAttribute("font-size", 11);
+      sign.setAttribute("font-weight", "700");
+      sign.setAttribute("fill", n.collapsed ? "#fff" : "#9aa7b8");
+      sign.textContent = n.collapsed ? "+" : "−";
+      g.appendChild(sign);
+    }
+
+    g.addEventListener("click", ev => {
+      ev.stopPropagation();
+      if (!n.children.length) return;
+      n.collapsed = !n.collapsed;
+      render();
+    });
+    viewport.appendChild(g);
+  });
+
+  // 视口尺寸
+  const W = (xof[maxDepth] || 0) + (maxW[maxDepth] || 220) + 120, H = rows * ROW + 80;
+  viewport.setAttribute("data-w", W);
+  viewport.setAttribute("data-h", H);
+  return { W, H };
+}
+
+/* ============ 5. 缩放/平移 ============ */
+let k = 1, tx = 0, ty = 0;
+function apply() { viewport.setAttribute("transform", `translate(${tx},${ty}) scale(${k})`); }
+function fit() {
+  const W = +viewport.getAttribute("data-w") || 1400;
+  const H = +viewport.getAttribute("data-h") || 1500;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  // 适应「宽度」而不是整张图：49 章全塞进一屏会让字小到看不清，纵向留给拖动
+  k = Math.max(0.5, Math.min((vw - 110) / W, 1.15));
+  tx = 30; ty = 20;
+  apply();
+}
+svg.addEventListener("wheel", e => {
+  e.preventDefault();
+  const r = svg.getBoundingClientRect();
+  const mx = e.clientX - r.left, my = e.clientY - r.top;
+  const f = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+  const nk = Math.max(0.18, Math.min(3, k * f));
+  tx = mx - (mx - tx) * (nk / k);
+  ty = my - (my - ty) * (nk / k);
+  k = nk;
+  apply();
+}, { passive: false });
+
+let drag = null;
+svg.addEventListener("pointerdown", e => {
+  drag = { x: e.clientX, y: e.clientY, tx, ty };
+  svg.classList.add("dragging");
+});
+svg.addEventListener("pointermove", e => {
+  if (!drag) return;
+  tx = drag.tx + (e.clientX - drag.x);
+  ty = drag.ty + (e.clientY - drag.y);
+  apply();
+});
+svg.addEventListener("pointerup", () => { drag = null; svg.classList.remove("dragging"); });
+svg.addEventListener("pointerleave", () => { drag = null; svg.classList.remove("dragging"); });
+
+function expandTo(level) {
+  (function walk(n) {
+    n.collapsed = n.depth >= level && n.children.length > 0;
+    n.children.forEach(walk);
+  })(root);
+  render(); fit();
+}
+
+render();
+fit();
+window.addEventListener("resize", () => { render(); fit(); });
+</script>
+</body>
+</html>

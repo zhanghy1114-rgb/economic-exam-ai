@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第04章 · 保险公司</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第04章 · 保险公司<small id="sub">错题 10 题 + 自命题 11 题 ｜ 20 分钟 ｜ 满分 28</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第04章 保险公司 · 即时判题训练卷", "totalMin": 20, "pass": 17, "full": 28, "nSingle": 14, "nMulti": 7, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 10 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 11 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "信托关系下，以自己的名义管理或者处分信托财产的是()", "opts": [{"k": "A", "t": "受托人"}, {"k": "B", "t": "监督人"}, {"k": "C", "t": "受益人"}, {"k": "D", "t": "托管人"}], "ans": "A", "kp": "第4章·信托关系当事人", "model": "主体归属型（谁以自己名义管理处分信托财产）", "chain": ["信托三当事人：委托人（出财产）、受托人（管财产）、受益人（享收益）", "信托的核心特征：财产权<b>转移给受托人</b>，受托人以<b>自己的名义</b>管理、处分", "受益人只享有受益权（衡平法上的权利），不占有、不管理"], "fast": "⚡信托一句话：<b>「委托人出钱、受托人管钱(用自己的名义)、受益人拿钱」</b>。题干「以自己的名义管理或处分」= 受托人的招牌动作 → A。", "traps": ["把「托管人」（保管财产）当成管理处分主体 —— 托管只保管、不决策", "受益人听起来最\"重要\"，但他只拿收益，不管理"], "mother": "母题抽象：<b>信托 = 财产权转移 + 名义转换</b>。凡问\"谁对外签约、谁起诉、谁以自己名义处分\"，答案恒为受托人。", "analysis": "<p>信托设立后，信托财产的权利转移给<b>受托人</b>，由受托人<b>以自己的名义</b>为受益人的利益或特定目的，对信托财产进行管理、运用和处分。A 正确。</p><p>委托人（B 无此项）是设立信托并转移财产的人；受益人享有信托受益权但不管理财产；托管人负责财产保管与清算交割，不作管理处分决策。</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "在保险合同上签署自己的名字，对保险做出接受、部分接受或拒绝的人是()", "opts": [{"k": "A", "t": "保人"}, {"k": "B", "t": "保险人"}, {"k": "C", "t": "承保人"}, {"k": "D", "t": "被保险人"}], "ans": "C", "kp": "第4章·保险合同当事人与关系人", "model": "主体归属型（谁在合同上签字接受/拒绝承保）", "chain": ["投保人：申请投保、交保费的人", "保险人：保险公司（承担赔偿责任的主体）", "<b>承保人</b>：保险人一方具体审核并决定接受 / 部分接受 / 拒绝承保，并在保险合同上签章的人"], "fast": "⚡抓动作词：<b>「签署 + 接受/拒绝」= 核保动作</b> → 承保人。投保人只有\"申请\"，保险人是一个机构（不是签字的人）。题干问\"人\" → C。", "traps": ["把「保险人」当答案 —— 保险人是<b>保险公司这个机构</b>，题干问的是\"在合同上签署自己名字的人\"", "A 项「保人」是「投保人」的 OCR 缺字，勿被带偏"], "mother": "母题抽象：<b>保险四方</b> —— 投保人(交钱·申请)、保险人/承保人(承担风险·核保签章)、被保险人(标的载体)、受益人(领钱)。凡问\"谁决定承保\"→ 承保人。", "analysis": "<p><b>承保人</b>是保险人一方负责审核投保申请、决定是否承保及承保条件，并在保险合同上签章的人，可作出接受、部分接受（加费 / 除外责任）或拒绝的决定。C 正确。</p><p>投保人是提出保险要求、支付保险费的人；保险人是经营保险业务、承担赔偿或给付责任的保险公司；被保险人是其财产或人身受保险合同保障的人。</p>"}, {"no": 2003, "label": "R3", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "信托财产的权利在法律上属于()", "opts": [{"k": "A", "t": "受托人"}, {"k": "B", "t": "委托人"}, {"k": "C", "t": "受益人"}, {"k": "D", "t": "托管人"}], "ans": "A", "kp": "第4章·信托财产的权属", "model": "权属判断型（信托财产法律上归谁）", "chain": ["信托一旦设立，委托人把财产<b>转移</b>给受托人", "受托人成为法律上的<b>所有权人</b>（名义上的权利人）", "受益人享有的是<b>受益权</b>（收益请求权），不是所有权"], "fast": "⚡信托财产权属钉子：<b>「法律上(名义上)归受托人，收益归受益人」</b>。题干只问\"权利在法律上属于\" → 受托人 = A。若问\"利益归谁\"才是受益人。", "traps": ["直觉认为\"谁出钱归谁\"→ 误选委托人（信托恰恰是<b>出钱人失去所有权</b>）", "受益人是最大受益者，但拿的是受益权不是所有权"], "mother": "母题抽象：<b>信托财产\"两权分离\"</b> —— 法律所有权(受托人) ≠ 受益所有权(受益人)。凡是\"名义/法律上\"→ 受托人；凡是\"利益/实质上\"→ 受益人。", "analysis": "<p>信托有效设立后，信托财产的所有权由委托人转移给<b>受托人</b>，受托人是信托财产法律上的权利人，以自己的名义管理和处分信托财产；受益人仅享有信托受益权。A 正确。</p><p>信托财产的独立性也由此体现：既独立于委托人的其他财产，也独立于受托人的固有财产。</p>"}, {"no": 2004, "label": "R4", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "再保险业务的安排方式不包括()。", "opts": [{"k": "A", "t": "合同再保险"}, {"k": "B", "t": "临时再保险"}, {"k": "C", "t": "预约再保险"}, {"k": "D", "t": "代理再保险"}], "ans": "D", "kp": "第4章·再保险的安排方式", "model": "选非题 · 体系补全（「不包括」）", "chain": ["再保险的三种安排方式：<b>临时再保险</b>（逐笔洽商）、<b>合同（固定）再保险</b>（约定范围内的业务必须分出/接受）、<b>预约再保险</b>（分出方可选、接受方必须接受）", "「代理再保险」不在三种方式之列"], "fast": "⚡三方式口诀「<b>临、合、预</b>」（临时 / 合同 / 预约）。圈出「不包括」→ 找不属于这三个的 → <b>代理再保险</b> = D。", "traps": ["先圈「不」字再作答，否则容易正向选了临时再保险", "「代理」是保险<b>营销</b>渠道的概念（保险代理人），被借来当干扰项"], "mother": "母题抽象：<b>再保险两维度</b> —— 按安排方式分三种（临时/合同/预约）；按责任分担方式分两种（比例再保险 / 非比例再保险-超额赔款）。两个维度别混。", "analysis": "<p>再保险业务的安排方式主要有三种：<b>临时再保险</b>（原保险人就单笔业务临时洽商，双方均可选择）、<b>合同再保险</b>（约定范围内业务双方必须分出与接受）、<b>预约再保险</b>（分出公司可选择是否分出，接受公司必须接受）。<b>代理再保险</b>不属于再保险的安排方式，故选 D。</p>"}, {"no": 2005, "label": "R5", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "按照保险合同约定按时支付保险费用的是()。", "opts": [{"k": "A", "t": "投保人"}, {"k": "B", "t": "保险人"}, {"k": "C", "t": "受益人"}, {"k": "D", "t": "被保人"}], "ans": "A", "kp": "第4章·保险合同的义务分配", "model": "义务归属型（谁付保险费）", "chain": ["投保人 = 与保险人订立保险合同、<b>并按约定支付保险费</b>的人", "保险人收保费、承担赔付责任", "被保险人 / 受益人只享有保障与受益，无缴费义务"], "fast": "⚡钱从谁口袋出 → <b>投保人</b>。见「支付保险费」四字直接选 A，无需看其余选项（送分题，10 秒内解决）。", "traps": ["「被保险人」是保障对象，最容易误选", "投保人与被保险人可以是同一人，也可以是不同的人（如本题丈夫为夫投保），但<b>缴费身份恒为投保人</b>"], "mother": "母题抽象：<b>保险权利义务配对</b> —— 投保人：交费 + 如实告知；保险人：赔付；被保险人：保险标的载体；受益人：领保险金。凡问义务先定位身份。", "analysis": "<p>投保人是指与保险人订立保险合同，并按照合同约定<b>负有支付保险费义务</b>的人。A 正确。</p><p>保险人是收取保费、承担赔偿或给付保险金责任的一方；被保险人以其财产或人身受保险合同保障；受益人由投保人或被保险人指定，享有保险金请求权，均不负缴费义务。</p>"}, {"no": 2006, "label": "R6", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABCD", "src": "真题错题", "stem": "信托当事人是指与信托有直接利害关系或权利义务关系的人，包括（）", "opts": [{"k": "A", "t": "委托人"}, {"k": "B", "t": "受益人"}, {"k": "C", "t": "监督人"}, {"k": "D", "t": "受托人"}, {"k": "E", "t": "账管人"}], "ans": "ABD", "kp": "第4章·信托当事人", "model": "多选 · 主体列举型", "chain": ["信托当事人 = 与信托有直接利害关系或权利义务关系的人", "三方：<b>委托人</b>（设立信托）、<b>受托人</b>（管理处分）、<b>受益人</b>（享有受益权）", "监督人（C）、账管人（E）不是信托的当事人"], "fast": "⚡信托三方口诀「<b>委、受、益</b>」（委托人 / 受托人 / 受益人）→ ABD。C、E 是生造角色，直接划掉。信托是典型的\"三当事人\"结构，记住就没有第二答案。", "traps": ["把\"托管人/账管人\"（保管财产的银行）当当事人 —— 保管人属<b>服务提供方</b>，不是信托关系当事人", "注意与\"信托财产权属\"题联动：法律上归受托人、利益归受益人"], "mother": "母题抽象：<b>信托结构三要素</b> —— 当事人(委托人·受托人·受益人) + 信托财产 + 信托目的。凡问\"信托××有哪些\"，先套这三要素的名单。", "analysis": "<p>信托当事人是指与信托有直接利害关系或权利义务关系的人，包括<b>委托人</b>（A，设立信托并转移财产的人）、<b>受托人</b>（D，以自己的名义管理处分信托财产的人）、<b>受益人</b>（B，享有信托受益权的人）。故选 <b>ABD</b>。</p><p>C 监督人、E 账管人（资金保管与账务管理机构）均不属于信托当事人。</p>"}, {"no": 2007, "label": "R7", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "CD", "src": "真题错题", "stem": "保险公司所筹措的资金，除一部分用于应付赔偿需要外，其余资金作为长期性资金主要投资于（）。", "opts": [{"k": "A", "t": "公司债券"}, {"k": "B", "t": "房地产开发"}, {"k": "C", "t": "政府债券"}, {"k": "D", "t": "发放信用贷款"}, {"k": "E", "t": "股票"}], "ans": "ACE", "kp": "第4章·保险资金运用", "model": "多选 · 投资范围列举型", "chain": ["保险资金具有<b>长期性、负债经营</b>特征，运用须遵循安全性、流动性、收益性原则", "可投：<b>政府债券</b>（C）、<b>公司债券</b>（A，金融债与企业债）、<b>股票</b>（E，比例受限）", "不可投：<b>房地产开发</b>（B，一般不允许直接开发房地产）、<b>发放信用贷款</b>（D，保险公司不得发放贷款 / 信用贷款）"], "fast": "⚡保险资金运用判据：<b>「能买标准化金融产品，不能自己去做实业开发、不能放贷款」</b>。债券✓、股票✓；房地产<b>开发</b>✗（不动产投资≠开发）、信用贷款✗ → ACE。", "traps": ["保险资金可以投资不动产，但<b>不得从事房地产开发</b> —— 一字之差", "保险公司不是银行，<b>不能发放贷款</b>（尤其不能放无担保的信用贷款）"], "mother": "母题抽象：<b>保险资金运用\"三可三不可\"</b> —— 可投：银行存款、债券、股票/基金、不动产、股权；不可：直接放贷（质押贷款除外）、房地产开发、风险投资。判据是<b>负债经营的谨慎性</b>。", "analysis": "<p>保险公司筹集的资金除用于赔付准备外，其余作为长期资金主要投资于<b>政府债券</b>（C）、<b>公司债券</b>（A，含金融债与企业债）、<b>股票</b>（E，受监管比例限制）等标准化金融产品，兼顾安全性、流动性与收益性。故选 <b>ACE</b>。</p><p>B 房地产开发：保险资金可投资不动产，但<b>不得从事房地产开发</b>；D 发放信用贷款：保险公司<b>不得发放贷款</b>，不属于其资金运用范围。</p>"}, {"no": 2008, "label": "R8", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "下列不可能作为信托财产的有（）", "opts": [{"k": "A", "t": "公司股权"}, {"k": "B", "t": "房产"}, {"k": "C", "t": "王先生债务"}, {"k": "D", "t": "保险单"}], "ans": "C", "kp": "第4章·信托财产范围", "model": "", "chain": ["信托财产须具有<b>可转让性（积极财产）</b>——股权、房产、保险单（现金价值）均可 → 「债务」是消极财产/负债，不能作为信托财产设立信托"], "fast": "⚡信托装的是「财产权利」，装「债」的叫负债，秒选 C", "traps": ["保险单可以：人身保险单的现金价值可质押、可作信托财产（保险金信托）", "别把「债权」与「债务」混——债权（应收款）可以信托，债务不行"], "mother": "母题抽象：<b>信托财产三要件</b>——合法性（委托人合法所有）、可转让性、确定性（可度量）。消极财产（债务）不合格。", "analysis": "<p>信托财产必须是委托人合法所有的、具有可转让性的积极财产。公司股权、房产、具有现金价值的保险单均可作为信托财产；<b>债务属于消极财产，不能作为信托财产</b>。故选 C。</p>"}, {"no": 2009, "label": "R9", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "甲通过保险代理人乙向保险公司丙为其丈夫丁买了一份保险，该笔业务保险人是()", "opts": [{"k": "A", "t": "甲"}, {"k": "B", "t": "乙"}, {"k": "C", "t": "丙"}, {"k": "D", "t": "丁"}], "ans": "C", "kp": "第4章·保险合同主体", "model": "", "chain": ["保险合同四主体：保险人 = 承保并承担赔偿责任的<b>保险公司</b>；投保人 = 交钱买保险的人（甲）；被保险人 = 受保障的人（丁）；保险代理人（乙）只是中介"], "fast": "⚡「保险人 = 保险公司」铁律，无论经过几个代理环节", "traps": ["乙是保险代理人（以保险人名义代为办理业务，责任由保险人承担），不是保险人", "甲是投保人、丁是被保险人，都别选"], "mother": "母题抽象：<b>保险四方对号入座</b>——交钱的=投保人｜被保的=被保险人｜赔钱的=保险人｜跑腿的=代理人/经纪人。", "analysis": "<p>保险人是与投保人订立保险合同，并承担赔偿或给付保险金责任的<b>保险公司</b>。本题中丙保险公司承保，故保险人为丙；乙只是保险代理人。故选 C。</p>"}, {"no": 2010, "label": "R10", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABCDE", "src": "真题错题", "stem": "属于财富管理服务的信托有()。", "opts": [{"k": "A", "t": "家族信托"}, {"k": "B", "t": "保险金信托"}, {"k": "C", "t": "慈善信托"}, {"k": "D", "t": "资产证券化服务信托"}, {"k": "E", "t": "遗嘱信托"}], "ans": "ABE", "kp": "第4章·信托业务分类（财富管理服务信托）", "model": "", "chain": ["财富管理服务信托（三分类新口径下 20 万-1000 万门槛的服务信托）：家族信托 ✅、保险金信托 ✅、遗嘱信托 ✅；资产证券化服务信托 ❌（属金融服务信托/资产证券化服务）；慈善信托 ❌（公益目的，属慈善信托）"], "fast": "⚡「家族 + 保险金 + 遗嘱」三件套 = 财富管理服务；「证券化 = 金融服务」「慈善 = 公益」各归各箱", "traps": ["D 资产证券化服务信托名字里也带\"服务信托\"，但归金融服务类", "C 慈善信托服务于公益目的，不是财富管理"], "mother": "母题抽象：<b>信托\"三分类\"定位法</b>——资产管理信托（集合金字塔）/资产服务信托（财富管理+金融服务+代销等）/公益慈善信托；按\"为谁服务、什么目的\"归箱。", "analysis": "<p>属于财富管理服务信托的有<b>家族信托、保险金信托、遗嘱信托</b>；资产证券化服务信托属于资产服务信托中的金融服务信托，慈善信托属于公益慈善信托。故选 ABE。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "某企业投保财产综合险，台风导致厂房倒塌压坏设备。经查，设备受损最直接、最有效、起决定作用的原因是台风。按保险理赔的责任认定规则，判断该损失是否属于保险责任应依据（　）。", "opts": [{"k": "A", "t": "最大诚信原则"}, {"k": "B", "t": "保险利益原则"}, {"k": "C", "t": "近因原则"}, {"k": "D", "t": "损失补偿原则"}], "ans": "C", "kp": "第4章·保险四大原则·近因原则", "model": "四原则题眼配对", "chain": ["保险四大原则：<b>最大诚信、保险利益、近因、损失补偿</b>", "<b>近因原则</b>＝判断致损的<b>最直接、最有效、起决定作用</b>的原因是否属于保险责任范围，属则赔", "其余三原则各管一段：最大诚信管<b>告知与保证</b>；保险利益管<b>投保人对标的须有法律上承认的利益</b>；损失补偿管<b>财产险赔付以实际损失为限</b>", "题干出现“最直接、最有效、起决定作用”三段式表述 → 只可能是近因原则"], "fast": "⚡见「<b>最直接、最有效、起决定作用</b>」→ 近因原则。四原则题眼各一句：告知保证→诚信；有利益才能保→保险利益；赔多少→损失补偿；为什么赔→近因。", "traps": ["看到“是否属于保险责任”就选最大诚信（诚信管的是订约时的告知，不管责任认定）→ A", "把“以实际损失为限”当成判断依据（那是赔付金额，不是责任归属）→ D"], "mother": "四原则题一律问“<b>它管哪一段</b>”：订约前→诚信；能不能保→保险利益；赔不赔→近因；赔多少→损失补偿。", "analysis": "<p>保险理赔责任认定的核心是<b>近因原则</b>：保险人只对造成损失的<b>最直接、最有效、起决定作用</b>的原因属于承保风险时承担赔付责任。</p><p>本题台风是设备受损的近因，若台风属承保风险则应赔，故选 <b>C</b>。</p><p>A 最大诚信原则约束投保人的如实告知与保证义务；B 保险利益原则要求投保人对保险标的具有法律上承认的利益；D 损失补偿原则解决财产险赔付上限（以实际损失、保险金额、保险价值三者低者为限），均不用于判断责任归属。</p><p>延伸：<b>多因连续</b>看最先发生的有效原因；<b>多因间断</b>看新介入的独立原因。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "关于损失补偿原则的适用范围，下列说法正确的是（　）。", "opts": [{"k": "A", "t": "损失补偿原则既适用于财产保险，也适用于人身保险"}, {"k": "B", "t": "损失补偿原则只适用于财产保险，人身保险按约定金额定额给付"}, {"k": "C", "t": "人身保险的给付以被保险人的实际经济损失为限"}, {"k": "D", "t": "损失补偿原则要求保险人一律按保险金额全额赔付"}], "ans": "B", "kp": "第4章·损失补偿原则·适用范围", "model": "原则适用范围辨析", "chain": ["损失补偿＝赔偿以<b>实际损失</b>为限，目的是<b>恢复原状、不使人获利</b>，因此只适用于<b>财产保险</b>", "人身保险的标的是人的生命与身体，<b>无法用金钱衡量损失</b>，按合同约定<b>定额给付</b>，不适用损失补偿，也不适用代位求偿", "D 错在“一律按保险金额全额赔付”——财产险还要受<b>实际损失</b>与<b>保险价值</b>双重约束，超额保险只按保险价值赔", "所以唯一正确表述是 B"], "fast": "⚡凡“损失补偿/代位求偿/按实际损失赔”一律只配<b>财产险</b>；人身险＝<b>定额给付</b>。见“人身险也适用补偿”直接划掉。", "traps": ["把“保险赔付”当成“损失补偿”，认为人身险也补损失 → A", "记成“买了多少保额就赔多少”，忽略财产险的实际损失上限 → D"], "mother": "适用范围题：先问“<b>这个标的的损失能不能用钱衡量</b>”——能（财产）→补偿；不能（人身）→给付。", "analysis": "<p><b>损失补偿原则</b>只适用于财产保险：保险人以被保险人的<b>实际损失</b>为限赔偿，且不超过保险金额与保险价值，避免被保险人获利，并由此派生出<b>代位求偿</b>与<b>重复保险分摊</b>。</p><p>人身保险的保险标的是人的生命和身体，价值无法用货币衡量，因此按合同约定的<b>保险金额定额给付</b>，不适用损失补偿原则，<b>B 正确</b>。</p><p>A、C 把补偿逻辑硬套到人身险；D 忽略实际损失与保险价值上限，均错误。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "核保后，保险公司对风险程度高于标准体、但仍可在一定条件下承保的保险标的，通常采取的承保决策是（　）。", "opts": [{"k": "A", "t": "正常承保"}, {"k": "B", "t": "加费承保"}, {"k": "C", "t": "拒保"}, {"k": "D", "t": "注销保单"}], "ans": "B", "kp": "第4章·承保管理·承保决策", "model": "承保决策四分类", "chain": ["承保决策四种：<b>正常承保、加费承保、除外责任承保、拒保</b>", "标准体（风险与费率匹配）→ <b>正常承保</b>（按标准费率）", "次标准体（风险偏高但可接受）→ <b>加费承保</b>（加收保费）或 <b>除外责任承保</b>（批单除外特定责任）", "不可保体（风险超出承受范围）→ <b>拒保</b>；注销保单不是承保决策，是合同存续期间的处理动作"], "fast": "⚡四档对号入座：<b>标准体→正常；次标准体→加费或除外；不可保→拒保</b>。题干出现「高于标准体但仍可承保」→ 加费承保。", "traps": ["把“仍可承保”读成“正常承保”，忽略风险偏高这个前提 → A", "把“注销保单”当成一种核保结论（它属保单存续管理，不是承保决策）→ D"], "mother": "承保决策题先给风险<b>分档</b>（标准/次标准/不可保），再选对应动作，别跳档。", "analysis": "<p>承保决策是核保的结论，分为四类：<b>正常承保</b>（标准体，按标准费率）、<b>加费承保</b>（次标准体，风险偏高，加收保费后承保）、<b>除外责任承保</b>（对特定风险以批单方式除外后承保）、<b>拒保</b>（风险不可接受）。</p><p>题干“风险高于标准体但仍可承保”属次标准体，最适宜的是<b>加费承保</b>，<b>B 正确</b>。</p><p>D 注销保单是保险合同存续期间因特定事由终止保单的处理，不属于核保结论。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "保险理赔的一般程序是（　）。", "opts": [{"k": "A", "t": "报案（出险通知）→ 查勘定损 → 审核单证 → 责任认定 → 理算 → 赔付"}, {"k": "B", "t": "报案（出险通知）→ 责任认定 → 查勘定损 → 审核单证 → 理算 → 赔付"}, {"k": "C", "t": "报案（出险通知）→ 审核单证 → 查勘定损 → 理算 → 责任认定 → 赔付"}, {"k": "D", "t": "查勘定损 → 报案（出险通知）→ 审核单证 → 责任认定 → 理算 → 赔付"}], "ans": "A", "kp": "第4章·理赔管理·理赔程序", "model": "程序顺序题", "chain": ["理赔六步：<b>报案 → 查勘定损 → 审核单证 → 责任认定 → 理算 → 赔付</b>", "逻辑链：先<b>知道出事</b>（报案）→ 再<b>到现场看损失多少</b>（查勘定损）→ 再<b>核对单证是否齐全有效</b>（审核）→ 再<b>判是否属于保险责任</b>（认定）→ 最后<b>算钱并支付</b>（理算、赔付）", "B 把“责任认定”提到查勘之前——不看现场无法定责；C 把理算放到责任认定之前——没定责不能算钱；D 报案放在查勘之后——程序起点颠倒"], "fast": "⚡顺序钉死：<b>报案→查勘→审单→定责→理算→赔付</b>。口诀「<b>先到现场，再对单据，后判责任，最后算钱</b>」。", "traps": ["把“责任认定”提前到查勘之前（想当然认为先定责）→ B", "把“理算”放在“责任认定”前（算钱不能先于定责）→ C"], "mother": "程序题只记一句：<b>信息→现场→单证→定性→定量→支付</b>，任何把“定性”放到“现场”前面、把“定量”放到“定性”前面的都是错的。", "analysis": "<p>保险理赔的基本程序为：<b>① 报案（出险通知）→ ② 查勘定损 → ③ 审核单证 → ④ 责任认定 → ⑤ 理算 → ⑥ 赔付</b>。</p><p>顺序的合理性在于：未接到报案无从启动；未查勘无法确定损失程度；未审核单证无法确认索赔主体与依据；未认定责任不能确定赔与不赔；未理算无法确定金额。<b>A 正确</b>。</p><p>B、C、D 均为环节错位，注意“定责”必须在“查勘＋审单”之后、“理算”之前。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于再保险业务种类的划分，下列说法正确的有（　）。", "opts": [{"k": "A", "t": "成数再保险按固定比例分出保险金额、保险费和赔款"}, {"k": "B", "t": "溢额再保险先确定自留额，超过自留额的部分按约定分出，可分层安排"}, {"k": "C", "t": "超额赔款再保险属于非比例再保险，以赔款超过起赔点（自负额）为触发条件"}, {"k": "D", "t": "赔付率超赔再保险属于比例再保险，按保险金额比例分摊赔款"}, {"k": "E", "t": "溢额再保险属于非比例再保险"}], "ans": "ABC", "kp": "第4章·再保险·业务种类", "model": "比例/非比例分类判别", "chain": ["比例再保险＝按<b>保险金额</b>的比例分：<b>成数再保险</b>（固定比例，保额/保费/赔款同比例）、<b>溢额再保险</b>（先定<b>自留额</b>，超额部分按线数分出）", "非比例再保险＝按<b>赔款或赔付率</b>分：<b>超额赔款再保险</b>（超过起赔点以上由再保人承担）、<b>赔付率超赔再保险</b>（年度赔付率超过约定水平以上由再保人承担）", "D 把赔付率超赔错划为比例再保险——它按<b>赔付率</b>而非保额比例分，属非比例", "E 把溢额错划为非比例——溢额虽有“自留额”，但分出部分仍按<b>保额比例</b>，属比例再保险"], "fast": "⚡一句话分野：<b>按“保额/比例”分＝比例（成数、溢额）；按“赔款/赔付率”分＝非比例（超额赔款、赔付率超赔）</b>。D、E 全是把两类对调。", "traps": ["看到“自留额”就归为非比例（自留额是溢额的标志，但溢额仍属比例）→ E", "看到“超赔”以为是比例分摊（超赔是按赔款触发，不按保额比例）→ D"], "mother": "先把四个名词按“<b>分什么</b>”分成两列，再看选项有没有跨界：分保额→比例；分赔款/赔付率→非比例。", "analysis": "<p>再保险按责任分担基础分为两类：</p><p><b>（1）比例再保险</b>——以保险金额为分配基础：① <b>成数再保险</b>，分出人与再保人按<b>固定比例</b>分担保额、保费与赔款；② <b>溢额再保险</b>，分出人先确定<b>自留额</b>，超过自留额部分按约定线数分出，可分层。故 A、B 正确。</p><p><b>（2）非比例再保险</b>——以赔款或赔付率为分配基础：① <b>超额赔款再保险</b>，赔款超过<b>起赔点（自负额）</b>以上部分由再保人承担；② <b>赔付率超赔再保险</b>，年度<b>赔付率</b>超过约定水平以上部分由再保人承担。故 C 正确。</p><p>D 错在类别（赔付率超赔属非比例，且不按保额比例分摊）；E 错在类别（溢额属比例再保险）。<b>答案 ABC</b>。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "某一年期医疗保险条款约定：保险期间届满时，保险人不得因被保险人健康状况变化或者历史理赔情况而拒绝续保或调整费率。该约定属于（　）。", "opts": [{"k": "A", "t": "保证续保条款"}, {"k": "B", "t": "非保证续保条款"}, {"k": "C", "t": "等待期条款"}, {"k": "D", "t": "免赔额条款"}], "ans": "A", "kp": "第4章·承保管理·续保规则", "model": "条款性质识别", "chain": ["续保两类：<b>保证续保</b>——保险公司<b>不得因被保险人健康状况变化或历史理赔</b>而拒保、加费或附加条件；<b>非保证续保</b>——期满需重新核保，公司可拒保或调整费率", "题干出现“<b>不得因健康状况变化或历史理赔拒绝续保/调费</b>”＝保证续保的定义原文", "C 等待期是保单生效后一段时间内出险不赔；D 免赔额是损失中由被保险人自担的额度——都与续保无关"], "fast": "⚡题眼：<b>「不得因健康状况变化或历史理赔拒保/加费」→ 保证续保</b>；「期满重新核保、公司可拒保」→ 非保证续保。", "traps": ["看到“一年期短期险”就默认非保证续保（期限短≠非保证，关键看条款有无上述限制）→ B", "把“不得调整费率”理解成费率固定不变（它只是不得<b>因健康/理赔</b>调费，不排除按年龄整体调费）"], "mother": "续保题只认一句话：<b>限制公司拒保/加费的权利＝保证续保</b>，与险种期限长短无关。", "analysis": "<p><b>保证续保</b>指在保险期间届满时，保险人<b>不得因被保险人健康状况变化或历史理赔情况</b>而拒绝续保、提高费率或附加其他条件，被保险人享有续保的确定权利。</p><p><b>非保证续保</b>指期满后需重新核保，保险人可拒保或调整费率。</p><p>题干表述正是保证续保条款的定义，<b>A 正确</b>。C 等待期、D 免赔额属赔付条件，与续保权利无关。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "多选", "lv": "真", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "根据保险资金运用管理的有关规定，保险公司的资金运用不得（　）。", "opts": [{"k": "A", "t": "直接从事房地产开发建设"}, {"k": "B", "t": "购买国债、金融债、企业债"}, {"k": "C", "t": "向企业发放贷款"}, {"k": "D", "t": "投资股票、证券投资基金"}, {"k": "E", "t": "投资不动产并设立保险资产管理公司进行受托管理"}], "ans": "AC", "kp": "第4章·保险资金运用·禁止性规定", "model": "选非型·禁止项识别", "chain": ["保险资金运用形式（允许）：<b>银行存款、买卖债券（国债/金融债/企业债）、买卖股票与证券投资基金、投资不动产、股权投资</b>等", "禁止两条：<b>不得直接从事房地产开发建设</b>（可投资不动产，但不能自己开发建设）、<b>不得向企业发放贷款</b>（放贷属银行专营）", "B、D、E 均在允许范围内——债券、股票基金、不动产投资与设立保险资管公司开展受托管理都是常规渠道"], "fast": "⚡禁止就两条，口诀「<b>不盖楼、不放贷</b>」：房地产开发建设×、向企业发放贷款×。买债、买股基、投不动产、设资管公司都是合法渠道。", "traps": ["把“投资不动产”与“房地产开发建设”混为一谈（前者允许，后者禁止）→ 误选 E 或漏选 A", "看到“投资股票”觉得风险高就当成禁止（保险资金可投股票与基金，有比例上限但非禁止）→ D"], "mother": "资金运用题：<b>“投资”可以，“经营”不行</b>——可以买楼收租，不可自己盖楼卖房；可以买债买股，不可放贷。", "analysis": "<p>保险资金运用须遵循<b>安全性、流动性、收益性</b>原则（安全性优先），允许的形式包括：银行存款，买卖债券、股票、证券投资基金份额等有价证券，投资不动产，以及股权投资等。</p><p>禁止性规定主要有：<b>不得直接从事房地产开发建设</b>（A）、<b>不得向企业发放贷款</b>（C）。</p><p>B 债券、D 股票与基金、E 投资不动产及设立保险资产管理公司受托管理，均属允许范围。<b>答案 AC</b>。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "保险营销组合的四个基本要素（4P）是（　）。", "opts": [{"k": "A", "t": "产品、价格、渠道、促销"}, {"k": "B", "t": "产品、人员、过程、有形展示"}, {"k": "C", "t": "客户、成本、便利、沟通"}, {"k": "D", "t": "市场、资金、技术、人才"}], "ans": "A", "kp": "第4章·保险营销·营销组合", "model": "要素集合识记", "chain": ["保险营销四要素（4P）：<b>产品（Product）、价格（Price）、渠道（Place）、促销（Promotion）</b>", "B 是服务营销 <b>7P</b> 中在 4P 之外追加的三项（人员、过程、有形展示）", "C 是 <b>4C</b>：客户（Customer）、成本（Cost）、便利（Convenience）、沟通（Communication），是从客户视角对 4P 的转换", "D 与营销组合无关"], "fast": "⚡<b>4P＝产品·价格·渠道·促销</b>；<b>4C＝客户·成本·便利·沟通</b>；7P 再加<b>人员·过程·有形展示</b>。题干问 4P 就只选这四个。", "traps": ["把 7P 的“人员/过程/有形展示”混进 4P → B", "把 4C 当成 4P 的另一种说法 → C"], "mother": "营销组合题先数个数：4 个 → P 是产品价格渠道促销、C 是客户成本便利沟通；7 个 → 服务营销。", "analysis": "<p>保险营销组合的四个基本要素即 <b>4P</b>：<b>产品（Product）、价格（Price，即费率）、渠道（Place，即直销/代理/经纪等）、促销（Promotion）</b>，<b>A 正确</b>。</p><p>B 属服务营销 7P 的追加要素（人员、过程、有形展示）；C 属 4C 理论（客户、成本、便利、沟通）；D 不属营销组合范畴。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于信托财产的独立性，下列说法正确的有（　）。", "opts": [{"k": "A", "t": "信托财产与受托人的固有财产相区别，不得归入受托人的固有财产"}, {"k": "B", "t": "受托人死亡或者依法解散、撤销、宣告破产时，信托财产不属于其遗产或者清算财产"}, {"k": "C", "t": "受托人管理运用信托财产所产生的债权，不得与其固有财产产生的债务相抵销"}, {"k": "D", "t": "信托财产可用于清偿受托人自身的债务"}, {"k": "E", "t": "委托人可以将不属于自己合法所有的财产（如代为保管的他人财物）设立信托"}], "ans": "ABC", "kp": "第4章·信托·信托财产独立性", "model": "选非型·属性判断", "chain": ["信托财产独立性三根支柱：<b>与固有财产分离</b>（A）、<b>不属受托人遗产/清算财产</b>（B）、<b>不得与固有财产债务抵销</b>（C）", "D 正好说反——信托财产独立于受托人，<b>不能</b>用于清偿受托人自身债务（这是独立性的核心价值）", "E 违反信托设立前提：信托财产必须是委托人<b>合法所有</b>的财产，且<b>装权利不装债务</b>；代管他人财物不属于委托人所有，不能设立信托"], "fast": "⚡独立性三句：<b>不入固有财产、不作遗产清算、不得抵销</b>；两条禁忌：<b>不清偿受托人自己的债、不带别人的债</b>。", "traps": ["把“独立”理解成“隔离委托人”而忘了隔离受托人 → D", "忽略“合法所有”前提，认为只要交付即可设立信托 → E"], "mother": "信托财产题只问一句：<b>这笔财产能不能被第三方债权人抓走</b>——受托人的债权人抓不到（独立），委托人的债权人看是否已合法设立，他人财产根本不能进来。", "analysis": "<p>信托财产具有独立性：</p><p>① <b>独立于受托人固有财产</b>：信托财产与受托人固有财产相区别，不得归入固有财产（A 正确）；</p><p>② <b>存续上的独立</b>：受托人死亡、解散、撤销或宣告破产时，信托财产不属于其遗产或清算财产（B 正确）；</p><p>③ <b>不得抵销</b>：受托人管理运用信托财产所产生的债权，不得与其固有财产产生的债务相抵销（C 正确）。</p><p>D 违背独立性本质——信托财产不得用于清偿受托人自身债务；E 违背设立条件——信托财产须为委托人<b>合法所有</b>的财产，代管他人财物不属其所有，不能设立信托。<b>答案 ABC</b>。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "以保险金请求权作为信托财产，由保险公司在保险事故发生后将保险金交付受托人，按委托人意愿管理和分配的财富管理服务信托是（　）。", "opts": [{"k": "A", "t": "家族信托"}, {"k": "B", "t": "保险金信托"}, {"k": "C", "t": "遗嘱信托"}, {"k": "D", "t": "慈善信托"}], "ans": "B", "kp": "第4章·信托·财富管理服务信托", "model": "三类财富管理信托辨识", "chain": ["财富管理服务信托三件套：<b>家族信托、保险金信托、遗嘱信托</b>", "<b>保险金信托</b>：以<b>保险金请求权</b>或保险金为信托财产，保险事故发生后保险金进入信托，按约定管理分配 → 题干完全对应", "<b>家族信托</b>：以家族财富（现金、股权、不动产等）为信托财产，用于<b>跨代传承、财富保护</b>，金额门槛较高", "<b>遗嘱信托</b>：以<b>遗嘱</b>设立，<b>身后生效</b>；<b>慈善信托</b>以公益为目的，<b>不属</b>财富管理服务信托"], "fast": "⚡四句题眼：<b>保险金请求权→保险金信托</b>；跨代传承→家族信托；遗嘱设立、身后生效→遗嘱信托；公益目的→慈善信托（且不属财富管理服务信托）。", "traps": ["看到“传承/分配”就选家族信托（家族信托的财产是家族财富，不是保险金请求权）→ A", "把慈善信托也算进财富管理服务信托（它是公益信托，不在三件套内）→ D"], "mother": "信托类型题只认<b>信托财产是什么</b>：保险金请求权→保险金信托；遗嘱→遗嘱信托；家族整体财富→家族信托；公益→慈善信托。", "analysis": "<p>财富管理服务信托主要包括<b>家族信托、保险金信托、遗嘱信托</b>。</p><p><b>保险金信托</b>是以<b>保险金请求权</b>（或保险金）作为信托财产设立的信托：投保人/被保险人将保单受益人变更为受托人，保险事故发生后保险金直接进入信托账户，由受托人按信托文件管理和分配，实现保险保障与财富传承的衔接，<b>B 正确</b>。</p><p>A 家族信托以家族财富为信托财产，侧重跨代传承与风险隔离；C 遗嘱信托以遗嘱方式设立、于立遗嘱人死亡后生效；D 慈善信托以公益为目的，不属财富管理服务信托。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "多选", "lv": "真", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "关于保险合同的主体，下列说法正确的有（　）。", "opts": [{"k": "A", "t": "投保人是与保险人订立保险合同、并按照合同约定负有交付保险费义务的人"}, {"k": "B", "t": "被保险人是其财产或者人身受保险合同保障、享有保险金请求权的人"}, {"k": "C", "t": "受益人是人身保险合同中由被保险人或者投保人指定、享有保险金请求权的人"}, {"k": "D", "t": "投保人可以为无民事行为能力人投保以死亡为给付保险金条件的保险，法律不作任何限制"}, {"k": "E", "t": "保险人是与投保人订立保险合同、承担赔偿或者给付保险金责任的保险公司"}], "ans": "ABCE", "kp": "第4章·保险合同·主体", "model": "选非型·主体权利义务配对", "chain": ["四个主体各管一段：<b>保险人</b>＝保险公司（收保费、担赔付，在保单上签署）；<b>投保人</b>＝订约并交费；<b>被保险人</b>＝受保障、享保险金请求权；<b>受益人</b>＝由被保险人或投保人指定领保险金", "A、B、C、E 分别为四个主体的标准定义", "D 违法：投保人<b>不得</b>为无民事行为能力人投保以死亡为给付保险金条件的保险；父母为其未成年子女投保的除外，且保险金额受监管上限约束，并须被保险人同意"], "fast": "⚡主体配对：<b>签字担责＝保险人（公司）｜交钱订约＝投保人｜受保障索赔＝被保险人｜指定领钱＝受益人</b>。凡“为无民事行为能力人投死亡险不受限制”一律错。", "traps": ["把“受益人”说成由保险人指定（受益人是被保险人或投保人指定，投保人指定须经被保险人同意）→ C 型干扰", "忽略死亡险对无民事行为能力人的禁止性规定 → D"], "mother": "主体题只问“<b>这件事谁做</b>”：签约交费→投保人；承担赔付→保险人；被保障→被保险人；领保险金→受益人。", "analysis": "<p><b>保险人</b>：与投保人订立保险合同、承担赔偿或给付保险金责任的保险公司（E 正确）；<b>投保人</b>：与保险人订立合同并负有交付保险费义务的人（A 正确）；<b>被保险人</b>：其财产或人身受合同保障、享有保险金请求权的人（B 正确）；<b>受益人</b>：人身保险合同中由被保险人或者投保人指定、享有保险金请求权的人（C 正确，投保人指定须经被保险人同意）。</p><p>D 错误：《保险法》规定投保人不得为无民事行为能力人投保以死亡为给付保险金条件的保险，父母为其未成年子女投保的不受此限，但保险金额不得超过监管规定的限额。<b>答案 ABCE</b>。</p>"}]};
+const KEY  = 'fin_drill_ch04_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+</body>
+</html>

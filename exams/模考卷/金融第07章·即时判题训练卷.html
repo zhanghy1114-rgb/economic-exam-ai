@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第07章 · 金融资产定价</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第07章 · 金融资产定价<small id="sub">错题 5 题 + 自命题 20 题 ｜ 24 分钟 ｜ 满分 32</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div id="skelGate" style="position:fixed;inset:0;z-index:9999;background:#f4f6fa;overflow:auto"> <div style="max-width:920px;margin:0 auto;padding:26px 20px 60px">  <div style="background:#fff;border:1px solid #dde3ec;border-radius:12px;padding:18px 20px;box-shadow:0 2px 14px rgba(20,40,80,.08)">   <h2 style="margin:0 0 6px;font-size:20px;color:#12305e">金融第07章 · 金融资产定价 · 骨架速过卡（约 5 分钟）</h2>   <div style="color:#6b7280;font-size:13px;margin-bottom:12px">    03/05 章裸做崩盘（24% / 43%）的根因是<b>先做题、后补骨架</b>；    06 章实测「先过骨架」后<b>自命题 93%、回炉 33%</b>——骨架过了新题就拿分。    从 06 章起：<b>骨架没过完，卷子不发</b>。下面 12 条是本章基础分，    逐条念一遍再开卷——念完点底部按钮。   </div>   <div style="border:1px solid #e5e9f0;border-radius:8px;overflow:hidden"><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">收益与风险度量</div><div style="flex:1;color:#26303d;line-height:1.6">预期收益率 <b>E(R)=Σpᵢ·Rᵢ</b>；风险＝<b>方差 σ² / 标准差 σ</b>。两资产组合 σ²p = w₁²σ₁²+w₂²σ₂²+2w₁w₂ρσ₁σ₂。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">分散化铁律</div><div style="flex:1;color:#26303d;line-height:1.6"><b>分散化只能降低非系统风险（特有风险），不能降低系统风险</b>；ρ=+1 完全正相关时<b>分散化无效</b>，ρ=−1 可构造无风险组合。见「消除系统风险」直接划掉。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★★★ 三大绩效指数</div><div style="flex:1;color:#26303d;line-height:1.6"><b>夏普</b>=(Rp−Rf)/<b>σp</b>（总风险，非充分分散组合）｜<b>特雷诺</b>=(Rp−Rf)/<b>βp</b>（系统风险，已充分分散组合）｜<b>詹森 α</b>=Rp−[Rf+β(Rm−Rf)]（差值，α＞0 跑赢）。口诀「<b>夏普用 σ、特雷诺用 β、詹森是个差</b>」，三者都<b>越大越好</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">三指数算例（同组数据）</div><div style="flex:1;color:#26303d;line-height:1.6">Rp=12%、Rf=3%、Rm=10%、σp=15%、β=1.2 → 夏普 <b>0.60</b>｜特雷诺 <b>7.5</b>｜詹森 <b>+0.6%</b>。三个一起考时<b>分母是唯一区分点</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">CAPM / SML</div><div style="flex:1;color:#26303d;line-height:1.6"><b>E(Rᵢ)=Rf+βᵢ(Rm−Rf)</b>；β 衡量<b>系统风险</b>，β=1 与市场同步、β＞1 激进。反求 <b>β=(组合收益−Rf)/(市场收益−Rf)</b>——<b>分子分母都减 Rf</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">APT vs CAPM</div><div style="flex:1;color:#26303d;line-height:1.6">APT 多因素、<b>不要求市场组合</b>、均衡时<b>无套利机会</b>；CAPM 是 APT 的<b>单因子特例</b>（因子＝市场组合）。真题错项原句：「均衡时存在套利机会」→ 判 ❌。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">债券估值</div><div style="flex:1;color:#26303d;line-height:1.6">价格＝利息+面值按市场利率折现之和；<b>利率↑→价格↓（反向）</b>；<b>期限越长、票面利率越低 → 越敏感</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">股票估值</div><div style="flex:1;color:#26303d;line-height:1.6">零增长 <b>P=D/r</b>｜固定增长（戈登）<b>V=D₁/(r−g)</b>，<b>D₁=D₀×(1+g)</b>；反求 <b>r=D₁/P+g</b>。两个坑：分子忘乘 (1+g)、分母写成 r+g。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">有效市场三形态</div><div style="flex:1;color:#26303d;line-height:1.6"><b>弱式（历史价格→废技术分析）→ 半强式（全部公开信息→废基本面）→ 强式（含内幕信息→内幕也无效）</b>。信息集越大越赚不到超额收益。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★ 期权价值结构</div><div style="flex:1;color:#26303d;line-height:1.6"><b>期权价值＝内在价值＋时间价值</b>；五因素「<b>标价、执价、期限、波动、无风险利率</b>」；见「预期收益率/风险度」直接划。看涨<b>买方＝下有底（最大损失＝期权费）、上无限</b>，行权条件市价＞执行价；「最大收益＝期权费」是<b>卖方</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★ 看涨看跌平价</div><div style="flex:1;color:#26303d;line-height:1.6"><b>C+PV(K)=P+S</b>，变形 <b>C−P=S−PV(K)</b>，<b>只适用于欧式期权</b>（美式可提前行权，只能写不等式）。求 C：<b>C=P+S−PV(K)</b>，代完两边验算相等。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">远期/期货/期权定价方法</div><div style="flex:1;color:#26303d;line-height:1.6">持有成本 <b>F=S·e^((r+c−y)T)</b>，无收益资产 F=S·e^(rT)；<b>F＞S＝溢价（正常市场）、F＜S＝现货溢价（便利收益高）</b>；期货价≈同期限远期价。B-S 五输入 <b>S/K/r/σ/T</b>，<b>σ↑、T↑→期权越贵</b>，中级<b>不手算公式</b>；风险中性定价不看风险偏好。</div></div></div>   <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">    <button id="skelGo" style="background:#1a4fa0;color:#fff;border:0;border-radius:8px;padding:11px 22px;font-size:15px;cursor:pointer">✅ 骨架过完了，开始做题</button>    <span style="color:#8a94a6;font-size:12px">（点击后本卡收起，计时开始）</span>   </div>  </div> </div></div>
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第07章 金融资产定价 · 即时判题训练卷", "totalMin": 24, "pass": 19, "full": 32, "nSingle": 18, "nMulti": 7, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 5 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 20 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "金融工程的基本分析方法不包括()。", "opts": [{"k": "A", "t": "风险中性定价法"}, {"k": "B", "t": "状态价格定价法"}, {"k": "C", "t": "利差定价法"}, {"k": "D", "t": "积木分析法"}], "ans": "C", "kp": "第7章·金融工程的分析方法", "model": "选非题 · 体系补全（「不包括」）", "chain": ["金融工程的基本分析方法有三：<b>积木分析法</b>、<b>风险中性定价法</b>、<b>状态价格定价法</b>", "积木分析法：把金融工具像积木一样拆分组合（教材原话\"金融工程的核心技术是组合与分解\"）", "风险中性定价法：假设投资者风险中性，用无风险利率贴现期望收益", "状态价格定价法：为未来每种状态定价，再按状态价格加权求和"], "fast": "⚡三方法口诀「<b>积、中、状</b>」（积木 / 风险中性 / 状态价格）。先圈「不包括」→ 找不属于这三个的 → <b>利差定价法</b> = C。", "traps": ["先圈「不」字，否则会正向选一个熟悉的方法", "「利差」是信贷定价里的概念，被借来做干扰项，金融工程里没有这一方法"], "mother": "母题抽象：<b>凡是\"××方法/××理论包括/不包括\"的题，先把标准体系背成口诀</b>，再拿选项逐个对号入座，对不上的就是答案。", "analysis": "<p>金融工程的基本分析方法包括<b>积木分析法</b>（将金融工具分解与组合，构造满足特定需求的金融产品）、<b>风险中性定价法</b>（在风险中性世界中以无风险利率对期望收益贴现）和<b>状态价格定价法</b>（为未来各种可能状态分别定价后加权）。<b>利差定价法</b>不属于金融工程的基本分析方法，故选 C。</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "假设某公司当期的股息为2元/股，经预测，该公司股票未来的股息增长率将永久性地保持在2%的水平，贴现率为8%。那么，该公司股票的内在价值为()。", "opts": [{"k": "A", "t": "34元"}, {"k": "B", "t": "100元"}, {"k": "C", "t": "33.33元"}, {"k": "D", "t": "25元"}], "ans": "A", "kp": "第7章·股票内在价值（戈登股利增长模型）", "model": "数值计算型（不变增长模型）", "chain": ["不变增长（戈登）模型：V = D₁ /(r − g)，其中 D₁ = D₀ × (1+g)", "D₁ = 2 × (1 + 2%) = 2.04 元", "r − g = 8% − 2% = 6%", "V = 2.04 / 0.06 = <b>34 元</b>"], "fast": "⚡公式钉死：<b>V = D₀(1+g)/(r−g)</b>。三步：先算分子 2×1.02=2.04，再算分母 8%−2%=6%，最后 2.04÷0.06=<b>34</b> → A。", "traps": ["<b>忘了乘 (1+g)</b>：2 ÷ 0.06 = 33.33 → 正好是 C 项，这是本题的头号陷阱", "用 D₀ 直接除：2 ÷ (0.08−0.02) 是错在把\"当期股息\"当\"下期股息\""], "mother": "母题抽象：<b>戈登模型三要素</b> —— 分子必须是<b>下一期</b>股利 D₁（=D₀×(1+g)）；分母是<b>超额贴现率</b>(r−g)；适用前提是 g &lt; r（否则公式无意义）。", "analysis": "<p>不变增长模型（戈登模型）：V = D₁/(r − g)。其中 D₁ = D₀(1+g) = 2 × 1.02 = 2.04 元，r − g = 8% − 2% = 6%，故 V = 2.04 ÷ 6% = <b>34 元</b>。A 正确。</p><p>C（33.33 元）是误用 D₀ 直接计算 2 ÷ 6% 的结果，属典型陷阱；B（100 元）相当于把 2% 当作股息率；D（25 元）为 2 ÷ 8%。</p>"}, {"no": 2003, "label": "R3", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "关于多种风险资产配置有效边界的说法，错误的是()", "opts": [{"k": "A", "t": "是一条向上凸的曲线"}, {"k": "B", "t": "反映了\"高风险、高收益\"的原则"}, {"k": "C", "t": "可能有凹陷的地方"}, {"k": "D", "t": "是一条向右上方倾斜的曲线"}], "ans": "C", "kp": "第7章·资产组合的有效边界", "model": "选非题 · 图形性质判断（「错误的是」）", "chain": ["有效边界（有效前沿）：给定风险下期望收益最高、或给定收益下风险最小的组合集合", "形状：<b>向右上方倾斜</b>（高风险高收益）、<b>向上凸</b>（凸向原点，边际替代递减）", "有效边界上<b>不存在凹陷</b>（凹陷处意味着同样风险有更高收益的组合，与\"有效\"矛盾）", "所以\"可能有凹陷\"是<b>错误</b>说法"], "fast": "⚡圈「错误」→ 逐项打勾：向右上倾斜✓、高风险高收益✓、向上凸✓、<b>有凹陷✗</b> → 只勾 ❌ 的那个 = C。有效边界\"有效\"二字本身就排除了凹陷。", "traps": ["选非题最容易正向作答，务必先圈「错误」", "\"向上凸\"与\"向上凹\"的方向描述易混，记住教材原话是<b>向上凸</b>（凸向原点）"], "mother": "母题抽象：<b>有效边界三性质</b> —— 向右上倾斜、向上凸、无凹陷。凡说\"有凹陷/有折返/向下倾斜\"必错。同时它体现\"高风险高收益\"原则。", "analysis": "<p>多种风险资产组合的有效边界是一条<b>向右上方倾斜</b>、<b>向上凸</b>的曲线，反映\"高风险、高收益\"的原则；曲线上<b>不可能存在凹陷</b>的部分 —— 若存在凹陷，则该凹陷处的组合在同等风险下可获得更高收益，与\"有效\"的定义矛盾。因此 C 说法错误，为本题答案。</p>"}, {"no": 2004, "label": "R4", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ACE", "src": "真题错题", "stem": "根据期权定价理论，期权价值的决定因素主要有()。", "opts": [{"k": "A", "t": "期权预期收益率"}, {"k": "B", "t": "无风险利率"}, {"k": "C", "t": "期权期限"}, {"k": "D", "t": "标的资产的风险度"}, {"k": "E", "t": "期权执行价格"}], "ans": "BCE", "kp": "第7章·期权价值的决定因素", "model": "多选 · 因素列举型", "chain": ["期权价值（期权费）取决于：<b>标的资产市场价格</b>、<b>执行价格</b>(E)、<b>期权期限</b>(C)、<b>标的资产价格波动率</b>、<b>无风险利率</b>(B)", "A 期权预期收益率 → <b>不选</b>（期权定价由无风险利率与复制组合决定，不依赖\"预期收益率\"这类主观变量）", "D 标的资产的风险度 → 按标准答案<b>不计入</b>"], "fast": "⚡期权五要素口诀「<b>标的行价、期限、波动、无风险利率</b>」。题干问\"决定因素\" → 检索到 BCE。凡出现\"<b>预期收益率</b>\"（A）一律排除 —— B-S 定价用的是<b>无风险利率</b>，不是预期收益率。", "traps": ["A「期权预期收益率」是最强干扰：期权定价理论的核心是<b>风险中性定价</b>，恰恰不需要预期收益率", "D「标的资产的风险度」若按\"价格波动率\"理解亦应入选，标准答案未计入，实考以官方答案为准"], "mother": "母题抽象：<b>B-S 五变量</b> —— S(标的价格)、X(执行价格)、T(期限)、σ(波动率)、r(无风险利率)。<b>看涨期权与 S、T、σ、r 同向，与 X 反向</b>（看跌相反）。凡\"预期收益率\"\"风险偏好\"都不是期权定价变量。", "analysis": "<p>根据期权定价理论，期权价值的决定因素主要包括<b>无风险利率</b>（B）、<b>期权期限</b>（C）、<b>期权执行价格</b>（E），以及标的资产市场价格与标的资产价格的波动率等。故选 <b>BCE</b>。</p><p>A 错误：期权定价采用风险中性定价与无套利复制思路，使用的是<b>无风险利率</b>而非\"期权预期收益率\"，投资者的预期收益率不进入定价公式。</p><p><b>⚠ 提示：</b>D「标的资产的风险度」若理解为<b>价格波动率</b>，在 B-S 框架下确实影响期权价值；本题标准答案未计入。实考请以官方答案为准，平时按 BCE 记忆。</p>"}, {"no": 2005, "label": "R5", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "AE", "src": "真题错题", "stem": "某投资经理要为客户配置资产组合，该客户希望资产组合波动小于市场波动。该投资经理需从以下不同β值的资产中选择两种，每种资产配置比率是50%，则不可能被选入组合的资产β值是()", "opts": [{"k": "A", "t": "0.8"}, {"k": "B", "t": "1.5"}, {"k": "C", "t": "1.1"}, {"k": "D", "t": "1.3"}, {"k": "E", "t": "0.7"}], "ans": "BD", "kp": "第7章·资产组合 β 的计算与应用", "model": "多选 · 计算反推型（给约束条件 → 反推不可选的资产）", "chain": ["目标：组合波动<b>小于</b>市场 → 组合 β &lt; 1（市场组合 β = 1）", "等权持有两种资产：β_p = 0.5·β₁ + 0.5·β₂ = (β₁ + β₂)/2", "要求 (β₁ + β₂)/2 &lt; 1 → <b>β₁ + β₂ &lt; 2</b>", "逐项试：能与某个其他资产配对使和 &lt; 2 的<b>可能入选</b>；怎么配都 ≥ 2 的<b>不可能入选</b>", "1.5：最小搭配 0.7 → 2.2 ≥ 2 → <b>不可能</b>；1.3：最小搭配 0.7 → 2.0，不小于 2 → <b>不可能</b>；1.1 + 0.7 = 1.8 ✓；0.8、0.7 均可"], "fast": "⚡先把目标翻译成一个不等式：<b>β₁ + β₂ &lt; 2</b>。然后对每个选项问\"它能找到搭档吗\" —— 用<b>最小</b>的 β(0.7) 去配：1.5+0.7=2.2✗、1.3+0.7=2.0✗（要严格小于）、1.1+0.7=1.8✓ → 不可能入选的是 <b>B、D</b>。", "traps": ["边界陷阱：1.3 + 0.7 = 2.0，组合 β = 1.0，是<b>等于</b>市场波动，\"小于\"不满足 → 必须排除", "问的是\"不可能被选入\"，别正向去选能入选的"], "mother": "母题抽象：<b>β 的三条性质</b> —— ①β 是<b>可加权平均</b>的（组合 β = Σwᵢβᵢ）；②β=1 与市场同步、&lt;1 波动小于市场、&gt;1 波动大于市场；③β 衡量<b>系统性风险</b>，可通过资产配置调节。凡\"组合波动小于市场\"的题，一律写成 β_p &lt; 1 的不等式来解。", "analysis": "<p>市场组合的 β = 1。要使组合波动小于市场，需 β_p &lt; 1。等权配置两种资产时 β_p = (β₁ + β₂)/2，故要求 <b>β₁ + β₂ &lt; 2</b>。</p><p>逐项检验：β = 1.5（B）即使与最小的 0.7 搭配，1.5 + 0.7 = 2.2 &gt; 2，无法入选；β = 1.3（D）与 0.7 搭配得 2.0，β_p = 1.0，<b>等于</b>市场波动、不满足\"小于\"，也无法入选。而 1.1 + 0.7 = 1.8 &lt; 2、0.8 与 0.7 均有可行搭配。</p><p>故不可能被选入的 β 值为 <b>B、D</b>。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "基", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "某资产未来有三种状态：概率 0.2 时收益率 10%、概率 0.5 时收益率 6%、概率 0.3 时收益率 −2%。该资产的<b>预期收益率</b>为（　）。", "opts": [{"k": "A", "t": "4.4%"}, {"k": "B", "t": "6.0%"}, {"k": "C", "t": "5.4%"}, {"k": "D", "t": "4.0%"}], "ans": "A", "kp": "第7章·预期收益率 E(R)=ΣpᵢRᵢ", "model": "加权计算", "chain": ["预期收益率＝各状态收益率 × 对应概率<b>加总</b>", "0.2×10% = 2%；0.5×6% = 3%；0.3×(−2%) = −0.6%", "合计 2% + 3% − 0.6% = <b>4.4%</b>", "风险用<b>方差 σ² / 标准差 σ</b>度量，不是预期收益率"], "fast": "⚡E(R)＝<b>概率×收益率逐项加总</b>，负收益那一项要带负号。三项算完先估量级（本题最高 10%、最低 −2%，答案必在 −2%~10% 之间）。", "traps": ["漏乘概率、直接把三个收益率取平均（(10+6−2)/3≈4.7%）", "负收益项按正数加（2+3+0.6=5.6%）"], "mother": "期望值题一律<b>逐项写 p×R 再求和</b>，别心算；概率之和必须=1。", "analysis": "<p>预期收益率是各可能状态收益率以其发生概率为权重的加权平均：<b>E(R) = Σ pᵢ·Rᵢ</b>。</p><p>代入：0.2×10% + 0.5×6% + 0.3×(−2%) = 2% + 3% − 0.6% = <b>4.4%</b>，故选 <b>A</b>。</p><p>注意第三个状态的收益率为负，必须带负号参与加权；概率之和 0.2+0.5+0.3=1，无需再归一化。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于投资组合<b>分散化</b>的说法，正确的有（　）。", "opts": [{"k": "A", "t": "分散化可以降低非系统风险（特有风险）"}, {"k": "B", "t": "充分分散化可以消除系统风险（市场风险）"}, {"k": "C", "t": "两种资产完全正相关（ρ=+1）时，分散化无法降低风险"}, {"k": "D", "t": "组合标准差等于各资产标准差按权重的加权平均"}, {"k": "E", "t": "相关系数越小，分散化降低风险的效果越明显"}], "ans": "ACE", "kp": "第7章·分散化与相关系数", "model": "铁律+绝对化验伪", "chain": ["铁律：<b>分散化只能降低非系统风险，不能降低系统风险</b> → A✓、B✗", "ρ=+1 完全正相关时组合标准差＝加权平均，<b>分散化无效</b> → C✓", "D 只在 ρ=+1 时才成立，作为一般陈述❌（一般 ρ<1 时组合标准差<b>小于</b>加权平均）", "ρ 越小（越接近 −1）分散效果越强 → E✓"], "fast": "⚡两句钉死：<b>分散化只降非系统风险</b>（见「消除系统风险」直接划）；<b>ρ=+1 分散无效、ρ=−1 可构造无风险组合</b>。", "traps": ["勾 B（「消除」是绝对化收网，系统风险无法分散，E4 归零）", "把 D 的「加权平均」当一般公式——它只在完全正相关时成立"], "mother": "组合风险题先问两句：<b>是系统风险还是特有风险？ρ 等于多少？</b>答不出就不勾。", "analysis": "<p>组合风险 σ²p = w₁²σ₁² + w₂²σ₂² + 2w₁w₂ρ₁₂σ₁σ₂。只有当 ρ=+1（完全正相关）时，组合标准差才等于各资产标准差的加权平均，此时<b>分散化完全无效</b>；ρ 越小，组合标准差越小，分散效果越明显。</p><p>更重要的铁律：<b>分散化只能降低非系统风险（公司特有风险），系统风险（市场风险）无法通过分散化消除</b>，因此 B 错误，D 只在 ρ=+1 时成立、作为一般性陈述错误。故选 <b>ACE</b>。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "以<b>总风险（标准差）</b>为分母、衡量单位风险超额收益的绩效指标是（　）。", "opts": [{"k": "A", "t": "夏普比率"}, {"k": "B", "t": "特雷诺指数"}, {"k": "C", "t": "詹森指数"}, {"k": "D", "t": "信息比率"}], "ans": "A", "kp": "第7章·三大绩效指数（2026核心新增）", "model": "分母配对", "chain": ["三大指数的<b>分母是唯一区分点</b>：「<b>夏普用 σ、特雷诺用 β、詹森是个差</b>」", "<b>夏普比率</b> =（Rp − Rf）/ <b>σp</b>，分母是总风险（标准差）", "特雷诺 =（Rp − Rf）/ βp，分母是系统风险", "詹森 α = Rp − [Rf + β(Rm − Rf)]，是差值没有分母"], "fast": "⚡见「<b>总风险/标准差</b>」→ <b>夏普</b>；见「<b>系统风险/β</b>」→ <b>特雷诺</b>；见「<b>跑赢多少/超额收益差</b>」→ <b>詹森</b>。三指数都<b>越大越好</b>。", "traps": ["把夏普与特雷诺的分母互换（这是出题人唯一的干扰手法）", "看到「超额收益」就选詹森——要看题干问的是<b>比值</b>还是<b>差值</b>"], "mother": "三指数题先写三行公式再对照，<b>只盯分母</b>：σ→夏普、β→特雷诺、无分母→詹森。", "analysis": "<p>三大绩效指数（2026 大纲核心新增）：<b>夏普比率</b> =（Rp − Rf）/ σp，以<b>总风险（标准差）</b>为分母，适用于非充分分散化的组合；<b>特雷诺指数</b> =（Rp − Rf）/ βp，以<b>系统风险（β）</b>为分母，适用于已充分分散化的组合；<b>詹森指数</b> α = Rp − [Rf + β(Rm − Rf)]，是实际收益与 CAPM 预期收益的<b>差值</b>。</p><p>本题问「总风险（标准差）为分母」→ 夏普比率，选 <b>A</b>。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "某投资组合已<b>充分分散化</b>，评价其「单位系统风险所获得的超额收益」应使用（　）。", "opts": [{"k": "A", "t": "夏普比率"}, {"k": "B", "t": "特雷诺指数"}, {"k": "C", "t": "詹森指数"}, {"k": "D", "t": "标准差"}], "ans": "B", "kp": "第7章·特雷诺指数适用场景", "model": "适用场景配对", "chain": ["「单位系统风险」＝分母是 <b>β</b> → 特雷诺指数", "（Rp − Rf）/ βp，衡量每承担一单位系统风险获得的超额收益", "适用前提：<b>已充分分散化</b>的组合（非系统风险已基本消除，只剩系统风险）", "夏普用 σ（总风险），适用于<b>非充分分散</b>组合"], "fast": "⚡「<b>已充分分散</b>」→ 只剩系统风险 → <b>特雷诺</b>（分母 β）；「<b>未充分分散</b>」→ 要看总风险 → <b>夏普</b>（分母 σ）。", "traps": ["把「充分分散」当成选夏普的理由（方向反了）", "见「超额收益」选詹森（詹森是差值，不是单位风险的比值）"], "mother": "先判组合状态：<b>分散够了没有</b>——够了用 β（特雷诺），不够用 σ（夏普）。", "analysis": "<p>当组合已充分分散化，非系统风险基本被消除，剩余风险主要是系统风险 β。此时用<b>特雷诺指数</b>（Rp − Rf）/ βp 衡量每单位系统风险的超额收益。</p><p>夏普比率以标准差（总风险）为分母，适用于尚未充分分散、需要评价全部风险的组合。故选 <b>B</b>。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "已知组合收益率 Rp=12%，无风险利率 Rf=3%，市场收益率 Rm=10%，组合标准差 σp=15%，组合 β=1.2。该组合的<b>詹森指数 α</b> 为（　）。", "opts": [{"k": "A", "t": "+0.6%（跑赢市场）"}, {"k": "B", "t": "−0.6%（跑输市场）"}, {"k": "C", "t": "+7.5%"}, {"k": "D", "t": "+0.60（比值）"}], "ans": "A", "kp": "第7章·詹森指数计算", "model": "计算题", "chain": ["詹森 α = Rp − [Rf + β(Rm − Rf)]，是<b>差值</b>不是比值", "中括号＝CAPM 预期收益：3% + 1.2×(10% − 3%) = 3% + 8.4% = <b>11.4%</b>", "α = 12% − 11.4% = <b>+0.6%</b> ＞ 0 → 跑赢市场", "同一组数据的另两个指数：夏普 =(12−3)/15 = 0.60；特雷诺 =(12−3)/1.2 = 7.5（C、D 是拿它们来混的）"], "fast": "⚡詹森三步：<b>先算市场风险溢价 (Rm−Rf) → 乘 β → 加 Rf 得预期收益 → 实际收益减它</b>。α＞0 跑赢、α＜0 跑输。", "traps": ["把 7.5% 或 0.60 当詹森（那是特雷诺和夏普，同一组数据三个指数一起考时最容易串）", "忘记乘 β 或只用 Rm−Rf 就减"], "mother": "三指数用同一组数据考时，<b>先看清问的是哪一个</b>：比值带 σ→夏普、比值带 β→特雷诺、百分号差值→詹森。", "analysis": "<p>詹森指数衡量组合实际收益率超过 CAPM 预期收益率的部分：<b>α = Rp − [Rf + β(Rm − Rf)]</b>。</p><p>代入：CAPM 预期收益 = 3% + 1.2×(10% − 3%) = 11.4%；α = 12% − 11.4% = <b>+0.6%</b>，为正说明组合跑赢市场，故选 <b>A</b>。</p><p>顺带记牢同一组数据的另两个结果：夏普 =(12%−3%)/15% = <b>0.60</b>（无量纲比值）；特雷诺 =(12%−3%)/1.2 = <b>7.5</b>。C、D 正是拿这两个数来混淆的。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>夏普比率、特雷诺指数、詹森指数</b>的说法，正确的有（　）。", "opts": [{"k": "A", "t": "三者都是数值越大，组合业绩越好"}, {"k": "B", "t": "夏普比率以标准差（总风险）为分母"}, {"k": "C", "t": "特雷诺指数以 β 系数（系统风险）为分母"}, {"k": "D", "t": "詹森指数是实际收益与 CAPM 预期收益之差"}, {"k": "E", "t": "夏普比率最适用于已充分分散化的组合"}], "ans": "ABCD", "kp": "第7章·三大绩效指数对比", "model": "对比表", "chain": ["三者都是<b>越大越好</b> → A✓", "夏普分母 σ（B✓）、特雷诺分母 β（C✓）、詹森是差值（D✓）", "E❌：<b>已充分分散化</b>的组合用<b>特雷诺</b>（只剩系统风险）；夏普适用<b>非充分分散</b>组合", "逐项：A✓ B✓ C✓ D✓ E✗"], "fast": "⚡三指数一份表背死：<b>夏普/σ/总风险/未充分分散</b>｜<b>特雷诺/β/系统风险/已充分分散</b>｜<b>詹森/差值/绝对业绩</b>。凡把「充分分散」配给夏普的一律 ❌。", "traps": ["勾 E（适用场景记反，E4 归零）", "认为「越大越好」只对部分指数成立而漏 A"], "mother": "对比类多选：<b>五个字母逐个写 √× + 一句理由</b>，理由写不出就不勾。", "analysis": "<p>三大绩效指数都是正向指标，数值越大业绩越好；区别只在分母与适用场景：夏普比率（Rp−Rf）/σp 用总风险，适用于非充分分散化组合；特雷诺指数（Rp−Rf）/βp 用系统风险，适用于已充分分散化组合；詹森指数 α 是实际收益与 CAPM 预期收益的差值，衡量绝对超额业绩。</p><p>E 把适用场景说反了：充分分散化的组合应看特雷诺指数。故选 <b>ABCD</b>。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于三大绩效指数的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "夏普比率的分母是组合标准差"}, {"k": "B", "t": "特雷诺指数的分母是 β 系数"}, {"k": "C", "t": "詹森指数反映的是实际收益与预期收益之差"}, {"k": "D", "t": "三大指数都是数值越小，组合业绩越好"}], "ans": "D", "kp": "第7章·三指数·选非题", "model": "选非题", "chain": ["逐项判：A✓（夏普用 σ）B✓（特雷诺用 β）C✓（詹森是差值）D✗", "三者都是<b>越大越好</b>——超额收益越高、单位风险越划算", "选非题只勾 <b>D</b>"], "fast": "⚡三指数<b>一律越大越好</b>。见「越小越好」直接判 ❌；选非题逐项 ✅❌ 后只勾那个 ❌。", "traps": ["选非方向搞反，把正确表述 A/B/C 当答案（E3）", "被「数值」二字绕进去，忘了三指数都是正向指标"], "mother": "选非三步：①圈「错误」②四项逐个标 ✅/❌ ③<b>只选 ❌</b>。", "analysis": "<p>夏普比率以标准差为分母、特雷诺指数以 β 为分母、詹森指数是实际收益与 CAPM 预期收益之差，A、B、C 均为正确表述。</p><p>三大指数都是<b>正向指标</b>——数值越大表示单位风险获得的超额收益越高、业绩越好，因此 D「越小越好」错误，故选 <b>D</b>。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 65, "wasWrong": false, "src": "自命题·仿真", "stem": "已知无风险利率 3%，市场风险溢价（Rm − Rf）为 6%，某股票 β=1.5。按 <b>CAPM</b> 计算，该股票的预期收益率为（　）。", "opts": [{"k": "A", "t": "12%"}, {"k": "B", "t": "9%"}, {"k": "C", "t": "13.5%"}, {"k": "D", "t": "10.5%"}], "ans": "A", "kp": "第7章·CAPM / 证券市场线 SML", "model": "计算题", "chain": ["CAPM：<b>E(Rᵢ) = Rf + βᵢ(Rm − Rf)</b>", "β 衡量<b>系统风险</b>；β=1 与市场同步、β＞1 激进型", "代入：3% + 1.5×6% = 3% + 9% = <b>12%</b>", "B 9% 是漏加 Rf；C 13.5% 是把 6% 当 Rm 又乘了 1.5 再加错"], "fast": "⚡CAPM 三步：<b>Rf + β × 市场风险溢价</b>。题干直接给「风险溢价」就别再减 Rf；给的是「市场收益率」才先减 Rf。", "traps": ["漏加无风险利率（选 B 9%）", "把「市场风险溢价」当成「市场收益率」再减一次 Rf"], "mother": "先看清题干给的是 <b>Rm</b> 还是 <b>Rm−Rf</b>：给溢价直接乘 β 加 Rf；给收益率先减 Rf 再乘。", "analysis": "<p>资本资产定价模型（证券市场线 SML）：<b>E(Rᵢ) = Rf + βᵢ(Rm − Rf)</b>，β = Cov(i,m)/σ²m 衡量资产的系统风险。</p><p>本题已直接给出市场风险溢价 6%，代入：3% + 1.5×6% = <b>12%</b>，故选 <b>A</b>。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 65, "wasWrong": false, "src": "自命题·仿真", "stem": "某组合预期收益率为 10%，无风险利率 1%，市场组合预期收益率为 5%。按 CAPM 反求，该组合的 <b>β 系数</b>为（　）。", "opts": [{"k": "A", "t": "2.25"}, {"k": "B", "t": "2.50"}, {"k": "C", "t": "1.80"}, {"k": "D", "t": "9.00"}], "ans": "A", "kp": "第7章·CAPM 反求 β（F-84 变式）", "model": "计算题·分子分母双减 Rf", "chain": ["β =（组合收益率 <b>− Rf</b>）÷（市场收益率 <b>− Rf</b>）", "分子：10% − 1% = 9%；分母：5% − 1% = 4%", "β = 9 ÷ 4 = <b>2.25</b>", "⚠️ 分子分母<b>都要减无风险利率</b>；B 2.5 是忘记减 Rf（10/5=2 或 10/4=2.5）"], "fast": "⚡β＝<b>超额收益 ÷ 超额市场</b>——<b>分子分母同减 Rf</b>。题干出现「市场利率 5%」别拿它当 Rf，Rf 是单独给的那个（本题 1%）。", "traps": ["只减分子或只减分母（得 2.5 或 1.8）", "把市场组合收益率 5% 误当无风险利率代入"], "mother": "反求 β 一律写两行：<b>收益−Rf / 市场−Rf</b>，两行都减完再除。", "analysis": "<p>由 CAPM：Rp = Rf + β(Rm − Rf)，移项得 <b>β = (Rp − Rf)/(Rm − Rf)</b>。</p><p>代入：(10% − 1%)/(5% − 1%) = 9%/4% = <b>2.25</b>，故选 <b>A</b>。</p><p>本题是 F-84 真题（组合收益率 10%、Rf 1%、市场 5%）的变式，两个要点：分子分母<b>同减 Rf</b>；不要把「市场组合收益率」当成无风险利率。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>资本资产定价模型（CAPM）与套利定价理论（APT）</b>的说法，正确的有（　）。", "opts": [{"k": "A", "t": "两者都属于均衡模型"}, {"k": "B", "t": "CAPM 可视为单因素模型，唯一因子是市场组合"}, {"k": "C", "t": "APT 不要求以市场组合作为定价因子"}, {"k": "D", "t": "APT 假设市场均衡时仍存在无风险套利机会"}, {"k": "E", "t": "CAPM 强调供需上的均衡，是 APT 的一种特殊情况"}], "ans": "ABCE", "kp": "第7章·CAPM vs APT", "model": "对比表·无套利铁律", "chain": ["两者都是<b>均衡模型</b> → A✓", "CAPM 单因子＝市场组合；APT 多因素（β₁λ₁+…+βₖλₖ）、<b>不要求市场组合</b> → B✓ C✓", "CAPM 是 APT 的特例（单因子取市场因子）、强调供需均衡 → E✓", "D❌：APT 的核心假设是<b>均衡时不存在无风险套利机会</b>（无套利），真题 Q6 答案就是这个错项"], "fast": "⚡APT 一句话：<b>市场一均衡，套利机会就没了</b>。见「均衡时存在套利机会」直接判 ❌——这是真题原句错项。CAPM＝APT 单因子特例。", "traps": ["勾 D（把「无套利」记成「有套利」，E4 归零）", "漏 E（记不住 CAPM 是 APT 特例）"], "mother": "两模型对比题先写三行：<b>都是均衡｜CAPM 单因子市场｜APT 多因子无套利</b>，再逐项对。", "analysis": "<p>CAPM 与 APT 都是资产定价的均衡模型。CAPM 是单因素模型，唯一因子为市场组合，强调供需均衡；APT 为多因素模型 E(Rᵢ)=Rf+βᵢ₁λ₁+…+βᵢₖλₖ，不要求市场组合，<b>CAPM 可视为 APT 在单因子（市场因子）下的特例</b>。</p><p>D 错误：APT 建立在<b>无套利</b>原理上，市场达到均衡时<b>不存在</b>无风险套利机会（这正是真题选非题的标准错项）。故选 <b>ABCE</b>。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "在其他条件不变时，市场利率上升，已发行债券的价格（　）。", "opts": [{"k": "A", "t": "下降，且期限越长的债券下降幅度越大"}, {"k": "B", "t": "上升，且期限越长的债券上升幅度越大"}, {"k": "C", "t": "不受影响，债券价格只由票面金额决定"}, {"k": "D", "t": "下降，但期限越短的债券下降幅度越大"}], "ans": "A", "kp": "第7章·债券估值·利率反向关系", "model": "方向题", "chain": ["债券价格＝未来现金流（利息＋面值）按<b>市场利率</b>折现之和", "折现率↑ → 现值↓，所以<b>利率与价格反向</b>", "<b>期限越长、票面利率越低 → 对利率越敏感</b>（久期更长）", "D 把敏感性方向说反了"], "fast": "⚡<b>利率↑债券价↓（跷跷板）</b>；<b>期限越长越敏感</b>。见「利率上升价格也上升」直接划掉。", "traps": ["方向反转选 B（E1）", "记住了反向但把期限敏感性记反（选 D）"], "mother": "债券价格题先判方向（反向），再判敏感度（长期、低票息更敏感），两步别跳。", "analysis": "<p>债券内在价值等于未来利息与面值按市场利率折现的现值之和。折现率（市场利率）上升，现值下降，故债券价格与市场利率<b>反向变动</b>。</p><p>同时，期限越长（现金流越靠后）、票面利率越低，债券价格对利率变化越敏感，跌幅越大。故选 <b>A</b>。</p>"}, {"no": 3012, "label": "P12", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "某公司当期股息 D₀=1.5 元/股，预计股息<b>永久性</b>按 4% 增长，必要收益率（贴现率）9%。按固定增长模型，其股票内在价值为（　）元。", "opts": [{"k": "A", "t": "31.2"}, {"k": "B", "t": "30.0"}, {"k": "C", "t": "16.67"}, {"k": "D", "t": "37.5"}], "ans": "A", "kp": "第7章·戈登固定增长模型（F-80 变式）", "model": "计算题", "chain": ["戈登模型：<b>V = D₁ / (r − g)</b>，其中 <b>D₁ = D₀ × (1+g)</b>", "D₁ = 1.5 × 1.04 = <b>1.56</b>", "V = 1.56 ÷ (9% − 4%) = 1.56 ÷ 0.05 = <b>31.2 元</b>", "B 30 是分子忘记乘 (1+g)；C 是零增长用 D/r；D 是分母用 r+g"], "fast": "⚡「<b>先长后除</b>」：D₁ = D₀×(1+g)，再除以 <b>(r−g)</b>。两个坑：分子必须乘增长、分母必须是<b>减</b>不是加。", "traps": ["分子用 D₀ 直接除（选 B 30）——真题 F-80 你曾选 100 元，同一个坑", "分母写成 r+g（选 D 37.5）"], "mother": "股票估值题先问：<b>零增长还是固定增长</b>？零增长 D/r；固定增长先算 D₁ 再除 (r−g)。", "analysis": "<p>固定增长（戈登）模型：<b>V = D₁/(r − g)</b>，其中 D₁ = D₀×(1+g) 为下一期股息。</p><p>代入：D₁ = 1.5×1.04 = 1.56；V = 1.56 ÷ (9% − 4%) = 1.56 ÷ 0.05 = <b>31.2 元</b>，故选 <b>A</b>。</p><p>本题是真题 F-80（D₀=2、g=2%、r=8% → 34 元）的变式，考的就是「分子必须乘 (1+g)、分母必须是 (r−g)」这两个坑。</p>"}, {"no": 3013, "label": "P13", "sec": "prop", "type": "单选", "lv": "真", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>有效市场假说</b>的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "弱式有效市场中，历史价格信息已反映在价格里，技术分析无法获得超额收益"}, {"k": "B", "t": "半强式有效市场中，全部公开信息已反映在价格里，基本面分析无法获得超额收益"}, {"k": "C", "t": "强式有效市场中，价格反映了包括内幕信息在内的全部信息"}, {"k": "D", "t": "在强式有效市场中，掌握内幕信息的投资者仍可稳定获得超额收益"}], "ans": "D", "kp": "第7章·有效市场三形态", "model": "选非题·三形态递进", "chain": ["三形态递进：<b>弱式（历史价格）→ 半强式（全部公开信息）→ 强式（含内幕信息）</b>", "A✓ 弱式只否定技术分析；B✓ 半强式连基本面分析也否定；C✓ 强式含内幕", "D✗：强式有效下<b>连内幕信息都已反映</b>，内幕交易也无法稳定获超额收益", "选非只勾 D"], "fast": "⚡<b>信息集越大，能赚钱的分析越少</b>：弱式废技术分析、半强式废基本面、强式连内幕都废。见「强式＋内幕仍能赚」直接判 ❌。", "traps": ["选非方向搞反，把 A/B/C 正确表述当答案（E3）", "把弱式与半强式否定的分析手段记串"], "mother": "有效市场题画一条递进线：<b>历史→公开→内幕</b>，越往右信息越全、超额收益越不可能。", "analysis": "<p>有效市场三形态按信息集递进：弱式有效（历史交易信息已反映，技术分析无效）、半强式有效（全部公开信息已反映，技术分析与基本面分析均无效）、强式有效（包含内幕信息在内的全部信息已反映）。</p><p>因此在强式有效市场中，即使掌握内幕信息也无法稳定获得超额收益，D 错误，故选 <b>D</b>。</p>"}, {"no": 3014, "label": "P14", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>期权价值构成</b>及其影响因素的说法，正确的有（　）。", "opts": [{"k": "A", "t": "期权价值等于内在价值与时间价值之和"}, {"k": "B", "t": "期权到期时的时间价值为零"}, {"k": "C", "t": "标的资产价格波动率越大，期权价值越高"}, {"k": "D", "t": "期权价值由标的资产的预期收益率决定"}, {"k": "E", "t": "期权剩余期限越长，通常期权价值越高"}], "ans": "ABCE", "kp": "第7章·期权价值结构（2026新增）", "model": "五因素+绝对化验伪", "chain": ["<b>期权价值 = 内在价值 + 时间价值</b> → A✓；到期时时间价值归零 → B✓", "五因素：<b>标的市价、执行价、到期期限、波动率、无风险利率</b> → C✓ E✓", "D❌：期权定价用<b>无套利/风险中性</b>，<b>不用预期收益率</b>——这是 F-82 真题的标准错项", "波动率↑、期限↑ → 期权越贵（时间价值越大）"], "fast": "⚡五因子口诀「<b>标价、执价、期限、波动、无风险利率</b>」；见「<b>预期收益率、风险度</b>」直接划——期权是无套利定价，跟预期收益无关。", "traps": ["勾 D（F-82 真题 Q93 你就勾过 A「预期收益率」→ 0 分，E4 归零）", "漏 B（到期时间价值为零是常考的正确项）"], "mother": "期权五因子先默写再逐项对照；<b>凡带「预期收益率/风险度」的不勾</b>。", "analysis": "<p>期权价值由<b>内在价值</b>（立即行权可得的收益）与<b>时间价值</b>（等待期内标的价格波动带来的可能性价值）构成，到期时时间价值为零。</p><p>2026 新增考点：期权价值的五个决定因素为标的资产市场价格、执行价格、到期期限、标的资产价格波动率、无风险利率。波动率越大、剩余期限越长，时间价值越大，期权越贵。</p><p>D 错误：期权定价基于无套利与风险中性原理，不依赖标的资产的预期收益率（真题 F-82 的标准错项）。故选 <b>ABCE</b>。</p>"}, {"no": 3015, "label": "P15", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>看涨期权买方</b>损益的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "最大损失以所支付的期权费为限"}, {"k": "B", "t": "最大收益理论上无限"}, {"k": "C", "t": "行权条件是标的市价高于执行价格"}, {"k": "D", "t": "最大收益为所收取的期权费"}], "ans": "D", "kp": "第7章·看涨期权买卖双方损益", "model": "选非题·买卖方错位", "chain": ["看涨期权<b>买方</b>：付期权费、预期上涨，<b>下有底（最大损失＝期权费）、上无限（收益理论无限）</b> → A✓ B✓", "行权条件：市价 ＞ 执行价 → C✓", "D✗：「最大收益＝期权费」是<b>卖方</b>（收期权费、收益封顶）", "选非只勾 D"], "fast": "⚡买方＝<b>下有底、上无限</b>（付出期权费）；卖方＝<b>上有顶、下无限</b>（收取期权费）。见「最大收益是期权费」→ 那是<b>卖方</b>，直接判 ❌。", "traps": ["把卖方特征安到买方头上（真题 F-85 你就选过 A，E1 方向错）", "选非题方向搞反"], "mother": "期权损益题先定<b>身份</b>：买方付钱（损失有底）、卖方收钱（收益封顶），再逐项对。", "analysis": "<p>看涨期权买方支付期权费，预期标的上涨，行权条件为标的市价高于执行价格；其最大损失以期权费为限（下有底），最大收益随标的价格上涨而理论无限（上无限）。</p><p>「最大收益为期权费」是<b>卖方</b>的损益特征——卖方收取期权费、收益封顶，但承担理论上无限的损失。故 D 错误，选 <b>D</b>。</p>"}, {"no": 3016, "label": "P16", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 70, "wasWrong": false, "src": "自命题·仿真", "stem": "欧式期权平价关系为 C + PV(K) = P + S。已知标的现价 S=50，执行价现值 PV(K)=48，看跌期权价格 P=2，则看涨期权价格 C 为（　）。", "opts": [{"k": "A", "t": "4"}, {"k": "B", "t": "2"}, {"k": "C", "t": "6"}, {"k": "D", "t": "0"}], "ans": "A", "kp": "第7章·看涨看跌期权平价（2026新增）", "model": "计算题·公式变形", "chain": ["平价式：<b>C + PV(K) = P + S</b>，变形 <b>C − P = S − PV(K)</b>", "移项求 C：<b>C = P + S − PV(K)</b> = 2 + 50 − 48 = <b>4</b>", "验算：4 + 48 = 52；2 + 50 = 52 ✓ 两边相等", "⚠️ PV(K)=K·e^(−rT) 是执行价的<b>现值</b>，本题已给出，不用再折现"], "fast": "⚡<b>C = P + S − PV(K)</b>（买看涨卖看跌＝买标的＋借钱）。算完必<b>左右验算</b>：C+PV(K) 与 P+S 必须相等。", "traps": ["符号记反写成 C = PV(K) + P − S（得 0）", "把 PV(K) 当 K 直接代（本题已给现值，别再折现）"], "mother": "平价题先写原式再移项，<b>代完两边验算相等</b>；不相等就是符号错了。", "analysis": "<p>欧式看涨看跌期权平价：<b>C + K·e^(−rT) = P + S</b>，即 <b>C − P = S − PV(K)</b>，含义是「买入看涨、卖出看跌」等价于「买入标的资产并借入执行价现值」。</p><p>移项得 C = P + S − PV(K) = 2 + 50 − 48 = <b>4</b>，故选 <b>A</b>。验算：C+PV(K)=4+48=52，P+S=2+50=52，两边相等。</p>"}, {"no": 3017, "label": "P17", "sec": "prop", "type": "单选", "lv": "真", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>看涨看跌期权平价关系</b>的说法，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "平价式可写为 C + PV(K) = P + S"}, {"k": "B", "t": "该关系由无套利原理推导得出"}, {"k": "C", "t": "平价关系可严格适用于美式期权"}, {"k": "D", "t": "变形后为 C − P = S − PV(K)"}], "ans": "C", "kp": "第7章·期权平价适用范围", "model": "选非题·适用范围", "chain": ["平价式 C + PV(K) = P + S（A✓）、由无套利推导（B✓）、变形 C−P = S−PV(K)（D✓）", "C✗：平价关系只适用于<b>欧式期权</b>（不能提前行权）", "美式期权可提前行权，只能写成<b>不等式</b>关系，不能严格取等", "选非只勾 C"], "fast": "⚡<b>平价＝欧式专属</b>（不能提前行权）。见「美式期权也严格成立」直接判 ❌；美式只能写不等式。", "traps": ["忽略「美式可提前行权」这个前提，认可 C", "选非题方向搞反（E3）"], "mother": "平价题先问一句：<b>能不能提前行权？</b>能（美式）→ 等号不成立；不能（欧式）→ 等号成立。", "analysis": "<p>看涨看跌期权平价 C + PV(K) = P + S 由无套利原理推导，其成立前提是<b>欧式期权</b>——只能在到期日行权，两个组合的到期 payoff 完全相同，现值才必然相等。</p><p>美式期权可提前行权，提前行权的可能性使等式不再严格成立，只能写成不等式关系。故 C 错误，选 <b>C</b>。</p>"}, {"no": 3018, "label": "P18", "sec": "prop", "type": "单选", "lv": "真", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "按<b>持有成本模型</b>，标的资产无收益、持有成本为正且无便利收益时，远期价格 F 与现货价格 S 的关系是（　）。", "opts": [{"k": "A", "t": "F ＞ S（溢价 / Contango）"}, {"k": "B", "t": "F ＜ S（现货溢价 / Backwardation）"}, {"k": "C", "t": "F = S，与持有成本无关"}, {"k": "D", "t": "F 由标的资产预期收益率决定"}], "ans": "A", "kp": "第7章·远期与期货定价方法", "model": "无套利+持有成本", "chain": ["无套利：<b>远期价格 = 现货价格 + 持有成本</b>（连续复利 F = S·e^((r+c)T)）", "持有成本为正、无便利收益 → F ＞ S，称<b>溢价（Contango）</b>，是正常市场", "便利收益 y 高时才可能 F ＜ S（<b>现货溢价 Backwardation</b>）", "D❌：远期定价用<b>无套利</b>，不用预期收益率"], "fast": "⚡<b>持有成本为正 → F＞S（正常市场/溢价）；便利收益高 → F＜S（现货溢价）</b>。见「由预期收益率决定」直接划——无套利定价不靠预期。", "traps": ["把溢价与现货溢价记反（选 B）", "把无套利定价误当成预期收益率定价（选 D）"], "mother": "远期价格题只抓一个变量：<b>持有成本 vs 便利收益</b>，谁大谁决定 F 与 S 的大小关系。", "analysis": "<p>持有成本模型下，远期价格等于现货价格加上持有成本：<b>F = S·e^((r+c−y)T)</b>，其中 r 为无风险利率、c 为存储保险等持有成本率、y 为便利收益。黄金等无收益资产简化为 F = S·e^(rT)。</p><p>当持有成本为正、无便利收益时必有 <b>F＞S</b>，即溢价（Contango），这是正常市场状态；只有便利收益足够高时才会出现 F＜S 的现货溢价。故选 <b>A</b>。</p>"}, {"no": 3019, "label": "P19", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>布莱克-斯科尔斯（B-S）期权定价模型</b>的说法，正确的有（　）。", "opts": [{"k": "A", "t": "输入变量包括标的资产价格、执行价格、无风险利率、波动率、到期时间"}, {"k": "B", "t": "标的资产波动率越大，期权价值越高"}, {"k": "C", "t": "中级经济师层面不要求手工计算 B-S 公式"}, {"k": "D", "t": "模型基于无套利与风险中性原理"}, {"k": "E", "t": "投资者的风险偏好是模型的必要输入变量"}], "ans": "ABCD", "kp": "第7章·期权定价方法（B-S）", "model": "五输入+风险中性", "chain": ["B-S 五个输入：<b>S、K、r、σ、T</b> → A✓", "σ 越大、T 越长 → 期权越贵 → B✓（同理 C 表述中的期限）", "中级层面考<b>输入变量、方向影响、平价关系</b>，不要求手算公式 → C✓", "风险中性定价下用无风险利率折现，<b>不需要投资者风险偏好</b> → D✓ E✗"], "fast": "⚡B-S 五输入「<b>标价、执价、无风险、波动、期限</b>」；<b>σ↑、T↑ → 期权贵</b>；风险中性＝<b>不看风险偏好</b>。见「风险偏好是输入」直接划。", "traps": ["勾 E（把风险中性定价理解反了，E4 归零）", "漏 C（以为要背公式，其实中级只考变量与方向）"], "mother": "定价方法题先分两层：<b>要算什么（公式）vs 只要知道什么（输入与方向）</b>；中级只考后者。", "analysis": "<p>布莱克-斯科尔斯模型的五个输入变量为<b>标的资产价格 S、执行价格 K、无风险利率 r、波动率 σ、到期时间 T</b>；模型建立在无套利与风险中性原理上，用无风险利率折现，因此<b>不需要投资者的风险偏好</b>作为输入。</p><p>波动率越大、到期时间越长，期权价值越高。中级经济师层面不要求手工推导或计算 B-S 公式，重点考输入变量、各变量变动的方向影响以及看涨看跌平价关系。故选 <b>ABCD</b>。</p>"}, {"no": 3020, "label": "P20", "sec": "prop", "type": "单选", "lv": "真", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "关于影响期权价值的因素，说法<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "标的资产价格波动率上升，期权价值上升"}, {"k": "B", "t": "剩余到期时间越长，一般期权价值越高"}, {"k": "C", "t": "期权价值由内在价值与时间价值两部分构成"}, {"k": "D", "t": "剩余到期时间越长，期权价值越低"}], "ans": "D", "kp": "第7章·期权价值影响因素·选非题", "model": "选非题·方向反转", "chain": ["A✓ 波动率↑ → 时间价值↑ → 期权贵", "B✓ 期限越长 → 波动可能性越大 → 期权越贵", "C✓ 价值＝内在价值 + 时间价值", "D✗ 与 B 直接矛盾——「越长越低」方向反了", "选非只勾 D"], "fast": "⚡<b>波动率↑、期限↑ → 期权越贵</b>（时间价值变大）。见「期限越长越便宜」直接判 ❌。选非题里<b>自相矛盾的两个选项必有一个是答案</b>。", "traps": ["没发现 B 与 D 互斥，随便选一个", "选非方向搞反，把 A/B/C 当答案"], "mother": "取非题若发现两个选项<b>互相矛盾</b>，答案八成就在它们俩之间——先判这对，再看其余。", "analysis": "<p>期权价值＝内在价值＋时间价值。时间价值来自标的资产价格在剩余期限内波动的可能性，因此<b>波动率越大、剩余到期时间越长，期权价值越高</b>。</p><p>B 与 D 表述直接矛盾，D「期限越长价值越低」方向相反，是错误项；本题为选非题，故选 <b>D</b>。</p>"}]};
+const KEY  = 'fin_drill_ch07_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+<script>
+(function(){
+  var g=document.getElementById("skelGate");
+  var b=document.getElementById("skelGo");
+  if(!g||!b) return;
+  b.onclick=function(){ g.style.display="none"; try{ window.dispatchEvent(new Event("skelDone")); }catch(e){} window.scrollTo(0,0); };
+})();
+</script>
+</body>
+</html>

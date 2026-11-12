@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第10章 · 开放经济均衡</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第10章 · 开放经济均衡<small id="sub">错题 11 题 + 自命题 20 题 ｜ 30 分钟 ｜ 满分 41</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div id="skelGate" style="position:fixed;inset:0;z-index:9999;background:#f4f6fa;overflow:auto"> <div style="max-width:920px;margin:0 auto;padding:26px 20px 60px">  <div style="background:#fff;border:1px solid #dde3ec;border-radius:12px;padding:18px 20px;box-shadow:0 2px 14px rgba(20,40,80,.08)">   <h2 style="margin:0 0 6px;font-size:20px;color:#12305e">金融第10章 · 开放经济均衡 · 骨架速过卡（约 5 分钟）</h2>   <div style="color:#6b7280;font-size:13px;margin-bottom:12px">    03/05 章裸做崩盘（24% / 43%）的根因是<b>先做题、后补骨架</b>；    06 章实测「先过骨架」后<b>自命题 93%、回炉 33%</b>——骨架过了新题就拿分。    09 章反过来：回炉 25%＝<b>锚表没默写就动笔</b>，同一批模考错题又摔一遍。    所以：<b>骨架没过完不发卷；回炉锚没默写不开卷</b>。下面 12 条是本章基础分，    逐条念一遍再开卷——念完点底部按钮。   </div>   <div style="border:1px solid #e5e9f0;border-radius:8px;overflow:hidden"><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">国际收支账户构成</div><div style="flex:1;color:#26303d;line-height:1.6"><b>经常账户＝货物、服务、初次收入（含投资收益）、二次收入（经常转移）</b>｜<b>资本与金融账户＝资本账户＋金融账户（直接投资、证券投资、其他投资、储备资产）</b>｜净误差与遗漏＝平衡项。⚠️ 买股票<b>本金</b>进金融账户，<b>股息收益</b>进初次收入。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">编制原则与差额层次</div><div style="flex:1;color:#26303d;line-height:1.6">编制＝<b>复式借贷记账、按成交时市场价格计价</b>（不是收货/发货/结汇时）。差额由窄到宽：<b>贸易差额 → 经常账户差额 → 基本差额 → 总差额</b>（贸→经→基→总）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">失衡成因与调节</div><div style="flex:1;color:#26303d;line-height:1.6">成因五类＝<b>临时性、周期性、结构性、收入性、货币性</b>。三方向：<b>利降钱走、价涨差扩、收增进口</b>；<b>本币贬值＝促出口、改善收支</b>。调节六件套＝财政、货币、汇率、直接管制、国际借贷、国际合作。⚠️ <b>逆差＝紧缩＋本币贬值</b>（顺差反之）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★国际储备四件套</div><div style="flex:1;color:#26303d;line-height:1.6"><b>货币性黄金、外汇储备、在 IMF 的储备头寸、SDR</b>，且必须是<b>货币当局（央行）持有、可随时动用</b>——商业银行/民间外汇、外国土地文物都不算。作用：<b>补逆差、稳汇率、保资信</b>（债权人视角＝维持国际资信）。见「消除/彻底」必错。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">储备规模与结构管理</div><div style="flex:1;color:#26303d;line-height:1.6">规模＝满足<b>3～4 个月进口用汇</b>（特里芬）＋外债还本付息＋干预需要；<b>过多</b>→机会成本高、通胀压力，<b>过少</b>→偿付干预不足。结构＝<b>币种分散并与贸易/外债币种匹配</b>＋<b>流动性与收益性权衡</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★BP 曲线（2026新增）</div><div style="flex:1;color:#26303d;line-height:1.6">国际收支平衡时 (i, Y) 组合，<b>纵轴是利率不是汇率</b>；<b>向右上方倾斜（斜率为正）</b>；<b>资本流动性越强越平坦、完全自由流动＝水平线</b>；<b>上方＝顺差、下方＝逆差</b>（利率高→资本流入）。见「斜率为负/垂直线/上方逆差」直接划。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★IS-LM-BP（2026新增）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>IS＝产品市场、LM＝货币市场、BP＝国际收支</b>；<b>三线共点＝内部均衡＋外部均衡同时实现</b>（不是只算两个市场，也不保证充分就业）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★米德冲突（2026新增）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>固定汇率制</b>下仅用支出调整政策（财政/货币）无法同时实现内部均衡（充分就业＋物价稳定）与外部均衡（国际收支平衡），必须搭配<b>支出转换政策（汇率/关税）</b>。题眼：<b>固定汇率＋内外打架＋工具不够</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">★三元悖论（2026新增）</div><div style="flex:1;color:#26303d;line-height:1.6"><b>货币政策独立性、汇率稳定、资本自由流动——三选二，必弃一</b>。货币局制＝汇率锁死，只能在「独立＋资本管制」或「资本自由＋放弃独立」里挑。我国＝<b>有管理浮动＋货币政策独立＋资本项目部分管制</b>。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">国际资本流动（原因/分类/影响）</div><div style="flex:1;color:#26303d;line-height:1.6">原因＝<b>利差、汇率预期、分散风险、国际分工、管制放松、投机冲击</b>。长期＝<b>FDI、证券投资、国际中长期贷款</b>；短期＝<b>贸易性、投机性（热钱）、保值性、套利性</b>。正面＝补缺口/技术溢出/市场深化；负面＝冲汇率/吹泡沫/外债风险/<b>削弱货币政策独立性</b>/货币危机。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">国际债券与可兑换</div><div style="flex:1;color:#26303d;line-height:1.6"><b>计价货币 ≠ 发行地货币 → 欧洲债券</b>；相等且发行人为外国 → 外国债券（在华人民币＝<b>熊猫债</b>、美国＝扬基、日本＝武士）。<b>IMF 第八条款＝经常项目可兑换</b>（不是完全可兑换）。汇率弹性排序「<b>局→传→爬→浮</b>」。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">SDR / 外债 / 外资</div><div style="flex:1;color:#26303d;line-height:1.6"><b>SDR＝白给、记账、花不出去</b>（IMF 无偿分配、记账单位、不能直接用于贸易或非贸易支付）；篮子五币<b>美、欧、人民币、日、英</b>（无瑞郎）。<b>FDI 不算外债</b>、<b>人民币计价外债不耗外汇储备</b>。外资＝负面清单＋产业目录＋并购安全审查；外债＝规模＋结构＋全口径宏观审慎＋登记用途。</div></div></div>   <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">    <button id="skelGo" style="background:#1a4fa0;color:#fff;border:0;border-radius:8px;padding:11px 22px;font-size:15px;cursor:pointer">✅ 骨架过完了，开始做题</button>    <span style="color:#8a94a6;font-size:12px">（点击后本卡收起，计时开始）</span>   </div>  </div> </div></div>
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第10章 开放经济均衡 · 即时判题训练卷", "totalMin": 30, "pass": 25, "full": 41, "nSingle": 21, "nMulti": 10, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 11 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 20 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "国外债权人放债前，往往会首先对一国国际储备数量及其增减趋势等因素进行评估，以确定该过能够（）", "opts": [{"k": "A", "t": "稳定本币汇率"}, {"k": "B", "t": "维持国际资信和投资环境"}, {"k": "C", "t": "弥补国际收支逆差"}, {"k": "D", "t": "稳定本国物价"}], "ans": "B", "kp": "第10章·国际储备的作用", "model": "场景匹配型（给使用场景 → 匹配对应作用）", "chain": ["国际储备三大作用：①<b>弥补国际收支逆差</b> ②<b>干预外汇市场、稳定本币汇率</b> ③<b>维持国际资信和投资环境</b>", "场景：<b>国外债权人放债前</b>评估储备 → 关心的是\"这个国家还得起吗\"", "对应作用③：储备充足 = 偿债能力强 = 可作为借债与投资的信用保证"], "fast": "⚡三大作用按场景选：<b>自己缺钱付账 → 弥补逆差；汇率乱 → 稳定汇率；别人借钱给你 / 评估你信用 → 维持国际资信</b>。题干\"国外债权人放债前评估\" → 信用 → B。", "traps": ["三个作用都是教材原话，容易乱选 —— 先看题干<b>主体是谁</b>（本国央行 vs 国外债权人）", "稳定本币汇率是央行自己干预市场的目的，与债权人视角不符"], "mother": "母题抽象：<b>国际储备三作用 × 三主体</b> —— 逆差（本国国际收支）｜汇率（本国货币当局）｜资信（外国债权人与投资者）。凡出现\"债权人/投资者/信用评级\"，一律选\"维持国际资信和投资环境\"。", "analysis": "<p>国际储备的作用主要有三方面：弥补国际收支逆差、干预外汇市场以稳定本币汇率、<b>维持一国的国际资信和投资环境</b>。国外债权人在放债前评估一国的国际储备数量及其增减趋势，正是为了判断该国对外偿付能力与信用风险，即确定其能否<b>维持国际资信和投资环境</b>。B 正确。</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "关于开放经济条件下，BP曲线说法正确的是()", "opts": [{"k": "A", "t": "BP曲线指国际收支平衡时汇率和收入组合的曲线"}, {"k": "B", "t": "BP曲线利率弹性越大，BP曲线越平坦"}, {"k": "C", "t": "若允许资本在国际间自由流动，BP曲线将是一条垂直线"}, {"k": "D", "t": "BP曲线的斜率为负"}], "ans": "B", "kp": "第10章·BP 曲线（国际收支均衡线）", "model": "图形性质判断型（BP 曲线的形状与斜率）", "chain": ["BP 曲线表示<b>国际收支平衡</b>时<b>利率与收入</b>的各种组合（不是汇率与收入，A 错）", "斜率通常为<b>正</b>：收入↑ → 进口↑ → 经常账户恶化 → 需利率↑吸引资本流入来平衡（D 错）", "<b>资本流动性越强（利率弹性越大），BP 曲线越平坦</b> —— 少量利率上升即可吸引足够资本（B 对）", "资本<b>完全自由流动</b>时 BP 为<b>水平线</b>，而非垂直线（C 错）"], "fast": "⚡BP 曲线三个钉子：<b>① 横轴收入、纵轴利率；② 斜率通常为正；③ 资本越自由流动越平坦，完全自由 = 水平线</b>。三个都记住，题目怎么问都不怕 → B。", "traps": ["把 BP 的斜率说成负（那是不可能三角推理错误）", "把\"完全自由流动\"对应成垂直线 —— 垂直线对应的是<b>资本完全不流动</b>"], "mother": "母题抽象：<b>BP 曲线斜率谱系</b> —— 资本完全不流动：垂直线（收入不影响 BP）｜资本有限流动：向右上倾斜、正斜率｜资本完全自由流动：水平线（利率被世界利率锁定）。<b>流动性越强，曲线越平</b>。", "analysis": "<p>BP 曲线表示国际收支平衡时利率与国民收入的各种组合，其斜率通常为正（收入增加导致进口增加、经常账户恶化，需要更高的利率吸引资本流入以维持平衡）。<b>资本的利率弹性越大（资本流动性越强），BP 曲线越平坦</b> —— 只需很小的利率上升就能吸引足够资本流入弥补经常账户逆差。B 正确。</p><p>A 错（是利率与收入的组合，不是汇率与收入）；C 错（资本完全自由流动时 BP 为<b>水平线</b>，完全不流动时才是垂直线）；D 错（斜率为正）。</p>"}, {"no": 2003, "label": "R3", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "不直接消耗外汇储备的外债是()。", "opts": [{"k": "A", "t": "港币外债"}, {"k": "B", "t": "人民币外债"}, {"k": "C", "t": "美方买方信贷"}, {"k": "D", "t": "欧元银团贷款"}], "ans": "B", "kp": "第10章·外债与外汇储备", "model": "概念理解型（哪种外债不消耗外汇储备）", "chain": ["外债偿还通常需要把本币换成外汇 → 消耗外汇储备", "<b>人民币外债</b>：以人民币计价、用人民币偿还，无需购汇", "港币、美元（买方信贷）、欧元（银团贷款）外债到期均需外汇偿付"], "fast": "⚡判据一句话：<b>「用什么币还，就消耗什么储备；用人民币还 → 不消耗外汇储备」</b>。见\"不直接消耗外汇储备\" → 找人民币 → B。", "traps": ["港币虽是中国香港地区货币，但对内地而言仍是<b>外币</b>，需外汇偿付", "买方信贷、银团贷款只是融资形式，不改变币种属性"], "mother": "母题抽象：<b>外债风险的币种维度</b> —— 币种错配（借外币、收本币）是新兴市场危机的经典根源；本币计价外债（人民币外债）天然规避储备消耗与汇率风险。凡问币种风险，先看\"计价的币\"。", "analysis": "<p><b>人民币外债</b>以人民币计价并以人民币偿付本息，债务人无需在外汇市场购汇，因此<b>不直接消耗外汇储备</b>。B 正确。</p><p>港币外债（A）、美方买方信贷（C）、欧元银团贷款（D）均以境外货币计价，偿付时需要兑换为相应外汇，会直接消耗外汇储备并承担汇率风险。</p>"}, {"no": 2004, "label": "R4", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABC", "src": "真题错题", "stem": "国家外汇管理局规定，我过外债的种类包括（）", "opts": [{"k": "A", "t": "国际金融组织的贷款"}, {"k": "B", "t": "外商对华直接投资"}, {"k": "C", "t": "发行的外币债券"}, {"k": "D", "t": "外国企业的贷款"}, {"k": "E", "t": "外国金融机构的贷款"}], "ans": "ACDE", "kp": "第10章·外债的构成", "model": "多选 · 范围判断型（哪些算外债）", "chain": ["外债的核心特征：<b>需偿还</b>的对外负债（与\"投资\"相对）", "A 国际金融组织的贷款 → <b>选</b>（需还本付息）", "B 外商对华<b>直接投资</b> → 是股权投资，<b>不需偿还</b>，不构成外债 → <b>不选</b>", "C 发行的外币债券 → <b>选</b>", "D 外国企业的贷款 → <b>选</b>", "E 外国金融机构的贷款 → <b>选</b>"], "fast": "⚡外债判据一句话：<b>「要不要还？」</b> —— 贷款、债券是要还的 ✓（ACDE）；直接投资是\"入股\"，不形成债务 ✗（B）。这是本题唯一的判断开关。", "traps": ["外商投资（FDI）与外债常被并列提及，容易混淆 —— <b>FDI 不计入外债</b>，因为它没有还本付息义务", "外国企业与外国金融机构的贷款都算外债，别漏选"], "mother": "母题抽象：<b>外债 vs 外资的界线</b> —— 外债 = 契约性偿还义务（贷款、债券、贸易信贷、延期付款）；非外债 = 股权类（FDI、证券投资中的股票）。<b>判据永远是\"有没有还本付息义务\"。</b>", "analysis": "<p>按国家外汇管理局规定，我国外债包括国际金融组织贷款（A）、境外发行外币债券（C）、外国企业贷款（D）、外国金融机构贷款（E）等<b>具有契约性偿还义务</b>的对外负债。故选 <b>ACDE</b>。</p><p>B 外商对华<b>直接投资</b>属股权投资，投资者按出资比例享有收益并承担风险，<b>无还本付息义务</b>，不计入外债。</p>"}, {"no": 2005, "label": "R5", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "BCE", "src": "真题错题", "stem": "根据投资主体性质的不同，我国上市公司股票的种类有（）", "opts": [{"k": "A", "t": "普通股"}, {"k": "B", "t": "法人股"}, {"k": "C", "t": "国有股"}, {"k": "D", "t": "社会公众股"}, {"k": "E", "t": "外资股"}], "ans": "BCDE", "kp": "第10章·上市公司股票的分类", "model": "多选 · 分类标准配对型", "chain": ["题干给标准：<b>按投资主体性质</b>划分", "我国上市公司股票按投资主体分为：<b>国有股</b>(C)、<b>法人股</b>(B)、<b>社会公众股</b>(D)、<b>外资股</b>(E)", "A 普通股 → 按<b>股东权利</b>划分（与优先股相对），不是按投资主体 → <b>不选</b>"], "fast": "⚡两条分类线不能混：<b>按投资主体 → 国有/法人/公众/外资（BCDE）；按股东权利 → 普通股/优先股</b>。题干说\"投资主体\" → 普通股直接排除 → BCDE。", "traps": ["普通股最眼熟，但它是<b>另一条分类线</b>的产物（典型的\"标准错配\"干扰）", "外资股（如 B 股、H 股）容易被漏选"], "mother": "母题抽象：<b>股票分类四条线</b> —— 按投资主体(国有/法人/公众/外资)、按股东权利(普通/优先)、按上市地(A/B/H/N 股)、按票面是否记名(记名/无记名)。<b>题干给哪条线就查哪条线。</b>", "analysis": "<p>按投资主体性质划分，我国上市公司股票分为<b>国有股</b>（C，国家授权投资部门或机构持有）、<b>法人股</b>（B，企业法人或事业单位法人持有）、<b>社会公众股</b>（D，境内个人与机构持有）、<b>外资股</b>（E，境外投资者持有，如 B 股、H 股）。故选 <b>BCDE</b>。</p><p>A 普通股是按<b>股东权利</b>划分的类别（与优先股相对），不属于按投资主体划分的结果。</p>"}, {"no": 2006, "label": "R6", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "AD", "src": "真题错题", "stem": "当前纳入特别提款权货币篮子的货币有（）", "opts": [{"k": "A", "t": "欧元"}, {"k": "B", "t": "瑞士法郎"}, {"k": "C", "t": "人民币"}, {"k": "D", "t": "美元"}, {"k": "E", "t": "英榜"}], "ans": "ACDE", "kp": "第10章·特别提款权（SDR）货币篮子", "model": "多选 · 时点记忆型（当前成员）", "chain": ["当前 SDR 货币篮子（2016 年人民币加入后）含五种：<b>美元</b>(D)、<b>欧元</b>(A)、<b>人民币</b>(C)、<b>日元</b>、<b>英镑</b>(E)", "B 瑞士法郎 → <b>不在</b>篮子内"], "fast": "⚡SDR 五币种口诀「<b>美欧人日英</b>」（美元、欧元、人民币、日元、英镑）→ ACDE。瑞士法郎虽是重要的避险货币，但<b>从未</b>进入 SDR 篮子，见到就划掉。", "traps": ["瑞士法郎（B）是最强干扰：瑞士是重要金融中心，但 SDR 只看<b>贸易与金融交易规模</b>", "人民币（C）于 2016 年 10 月正式入篮，属于必考的时政知识点"], "mother": "母题抽象：<b>SDR 两个时点</b> —— 入篮前：美元、欧元、日元、英镑（2016 年前）；入篮后：+ <b>人民币</b>（2016.10.1 生效，权重第三）。凡问\"当前/目前\"一律按五币种答。", "analysis": "<p>目前纳入特别提款权（SDR）货币篮子的货币有五种：<b>美元</b>（D）、<b>欧元</b>（A）、<b>人民币</b>（C，2016 年 10 月 1 日正式加入）、日元、<b>英镑</b>（E）。故选 <b>ACDE</b>。</p><p>B 瑞士法郎不在 SDR 货币篮子内。</p>"}, {"no": 2007, "label": "R7", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "2016年8月31日，国际复兴开发银行获准在中国发行特别提款权计价债券，该债券属于（）", "opts": [{"k": "A", "t": "扬基债券"}, {"k": "B", "t": "欧洲债券"}, {"k": "C", "t": "熊猫债券"}, {"k": "D", "t": "国内债券"}], "ans": "B", "kp": "第10章·国际债券分类", "model": "", "chain": ["国际债券按计价货币分：外国债券（以<b>发行地货币</b>计价，如熊猫债=境外机构在境内发人民币债、扬基债=外国人在美国发美元债）vs 欧洲债券（以<b>发行地以外货币</b>计价）→ 世界银行在中国境内发行 <b>SDR 计价</b>债券：发行地=中国、计价货币=SDR（非人民币）→ 欧洲债券"], "fast": "⚡判别一问「计价货币是不是发行地货币」——不是 → 欧洲债券；熊猫债必须是人民币计价", "traps": ["C「熊猫债券」：境内发行 + <b>人民币</b>计价才叫熊猫债，SDR 计价不符", "A「扬基债券」：在美国发行的美元债，地域错位"], "mother": "母题抽象：<b>国际债券判别流程图</b>——发行地 vs 计价货币：同币=外国债券（扬基/武士/熊猫）；异币=欧洲债券（欧洲美元债、SDR 债）。", "analysis": "<p>2016 年世界银行（国际复兴开发银行）获准在中国银行间市场发行<b>SDR 计价债券</b>：发行地在中国，计价货币不是人民币，属于以发行地以外货币计价的<b>欧洲债券</b>。故选 B。</p>"}, {"no": 2008, "label": "R8", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "国际收支平衡表交易计价的基础是()", "opts": [{"k": "A", "t": "收货时的市场价格"}, {"k": "B", "t": "成交时的市场价格"}, {"k": "C", "t": "结汇时的市场价格"}, {"k": "D", "t": "发货时的市场价格"}], "ans": "B", "kp": "第10章·国际收支平衡表编制原则", "model": "", "chain": ["IMF《国际收支手册》：国际收支平衡表按<b>成交时的市场价格</b>计价（实际交换价格），而非收汇/发货/结汇时点价格"], "fast": "⚡计价钉子「成交时 + 市场价格」——四个时点选项里选\"成交\"", "traps": ["D「发货时」是海关统计口径的干扰（货物贸易海关数据按离岸价/到岸价，与 BOP 编制不同）"], "mother": "母题抽象：<b>BOP 编制三原则</b>——复式记账（有借必有贷）｜权责发生制（所有权变更时记录）｜成交时市场价格计价。", "analysis": "<p>依据 IMF《国际收支手册》，国际收支平衡表的各项交易以<b>成交时的市场价格</b>作为计价基础。故选 B。</p>"}, {"no": 2009, "label": "R9", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "管理国际储备是中央银行()的职责。", "opts": [{"k": "A", "t": "发行的银行"}, {"k": "B", "t": "银行的银行"}, {"k": "C", "t": "国家的银行"}, {"k": "D", "t": "管理金融的银行"}], "ans": "C", "kp": "第11章·中央银行职能", "model": "", "chain": ["央行三大职能：「发行的银行」（垄断货币发行）｜「银行的银行」（最后贷款人、集中准备金、清算）｜「国家的银行」（代理国库、保管外汇和黄金储备、制定执行货币政策）→ 管理国际储备 = 政府的银行（国家的银行）"], "fast": "⚡「国库、储备、国际往来」→ 国家的银行；「最后贷款人」→ 银行的银行", "traps": ["B「银行的银行」盯的是国内金融机构（再贴现、清算），不管国际储备"], "mother": "母题抽象：<b>央行三职能对号表</b>——发钞=发行的｜最后贷款人/准备金=银行的｜国库/储备/政府往来=国家的。", "analysis": "<p>作为「国家的银行」，中央银行代理国库、<b>保管和管理国际储备</b>（外汇、黄金）、代表政府参与国际金融活动。故选 C。</p>"}, {"no": 2010, "label": "R10", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "根据三元悖论，在货币局制度下，阿根廷可以选择的政策组合是()。", "opts": [{"k": "A", "t": "浮动汇率、资本管制"}, {"k": "B", "t": "货币政策独立、资本管制"}, {"k": "C", "t": "货币政策独立、资本自由流动"}, {"k": "D", "t": "浮动汇率、资本自由流动"}], "ans": "B", "kp": "第10章·三元悖论（政策组合选择）", "model": "", "chain": ["三元悖论：汇率稳定、资本自由流动、货币政策独立三者只能取二 → 货币局制锁定了<b>汇率稳定</b> → 在剩余两目标中二选一；阿根廷陷米德冲突、亟需自主政策空间调节内外失衡 → 放弃资本自由流动、<b>保货币政策独立 + 资本管制</b>"], "fast": "⚡推理链：货币局制→汇率已锁→剩\"独立货币 vs 自由资本\"二选一→解决米德冲突需要自主政策→选独立+管制", "traps": ["D「浮动汇率 + 资本自由流动」是放弃货币局制的组合，与题干\"货币局制度下\"矛盾", "C「独立 + 自由流动」：与已锁定的汇率稳定构成\"三全其美\"，违背三元悖论"], "mother": "母题抽象：<b>三元悖论解题三步</b>——①题干已锁定哪个目标 ②剩余两目标二选一 ③结合情境（是否需要政策自主）定组合。", "analysis": "<p>货币局制度下汇率稳定已被制度锁定，按三元悖论须在「货币政策独立」与「资本自由流动」之间取舍。阿根廷面临米德冲突、需要自主的政策空间调节内外失衡，故应选择<b>货币政策独立 + 资本管制</b>。故选 B。</p>"}, {"no": 2011, "label": "R11", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "BCD", "src": "真题错题", "stem": "关于特别提款权的说法，正确的有()。", "opts": [{"k": "A", "t": "特别提款权由国际货币基金组织有偿分配给会员国"}, {"k": "B", "t": "特别提款权可以用于偿还国际货币基金组织的贷款"}, {"k": "C", "t": "特别提款权可以直接用于贸易结算"}, {"k": "D", "t": "特别特别提款权实际上是一种记账单位"}, {"k": "E", "t": "特别提款权可以直接用于非贸易结算"}], "ans": "BD", "kp": "第10章·特别提款权（SDR）", "model": "", "chain": ["逐项判定：A「有偿分配」❌——SDR 由 IMF 按<b>份额无偿</b>分配；B 可用于偿还 IMF 贷款 ✅；C「直接用于贸易结算」❌——SDR 是账面资产，<b>不能直接</b>用于贸易或非贸易支付，须先换成可自由使用货币；D 实际上是一种记账单位（\"纸黄金\"）✅；E「直接用于非贸易结算」❌（同 C）"], "fast": "⚡SDR 三钉子「无偿分配 + 记账单位 + 不能直接支付」——见\"直接用于\"划掉", "traps": ["C/E 同一性质的否定说法占两个选项，识别一个即排除两个", "A \"有偿/无偿\"一字之差"], "mother": "母题抽象：<b>SDR 身份三问</b>——谁给的？（IMF 无偿按份额）是什么？（记账单位/储备资产）怎么用？（换币后偿还 IMF 贷款或官方结算，不能直接支付）。", "analysis": "<p>特别提款权是 IMF 按会员国份额<b>无偿</b>分配的账面储备资产，实际上是一种记账单位（\"纸黄金\"），可用于偿还 IMF 贷款；<b>不能直接用于贸易或非贸易结算</b>。故选 BD。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "基", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "按国际收支平衡表的账户口径，一国居民因持有境外上市公司股票而取得的<b>股息收入</b>，应记入（　）。", "opts": [{"k": "A", "t": "经常账户·货物"}, {"k": "B", "t": "经常账户·初次收入"}, {"k": "C", "t": "资本与金融账户·金融账户（证券投资）"}, {"k": "D", "t": "资本账户·资本转移"}], "ans": "B", "kp": "第10章·国际收支平衡表账户归类", "model": "相邻概念错位", "chain": ["题眼「<b>股息收入</b>」＝投资收益，属于<b>初次收入</b>（生产要素报酬）", "初次收入与二次收入（经常转移）都挂在<b>经常账户</b>下", "→ B"], "fast": "⚡经常账户四项 = <b>货物、服务、初次收入（含投资收益）、二次收入</b>。「买股票」这一笔本金才进金融账户，<b>赚到的股息进初次收入</b>。", "traps": ["见「股票/证券」就往金融账户（C）勾——那是<b>投资本金</b>的流向，不是收益", "把初次收入与资本转移（D）混为一谈"], "mother": "账户归属两步判：①是不是经常发生的经常性交易（货物/服务/收入/转移）→ 是则经常账户；②是不是资产与负债的所有权交易 → 资本与金融账户；③误差遗漏是平衡项。", "analysis": "<p>国际收支平衡表的<b>经常账户</b>包括货物、服务、<b>初次收入</b>（雇员报酬、投资收益等）和<b>二次收入</b>（经常转移）。股息属于投资收益，是初次收入的组成部分，记入经常账户。</p><p>C 项金融账户下的「证券投资」记录的是<b>购买股票这一资本交易本身</b>（本金流动），而非持有期间取得的收益；把本金流量与收益流量混同是本题最典型的错法。D 资本转移属资本账户。故选 <b>B</b>。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "下列国际收支差额指标，按统计口径<b>由窄到宽</b>排列正确的是（　）。", "opts": [{"k": "A", "t": "贸易差额 → 经常账户差额 → 基本差额 → 总差额"}, {"k": "B", "t": "经常账户差额 → 贸易差额 → 基本差额 → 总差额"}, {"k": "C", "t": "贸易差额 → 基本差额 → 经常账户差额 → 总差额"}, {"k": "D", "t": "总差额 → 基本差额 → 经常账户差额 → 贸易差额"}], "ans": "A", "kp": "第10章·国际收支差额层次", "model": "排序题·相邻概念错位", "chain": ["最窄：<b>贸易差额</b>（只算货物进出口）", "加服务与收入 → <b>经常账户差额</b>；再加长期资本流动 → <b>基本差额</b>", "最宽：<b>总差额</b>（含全部项目，需由储备资产变动平衡）", "→ A；D 是反向倒序，先划掉"], "fast": "⚡差额四层「<b>贸→经→基→总</b>」，一层比一层多包一块。见「总差额排第一」直接划（那是倒序）。", "traps": ["B/C 把贸易差额与经常账户差额、基本差额的顺序前后调换", "D 直接给倒序，属方向反转固定手法"], "mother": "差额层次 = 逐步扩大统计范围的四个同心圈：货物 → 货物+服务+收入 → 再加长期资本 → 全部项目。", "analysis": "<p>贸易差额仅含货物进出口，口径最窄；经常账户差额在此基础上加入服务、初次收入与二次收入；基本差额再加入长期资本流动；<b>总差额</b>涵盖经常账户、资本与金融账户（不含储备资产）的全部借贷差额，须由储备资产变动弥补，口径最宽。故正确顺序为 <b>A</b>。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>国际收支失衡的成因</b>，下列表述<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "国民收入相对增长带动进口需求增加，可能使顺差缩小或形成逆差"}, {"k": "B", "t": "本国物价水平相对上涨、出口竞争力下降，可能扩大逆差"}, {"k": "C", "t": "经济周期由繁荣转向衰退，可能引发周期性失衡"}, {"k": "D", "t": "本币贬值会抑制出口、扩大进口，从而恶化国际收支"}], "ans": "D", "kp": "第10章·国际收支失衡成因（方向）", "model": "选非 + 方向反转", "chain": ["先圈「<b>错误</b>」，逐项 ✅❌，只勾 ❌", "A ✅ 收入增→进口增（F-101 原话）｜B ✅ 价涨→出口难｜C ✅ 周期波动＝周期性失衡", "D ❌ <b>本币贬值 → 出口变便宜、进口变贵 → 改善</b>国际收支，方向说反", "→ D"], "fast": "⚡三方向口诀「<b>利降钱走、价涨差扩、收增进口</b>」；汇率那条单记：<b>本币贬值＝促出口、改善收支</b>。选非题里出现「贬值→恶化」直接锁答案。", "traps": ["把 A 当成错项（很多人以为收入增长会刺激出口）——A 其实是教材原话", "D 的方向反转最容易漏看：题眼在「贬值」与「恶化」的搭配"], "mother": "失衡成因五类：临时性、周期性、结构性、收入性、货币性；影响因素三方向：利率、物价、国民收入（外加汇率）。", "analysis": "<p>A、B、C 均为教材标准表述：收入增长先带来进口增加、本国物价相对上涨削弱出口竞争力、经济周期波动引发周期性失衡。<b>D 方向错误</b>——本币贬值使本国商品以外币计价更便宜、进口商品以本币计价更贵，效果是<b>促进出口、抑制进口、改善国际收支差额</b>（这正是逆差国采用汇率政策调节的依据，见逆差→紧缩+贬值）。故选 <b>D</b>。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "一国出现持续性国际收支逆差，若用<b>需求管理政策搭配汇率政策</b>进行调节，正确的组合是（　）。", "opts": [{"k": "A", "t": "扩张性财政货币政策 + 本币升值"}, {"k": "B", "t": "紧缩性财政货币政策 + 本币贬值"}, {"k": "C", "t": "扩张性财政货币政策 + 本币贬值"}, {"k": "D", "t": "紧缩性财政货币政策 + 本币升值"}], "ans": "B", "kp": "第10章·国际收支调节政策搭配", "model": "方向反转（松紧 × 升贬双轴）", "chain": ["第一问：逆差＝<b>花钱太多</b> → 要压缩需求 → <b>紧缩</b>（财政/货币）", "第二问：还要让外国人多买本国货 → <b>本币贬值</b>（促出口）", "→ B；含「扩张」或「升值」的选项整组划掉"], "fast": "⚡逆差组合钉死「<b>紧缩 + 贬值</b>」；顺差反过来「扩张 + 升值」。<b>卖/提/加＝紧、买/降/降＝松</b>（与 09 章松紧手卡同一套）。", "traps": ["把「紧缩」误当成会进一步压出口而不敢选", "A/C 的扩张政策是治理<b>顺差/衰退</b>用的，D 的升值会进一步压出口"], "mother": "调节措施六件套：财政政策、货币政策、汇率政策、直接管制、国际借贷、国际经济合作。需求管理（财政/货币）调内外需，支出转换（汇率/关税）调相对价格。", "analysis": "<p>逆差意味着对外支出大于收入，需求管理政策需<b>紧缩</b>以压低进口需求；汇率政策需<b>本币贬值</b>以提升出口竞争力。两者搭配即「紧缩 + 贬值」，也是米德冲突下解决内外失衡时支出调整政策与支出转换政策的经典组合。故选 <b>B</b>。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "在<b>固定汇率制</b>下，一国同时面临国内经济衰退（失业严重）与国际收支逆差，仅靠支出调整政策（财政、货币政策）无法同时实现内部均衡与外部均衡，这一局面称为（　）。", "opts": [{"k": "A", "t": "特里芬难题"}, {"k": "B", "t": "米德冲突"}, {"k": "C", "t": "三元悖论（克鲁格曼不可能三角）"}, {"k": "D", "t": "流动性陷阱"}], "ans": "B", "kp": "第10章·米德冲突（2026 新增）", "model": "新概念配对", "chain": ["题眼三件套：<b>固定汇率 + 内外目标打架 + 单一政策工具不够</b>", "米德冲突＝固定汇率下只用支出调整政策无法兼顾内外均衡，必须搭配<b>支出转换政策</b>（汇率/关税）", "→ B"], "fast": "⚡四个新概念各钉一句：<b>米德冲突＝固定汇率下内外均衡打架</b>｜三元悖论＝三选二｜特里芬难题＝储备货币国流动性vs信心｜流动性陷阱＝货币政策失效。", "traps": ["C 三元悖论也讲「不能同时」，但它讲的是<b>三个制度目标三选二</b>，不是内外均衡的政策搭配", "A 特里芬难题是布雷顿森林体系下美元作为储备货币的信心/流动性矛盾"], "mother": "2026 新增三件套：IS-LM-BP（三线交点＝内外同时均衡）、米德冲突（固定汇率+政策搭配）、三元悖论（三选二）。", "analysis": "<p><b>米德冲突</b>由米德提出：在固定汇率制下，若只使用支出调整政策（财政、货币政策），当经济处于「衰退+逆差」或「通胀+顺差」时，同一政策对内外两个目标的作用方向相反，无法兼顾，必须引入<b>支出转换政策</b>（汇率调整、关税、配额）搭配使用。故选 <b>B</b>。</p><p>真题案例「1999 年阿根廷经济衰退失业严重 + 国际收支逆差并存」即为米德冲突的标准情形。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "根据<b>三元悖论</b>，我国实行有管理的浮动汇率制度、并保持货币政策的独立性，则在资本流动方面必然（　）。", "opts": [{"k": "A", "t": "实现资本项目完全自由流动"}, {"k": "B", "t": "对资本项目实行完全封闭、禁止一切跨境资本流动"}, {"k": "C", "t": "对资本项目保留一定程度的管理（部分可兑换）"}, {"k": "D", "t": "与汇率制度、货币政策独立性无关，可任意组合三者"}], "ans": "C", "kp": "第10章·三元悖论（2026 新增）", "model": "三选二推理", "chain": ["三角三顶点：<b>货币政策独立性、汇率稳定、资本自由流动——三选二</b>", "我国占了「货币政策独立」+「汇率稳定（有管理浮动，仍有管理）」→ 必须放弃<b>资本完全自由流动</b>", "→ C「部分可兑换/资本项目一定程度管理」"], "fast": "⚡三元悖论口诀「<b>独立、稳汇、自由——三选二，必弃一</b>」；我国组合＝<b>有管理浮动 + 货币政策独立 + 资本项目部分管制</b>。见「任意组合三者」直接划。", "traps": ["A 把三者全要（这正是「不可能三角」要否定的）", "B 走向另一个极端：我国是<b>部分管制</b>不是完全封闭；D 直接否定三选二"], "mother": "三元悖论：货币政策独立性、汇率稳定、资本自由流动不可兼得，最多同时实现两项。货币局制＝汇率已锁死，只能在「独立+管制」与「自由+放弃独立」里挑。", "analysis": "<p>三元悖论（不可能三角）指出一国无法同时实现货币政策独立性、汇率稳定与资本自由流动。我国选择的是<b>有管理的浮动汇率制度 + 独立的货币政策 + 资本项目部分可兑换（一定程度管理）</b>，即放弃资本完全自由流动这一角。故选 <b>C</b>。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于开放经济条件下的 <b>BP 曲线</b>，说法<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "BP 曲线表示国际收支平衡时利率与收入的各种组合"}, {"k": "B", "t": "资本流动的利率弹性越大，BP 曲线越平坦"}, {"k": "C", "t": "资本完全自由流动时，BP 曲线是一条水平线"}, {"k": "D", "t": "BP 曲线向右下方倾斜，其上方区域表示国际收支逆差"}], "ans": "D", "kp": "第10章·BP 曲线（2026 新增）", "model": "选非 + 半真半假长选项 + 方向反转", "chain": ["先圈「<b>错误</b>」；A ✅ 纵轴是<b>利率</b>不是汇率｜B ✅ 弹性大→平坦｜C ✅ 全流动→水平线", "D 两处错：<b>BP 斜率为正（右上倾斜）</b>，且<b>上方＝顺差</b>（利率高于均衡→资本流入）", "→ D"], "fast": "⚡BP 三钉子「<b>弹性大→平坦；全流动→水平；斜率为正</b>」；<b>上方＝顺差、下方＝逆差</b>；纵轴是<b>利率</b>不是汇率。见「斜率为负 / 垂直线 / 上方逆差」直接划。", "traps": ["这是回炉题 61（你选 D「斜率为负」）的同考点二次考法——D 把两个错处打包成一个长选项", "把「上方＝顺差」记反（记法：利率高→外资涌进来→顺差）"], "mother": "BP 曲线：国际收支平衡时 (i, Y) 组合；利率上升→资本流入→需更高收入（进口增加）来抵消，故斜率为正。资本流动性越强越平坦，完全流动时水平。", "analysis": "<p>A、B、C 均为 BP 曲线的标准性质：纵轴为<b>利率</b>、横轴为收入；资本流动对利率越敏感，为维持国际收支平衡所需的收入变动越小，曲线越平坦；资本完全自由流动时利率稍偏离即引发巨量资本流动，BP 为水平线。<b>D 全错</b>：BP 曲线<b>向右上方倾斜</b>（斜率为正），且曲线<b>上方对应国际收支顺差</b>、下方对应逆差。故选 <b>D</b>。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "在 <b>IS-LM-BP 模型</b>中，IS、LM、BP 三条曲线相交于同一点，意味着（　）。", "opts": [{"k": "A", "t": "仅产品市场与货币市场同时达到均衡"}, {"k": "B", "t": "产品市场、货币市场与国际收支同时达到均衡（内外均衡）"}, {"k": "C", "t": "仅国际收支达到平衡，国内两个市场可以失衡"}, {"k": "D", "t": "经济必然达到充分就业且物价零上涨"}], "ans": "B", "kp": "第10章·IS-LM-BP 模型（2026 新增）", "model": "新概念配对 + 绝对化收网", "chain": ["三线各管一段：<b>IS＝产品市场｜LM＝货币市场｜BP＝国际收支</b>", "交点＝<b>三条同时成立</b> → 内部均衡 + 外部均衡", "→ B；见「仅/必然」先找反例"], "fast": "⚡三线交点＝<b>内外同时均衡</b>（产品+货币+国际收支）。见「仅…」「必然充分就业」＝绝对化收网，直接划。", "traps": ["A 漏了国际收支；C 漏了国内两个市场——都是「半截答案」", "D 把均衡等同于充分就业（IS-LM-BP 是<b>均衡</b>条件，不保证充分就业）"], "mother": "IS-LM-BP：把 09 章 IS（产品市场）、LM（货币市场）加上 BP（国际收支）放在同一 (i, Y) 坐标系；三线共点＝开放经济一般均衡。", "analysis": "<p>IS 曲线代表产品市场均衡、LM 曲线代表货币市场均衡、BP 曲线代表国际收支平衡。三线交于一点，表示同一利率与收入组合同时满足三个条件，即<b>内部均衡与外部均衡同时实现</b>。故选 <b>B</b>。均衡不等于充分就业，D 属绝对化表述。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "单选", "lv": "基", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "下列资产中，<b>不属于</b>一国国际储备构成的是（　）。", "opts": [{"k": "A", "t": "货币当局持有的货币性黄金"}, {"k": "B", "t": "货币当局持有的外汇储备"}, {"k": "C", "t": "在国际货币基金组织（IMF）的储备头寸"}, {"k": "D", "t": "商业银行持有的外汇资产"}], "ans": "D", "kp": "第10章·国际储备构成", "model": "选非 + 主体错位", "chain": ["先圈「<b>不属于</b>」；储备四件套：<b>货币性黄金、外汇储备、IMF 储备头寸、SDR</b>", "关键限定词：<b>货币当局（央行）持有并可随时动用</b>", "D 是<b>商业银行</b>持有 → 不属国家国际储备 → 勾 D"], "fast": "⚡储备四件套「<b>金、汇、头寸、SDR</b>」＋一个主体限定「<b>货币当局持有</b>」。见「民间/商业银行/企业持有」「外国土地/文物」直接划。", "traps": ["把「外汇」两字看成万能——主体错位是本题唯一考点", "回炉真题卷 Q7 你见过同款（民间持有的外汇资产、政府持有的外国土地）"], "mother": "国际储备＝一国货币当局持有的、可随时用于弥补国际收支逆差与干预外汇市场的国际清偿能力资产。四件套之外还有「主体」与「流动性」两个判据。", "analysis": "<p>国际储备由<b>货币性黄金、外汇储备、在 IMF 的储备头寸、特别提款权（SDR）</b>四部分构成，且必须是<b>货币当局持有、可随时动用</b>的资产。商业银行、企业或居民持有的外汇资产属民间对外资产，政府持有的外国土地、文物等非金融资产也不计入储备。故选 <b>D</b>。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>国际储备的作用</b>，说法<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "弥补国际收支逆差"}, {"k": "B", "t": "干预外汇市场，维持本币汇率相对稳定"}, {"k": "C", "t": "维持本国国际资信，为对外融资提供偿付保证"}, {"k": "D", "t": "彻底消除汇率波动与国际收支失衡"}], "ans": "D", "kp": "第10章·国际储备作用 + 视角切换", "model": "选非 + 绝对化收网", "chain": ["先圈「<b>错误</b>」；A ✅ 补逆差｜B ✅ 稳汇率｜C ✅ 债权人视角＝维持国际资信", "D「<b>彻底消除</b>」＝绝对化收网：储备只能<b>缓冲/调节</b>，不能消灭波动与失衡", "→ D"], "fast": "⚡储备三作用「<b>补逆差、稳汇率、保资信</b>」（C 是<b>债权人视角</b>，回炉题 58 就栽在视角切换）。见「消除/彻底/完全」直接划——风险与波动只能缓冲不能消灭。", "traps": ["C 常被误判为错项（本国视角只记得逆差/汇率/物价）——它是教材明确的对外功能", "D 用「彻底消除」收网，眼熟术语 + 绝对化＝组合拳"], "mother": "储备作用分两个视角：本国视角（弥补逆差、干预汇市稳汇率、稳定国内物价）；债权人视角（维持国际资信与投资环境）。", "analysis": "<p>A、B、C 均为国际储备的标准作用。其中 C 是<b>对外/债权人视角</b>：国外债权人放债前评估一国储备数量与增减趋势，目的是确认该国能维持国际资信与偿债能力。<b>D 错误</b>：储备只能缓冲短期冲击、为调节争取时间，无法彻底消除汇率波动或结构性国际收支失衡。故选 <b>D</b>。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "某国全年进口额为 <b>2400 亿美元</b>，按特里芬经验法则（国际储备应满足 <b>3 个月进口用汇</b>）估算，其国际储备适度规模的下限约为（　）。", "opts": [{"k": "A", "t": "200 亿美元"}, {"k": "B", "t": "600 亿美元"}, {"k": "C", "t": "800 亿美元"}, {"k": "D", "t": "1200 亿美元"}], "ans": "B", "kp": "第10章·国际储备规模管理（2026 大纲要求）", "model": "计算题·数值错位", "chain": ["第一步：月均进口额 = 2400 ÷ 12 = <b>200 亿美元/月</b>", "第二步：3 个月用汇 = 200 × 3 = <b>600 亿美元</b>", "→ B"], "fast": "⚡特里芬法则「<b>3～4 个月进口额</b>」＝年进口额 ÷ 4（3 个月）到 ÷ 3（4 个月）。本题 2400÷4 = <b>600</b>。<b>先算月均再乘月数，别跳步</b>。", "traps": ["A 200 = 只算了 1 个月；C 800 = 4 个月（上限不是下限）；D 1200 = 半年", "问的是「<b>下限</b>」——看到 3 个月就别选 4 个月的 800"], "mother": "规模管理（适度规模）：满足 3-4 个月进口用汇 + 外债还本付息需求 + 干预外汇市场需要。过多→机会成本高、本币投放带来通胀压力；过少→偿付与干预能力不足。", "analysis": "<p>按特里芬经验法则，国际储备应至少满足 3 个月进口用汇：2400 ÷ 12 × 3 = <b>600 亿美元</b>。若按 4 个月则为 800 亿美元（上限口径）。故选 <b>B</b>。</p>"}, {"no": 3012, "label": "P12", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于国际储备的<b>结构管理</b>，下列做法正确的是（　）。", "opts": [{"k": "A", "t": "币种应全部集中于单一强势货币，以最大限度降低管理成本"}, {"k": "B", "t": "币种结构应与本国贸易结算币种、外债币种结构相匹配并适度分散"}, {"k": "C", "t": "资产应全部配置高收益长期资产，无需保留随时可动用的流动性"}, {"k": "D", "t": "结构管理只取决于收益率高低，与流动性安排无关"}], "ans": "B", "kp": "第10章·国际储备结构管理（2026 大纲要求）", "model": "绝对化收网 + 半真半假", "chain": ["结构管理两条线：<b>币种结构</b>（分散化 + 与贸易/外债币种匹配）、<b>资产结构</b>（流动性与收益性权衡）", "A「全部集中」✗｜C「无需流动性」✗｜D「与流动性无关」✗——三个都踩绝对化", "→ B"], "fast": "⚡结构管理两句：「<b>币种分散＋与贸易/外债币种匹配</b>」「<b>流动性与收益性权衡</b>」。见「全部/唯一/无关」直接划。", "traps": ["A 的「降低管理成本」听起来有理，但「全部集中」违反分散化原则", "C/D 都无视「储备要随时能干预汇市」这一流动性前提"], "mother": "储备管理两分：规模管理（适度，3-4 个月进口 + 外债 + 干预需要）；结构管理（币种分散匹配、资产流动性/收益性权衡）。", "analysis": "<p>储备结构管理包含两方面：<b>币种结构</b>应分散并与本国贸易结算币种、外债币种结构相匹配，以降低汇率错配风险；<b>资产结构</b>需在流动性（随时可干预外汇市场）与收益性之间权衡。故选 <b>B</b>。其余三项或以「全部」违背分散原则，或否认流动性约束。</p>"}, {"no": 3013, "label": "P13", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "下列各项中，<b>不属于</b>国际资本流动主要原因的是（　）。", "opts": [{"k": "A", "t": "各国间利率差异带来的逐利动机"}, {"k": "B", "t": "汇率变动预期引发的套利与避险需求"}, {"k": "C", "t": "通过跨国资产配置分散投资风险"}, {"k": "D", "t": "一国资本管制越严格，长期资本流入规模越大"}], "ans": "D", "kp": "第10章·国际资本流动的原因（2026 大纲要求）", "model": "选非 + 方向反转", "chain": ["先圈「<b>不属于</b>」；A ✅ 利差逐利｜B ✅ 汇率预期｜C ✅ 分散风险", "D ❌ <b>管制放松/金融自由化</b>才促进资本流动；管制越严流入越少，方向说反", "→ D"], "fast": "⚡资本流动六大原因「<b>利差、汇预期、分散风险、国际分工、管制放松、投机冲击</b>」。见「管制越严流入越多」直接划（方向反）。", "traps": ["D 的方向反转藏在「越…越…」句式里，容易一眼滑过去", "C 的「分散风险」是标准表述，别误当错项"], "mother": "资本流动原因：利率差异、汇率预期、分散风险、国际分工与 FDI、资本管制放松与金融自由化、投机冲击。影响：正面（补缺口、技术溢出、市场深化）；负面（冲击汇率、资产泡沫、外债风险、削弱货币政策独立性、货币危机）。", "analysis": "<p>A、B、C 及国际分工/直接投资、资本管制放松与金融自由化、投机冲击，共同构成国际资本流动的主要原因。<b>D 方向相反</b>：资本管制越严格，跨境资本流动的交易成本与制度障碍越大，长期资本流入规模应越小；放松管制与金融自由化才是促进因素。故选 <b>D</b>。</p>"}, {"no": 3014, "label": "P14", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "按期限划分，下列各项中属于<b>短期资本流动</b>的是（　）。", "opts": [{"k": "A", "t": "外商直接投资（FDI）"}, {"k": "B", "t": "国际中长期银行贷款"}, {"k": "C", "t": "以追逐短期利差、汇差为目的的「热钱」"}, {"k": "D", "t": "境外发行的中长期股票融资"}], "ans": "C", "kp": "第10章·国际资本流动分类（2026 大纲要求）", "model": "清单归类", "chain": ["<b>长期</b>：直接投资（FDI）、证券投资（中长期）、国际中长期贷款", "<b>短期</b>：贸易性（贸易信贷）、<b>投机性（热钱）</b>、保值性（资本外逃）、套利性", "→ C"], "fast": "⚡「<b>FDI＝长期，热钱＝短期投机</b>」；FDI 是股权性质、<b>不算外债</b>（F-105 同款）。", "traps": ["把 FDI 当短期（它是典型的长期资本流动）", "把「股票/证券投资」一律当短期——证券投资按期限可长可短，教材把 FDI 与中长期证券投资归长期"], "mother": "长期资本流动（期限一年以上或无固定到期日）：FDI、证券投资、国际中长期贷款；短期资本流动：贸易性、投机性、保值性、套利性。", "analysis": "<p>「热钱」以追逐短期利差、汇差与资产价差为目的、快进快出，属<b>短期投机性资本流动</b>。A 外商直接投资、B 国际中长期贷款、D 中长期股票融资均属长期资本流动。故选 <b>C</b>。</p>"}, {"no": 3015, "label": "P15", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于我国<b>外资管理政策</b>，说法正确的有（　）。", "opts": [{"k": "A", "t": "实行准入前国民待遇加负面清单管理制度"}, {"k": "B", "t": "通过鼓励外商投资产业目录等产业政策引导外资投向"}, {"k": "C", "t": "对影响或可能影响国家安全的外资并购实施安全审查"}, {"k": "D", "t": "所有外商投资项目一律实行逐案核准审批"}, {"k": "E", "t": "外商投资可不受国家产业政策的约束"}], "ans": "ABC", "kp": "第10章·外资管理政策（2026 大纲要求）", "model": "清单多选 + 绝对化收网 ×2", "chain": ["A ✅ 负面清单 + 准入前国民待遇｜B ✅ 产业目录引导｜C ✅ 并购安全审查", "D ✗「<b>所有…一律逐案审批</b>」与负面清单制度直接矛盾（清单外备案即可）", "E ✗「<b>不受产业政策约束</b>」＝绝对化，且与 B 自相矛盾", "→ ABC（<b>本题只有 3 项，勾满 4 项就归零</b>）"], "fast": "⚡外资三件套「<b>负面清单、产业目录、安全审查</b>」。见「一律逐案审批」「不受…约束」直接划。<b>D 与 B、E 与 B 各自矛盾——同一题里的矛盾对必有一错</b>。", "traps": ["把 D/E 当成「加强管理」而勾上——它们是绝对化收网", "惯性勾 4 项：本题正确项只有 3 个，逐项 √× 才算得准"], "mother": "外资管理：准入前国民待遇 + 负面清单、产业指导目录（鼓励/限制/禁止）、并购安全审查、准入后依法平等适用支持政策。", "analysis": "<p>A、B、C 为我国外资管理的基本制度安排。<b>D 错误</b>：负面清单之外的领域实行备案制，不再是「所有项目一律逐案核准」；<b>E 错误</b>：外商投资须遵守产业政策与安全审查要求。故选 <b>ABC</b>。</p>"}, {"no": 3016, "label": "P16", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于我国<b>外债管理</b>，说法正确的有（　）。", "opts": [{"k": "A", "t": "实行外债规模（余额/额度）管理"}, {"k": "B", "t": "实行期限、币种、利率等结构管理，控制短期外债占比"}, {"k": "C", "t": "实施全口径跨境融资宏观审慎管理"}, {"k": "D", "t": "外商直接投资（FDI）应计入外债余额"}, {"k": "E", "t": "外债需办理登记并按规定用途使用"}], "ans": "ABCE", "kp": "第10章·外债管理政策（2026 大纲要求）", "model": "清单多选 + 固定干扰位", "chain": ["A ✅ 规模｜B ✅ 结构｜C ✅ 全口径宏观审慎｜E ✅ 登记与用途", "D ✗ <b>FDI 是股权性质投资、无还本付息义务，不属于外债</b>（回炉题 98 你勾过 B 这一位）", "→ ABCE"], "fast": "⚡外债管理四件套「<b>规模、结构、宏观审慎、登记用途</b>」；钉死一句「<b>FDI 不是债</b>」。回炉题 98 的固定干扰位换个皮又出现。", "traps": ["D 是本章出题人最爱用的固定干扰位（真题卷 01 第 4 题同款）", "漏 E（登记与用途管理常被忽略）→ 少选只拿 1.5 分"], "mother": "外债＝需还本付息的外币（或约定外币）债务：国际金融组织贷款、外国企业/金融机构贷款、境内机构发行的外币债券等；FDI、利润再投资不计入。人民币计价外债偿还不耗外汇储备。", "analysis": "<p>A、B、C、E 分别对应我国外债管理的<b>规模管理、结构管理、全口径跨境融资宏观审慎管理、外债登记与用途管理</b>。<b>D 错误</b>：外商直接投资属股权性质投资，不产生还本付息义务，不计入外债余额。故选 <b>ABCE</b>。</p>"}, {"no": 3017, "label": "P17", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于 IMF 口径下<b>汇率制度</b>按弹性由小到大的排列及其特征，说法正确的有（　）。", "opts": [{"k": "A", "t": "货币局制度的汇率弹性最小，货币发行完全锚定某种外币"}, {"k": "B", "t": "传统盯住的汇率弹性大于爬行盯住"}, {"k": "C", "t": "单独浮动（自由浮动）的汇率弹性最大"}, {"k": "D", "t": "由小到大的顺序为：货币局制 → 传统盯住 → 爬行盯住 → 单独浮动"}, {"k": "E", "t": "爬行盯住是定期按小幅调整平价，弹性介于传统盯住与单独浮动之间"}], "ans": "ACDE", "kp": "第10章·汇率制度分类（F-107 变式）", "model": "排序多选 + 矛盾对", "chain": ["口诀「<b>局 → 传 → 爬 → 浮</b>」，越爬越活", "A ✅ 局最死｜C ✅ 浮最活｜D ✅ 完整顺序｜E ✅ 爬在中间", "B ✗「传 &gt; 爬」方向反，且与 D 的顺序<b>自相矛盾</b>——同一题里矛盾对必有一错", "→ ACDE"], "fast": "⚡弹性排序「<b>局→传→爬→浮</b>」两头钉死：<b>局在最前、浮在最后</b>，中间只有「传→爬」一种顺序。见「传统盯住弹性大于爬行盯住」直接划。", "traps": ["B 与 D 自相矛盾：认准 D 这条完整顺序，B 必然是错项", "把货币局制插到中间或把传统盯住排到最后（F-107 你原错过一次）"], "mother": "IMF 按汇率弹性由小到大：货币局制 → 传统盯住 → 爬行盯住 → 单独浮动。货币局制＝货币发行完全锚定外币。", "analysis": "<p>A、C、D、E 均符合 IMF 按弹性由小到大「<b>货币局制 → 传统盯住 → 爬行盯住 → 单独浮动</b>」的划分及其特征。<b>B 错误</b>：传统盯住的弹性<b>小于</b>爬行盯住（后者定期小步调整平价，弹性更大），B 与 D 构成同一题内的矛盾对。故选 <b>ACDE</b>。</p>"}, {"no": 3018, "label": "P18", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于《国际货币基金协定》<b>第八条款</b>与货币可兑换，说法正确的有（　）。", "opts": [{"k": "A", "t": "第八条款义务对应的是经常项目可兑换"}, {"k": "B", "t": "成员国不得对经常性国际交易的支付与转移施加限制"}, {"k": "C", "t": "第八条款要求成员国实现资本项目完全自由兑换"}, {"k": "D", "t": "我国已实现人民币经常项目可兑换，资本项目仍保留一定管理"}, {"k": "E", "t": "完全可兑换（经常+资本项目）是比第八条款义务更宽口径的概念"}], "ans": "ABDE", "kp": "第10章·货币可兑换（F-108 变式）", "model": "清单多选 + 张冠李戴", "chain": ["A ✅ 第八条款＝<b>经常项目</b>可兑换｜B ✅ 不得限制经常性支付转移｜D ✅ 我国现状｜E ✅ 口径区分", "C ✗ 把「资本项目完全自由兑换」安到第八条款上——<b>协定没这么要求</b>", "→ ABDE"], "fast": "⚡钉死一句「<b>IMF 谈可兑换＝经常项目</b>」；「完全可兑换＝经常+资本项目」是<b>学术口径</b>，不是协定第八条款义务。见「第八条款 + 资本项目」直接划。", "traps": ["C 是 F-108 原题（你选了「完全可兑换」）的同款换皮", "E 常被误判为错项——它恰恰是区分两个口径的正确表述"], "mother": "《国际货币基金协定》第八条款：不得限制经常性国际交易的支付与转移、不得实行歧视性货币安排等，即经常项目可兑换；资本项目可兑换不在协定强制义务内。", "analysis": "<p>A、B、D、E 表述正确。<b>C 错误</b>：第八条款要求的是<b>经常项目可兑换</b>，并未要求成员国实现资本项目完全自由兑换；「完全可兑换 = 经常项目 + 资本项目均可兑换」是更宽的学术口径。故选 <b>ABDE</b>。</p>"}, {"no": 3019, "label": "P19", "sec": "prop", "type": "多选", "lv": "基", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "按国际收支平衡表的账户构成，<b>属于经常账户</b>的项目有（　）。", "opts": [{"k": "A", "t": "货物"}, {"k": "B", "t": "服务"}, {"k": "C", "t": "初次收入（含投资收益）"}, {"k": "D", "t": "二次收入（经常转移）"}, {"k": "E", "t": "储备资产"}], "ans": "ABCD", "kp": "第10章·国际收支平衡表账户构成", "model": "清单多选 + 相邻概念错位", "chain": ["经常账户四项：<b>货物、服务、初次收入、二次收入</b> → ABCD ✅", "E 储备资产属<b>资本与金融账户·金融账户</b>，不在经常账户下 ✗", "→ ABCD"], "fast": "⚡经常账户四项「<b>货、服、初、二</b>」；金融账户四项「<b>直、证、其他、储备</b>」。见「储备资产/Direct Investment」出现在经常账户题里直接划。", "traps": ["E 是真题卷 01 第 10 题的正解项之一，换个位置当干扰项", "把「初次收入」误当成资本账户项目（与 P1 同一个坑）"], "mother": "经常账户：货物、服务、初次收入、二次收入；资本与金融账户：资本账户（资本转移、非生产非金融资产）+ 金融账户（直接投资、证券投资、其他投资、储备资产）；净误差与遗漏为平衡项。", "analysis": "<p>经常账户记录居民与非居民之间货物、服务、初次收入（雇员报酬与投资收益）与二次收入（经常转移）的流量，A—D 全部入选。<b>E 储备资产</b>属资本与金融账户下的<b>金融账户</b>，是货币当局持有的对外资产，不属经常账户。故选 <b>ABCD</b>。</p>"}, {"no": 3020, "label": "P20", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>国际资本流动的影响</b>，说法正确的有（　）。", "opts": [{"k": "A", "t": "可以弥补东道国储蓄—投资缺口，缓解资金不足"}, {"k": "B", "t": "带来技术与管理溢出，促进本国金融市场深化"}, {"k": "C", "t": "大规模短期资本快进快出可能冲击汇率稳定、催生资产泡沫"}, {"k": "D", "t": "资本自由流动必然使一国货币政策的独立性增强"}, {"k": "E", "t": "任何形式的资本流入都会引发货币危机"}], "ans": "ABC", "kp": "第10章·国际资本流动影响（2026 大纲要求）", "model": "多选 + 绝对化收网 ×2 + 三元悖论方向", "chain": ["A ✅ 补缺口｜B ✅ 技术溢出｜C ✅ 负面冲击（短期资本）", "D ✗「<b>必然增强独立性</b>」方向反——按<b>三元悖论</b>，资本自由流动恰恰会<b>削弱</b>货币政策独立性", "E ✗「<b>任何…都会</b>」绝对化收网｜→ <b>本题只有 3 项正确</b>", "→ ABC"], "fast": "⚡资本流动影响两栏：<b>正面＝补缺口、技术溢出、市场深化；负面＝冲汇率、吹泡沫、外债风险、削弱独立性、货币危机</b>。见「必然增强」「任何…都会」直接划。", "traps": ["D 把三元悖论的结论说反（这是 09 章「松紧方向」病根的同族陷阱）", "惯性勾 4 项：正确项只有 3 个，D/E 都是绝对化，逐项 √× 才不归零"], "mother": "正面影响：弥补储蓄—投资缺口、优化资源配置、技术与管理溢出、促进金融市场深化。负面影响：冲击汇率稳定、催生资产泡沫、加剧外债风险、削弱货币政策独立性（三元悖论）、引发货币危机。", "analysis": "<p>A、B 为资本流动的正面效应，C 为短期大规模资本流动的负面效应，均正确。<b>D 错误</b>：按三元悖论，资本自由流动与汇率稳定、货币政策独立性三者只能取其二，资本自由流动往往<b>削弱</b>而非增强货币政策独立性；<b>E 错误</b>：「任何形式都会引发危机」属绝对化表述。故选 <b>ABC</b>。</p>"}]};
+const KEY  = 'fin_drill_ch10_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+<script>
+(function(){
+  var g=document.getElementById("skelGate");
+  var b=document.getElementById("skelGo");
+  if(!g||!b) return;
+  b.onclick=function(){ g.style.display="none"; try{ window.dispatchEvent(new Event("skelDone")); }catch(e){} window.scrollTo(0,0); };
+})();
+</script>
+</body>
+</html>

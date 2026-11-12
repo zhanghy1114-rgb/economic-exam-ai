@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>经基 · 答题技巧卡</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1a1d21; --ink2:#5b6470; --line:#e3e6ea;
+  --red:#c0392b; --redbg:#fdf0ee; --blue:#1d6fb8; --bluebg:#eef5fc;
+  --gold:#a6761d; --goldbg:#fdf7e8; --green:#1e7d5a; --greenbg:#eaf6f1;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14171a; --card:#1c2024; --ink:#eef1f4; --ink2:#9aa4b0; --line:#2c3238;
+    --red:#ff8a7a; --redbg:#2a1c1a; --blue:#7bb8ee; --bluebg:#16232e;
+    --gold:#e0b25c; --goldbg:#2a2317; --green:#6cd3a8; --greenbg:#152420;
+  }
+}
+*{box-sizing:border-box;-webkit-text-size-adjust:100%}
+body{margin:0;padding:0 0 60px;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  line-height:1.72;font-size:16px}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header{padding:26px 0 14px;border-bottom:2px solid var(--ink);margin-bottom:18px}
+h1{font-size:23px;margin:0 0 6px;letter-spacing:-.3px}
+.sub{font-size:13.5px;color:var(--ink2);line-height:1.6}
+h2{font-size:17px;margin:26px 0 12px;padding-left:10px;border-left:4px solid var(--ink);line-height:1.35}
+h3{font-size:15.5px;margin:22px 0 10px;line-height:1.5;font-weight:700}
+h3 .badge{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:2px 9px;
+  background:var(--goldbg);color:var(--gold);margin-left:6px;vertical-align:middle;letter-spacing:0;
+  font-variant-numeric:tabular-nums}
+p{margin:10px 0;font-size:15px}
+b{font-weight:700}
+.hit{color:var(--red);font-weight:700;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;background:var(--bluebg);color:var(--blue);border-radius:6px;
+  padding:1px 7px;font-size:12.5px;font-weight:700;margin:1px 2px;font-variant-numeric:tabular-nums}
+.lead{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin:0 0 14px}
+blockquote{margin:10px 0;background:var(--bluebg);border-left:4px solid var(--blue);
+  border-radius:0 10px 10px 0;padding:11px 13px;font-size:14.5px;color:var(--ink)}
+blockquote.warn{background:var(--redbg);border-left-color:var(--red)}
+blockquote.tip{background:var(--greenbg);border-left-color:var(--green)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:8px 0;
+  border:1px solid var(--line);border-radius:12px;background:var(--card)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:100%}
+th{text-align:left;font-weight:700;color:var(--ink2);font-size:12px;padding:8px 7px;
+  border-bottom:2px solid var(--line);letter-spacing:.4px;white-space:nowrap;background:var(--card)}
+td{padding:8px 7px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:700;color:var(--blue);white-space:nowrap}
+td .hit{color:var(--red)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;
+  font-size:12.5px;line-height:1.9;overflow-x:auto;margin:10px 0;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
+ul,ol{margin:8px 0;padding-left:22px;font-size:15px}
+li{margin:5px 0}
+hr{border:none;border-top:1px solid var(--line);margin:22px 0}
+.foot{text-align:center;font-size:12.5px;color:var(--ink2);padding:22px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>经基 · 答题技巧卡</h1>
+<div class="sub">693 道真题答案统计 + 你 256 道错题错因<br>先破三个伪技巧，再给 8 条真技巧</div></header>
+<blockquote>数据源：<span class="chip">真题分章卷/经基第*</span> <b>89 卷 693 题</b>（单选 456 / 多选 237），全部答案键已解析校验，零缺失。 个人错因：你的 <b>256 道经基错题</b>（单选 133 / 多选 123，含「你选 / 正解 / 病因码」）。 用法：考前一晚看第〇章和第一章；进场前 3 分钟只看第一章那 8 条。</blockquote>
+<h2>〇、先破三个"网红技巧"——它们在经基真题里不成立</h2>
+<p>这三条你千万别用，用了反而丢分。<b>结论来自 693 道真题的答案统计，不是猜的。</b></p>
+<div class="scroll"><table>
+<tr><th>网红说法</th><th>真题实测</th><th>判定</th></tr>
+<tr><td>"含<b>绝对化词</b>（必须/全部/只能/所有/唯一）的选项一定错"</td><td>正确项含绝对化词 <b>8.6%</b>，错误项 <b>7.9%</b>——几乎没差别（0.92 倍）</td><td>❌ <b>不成立</b></td></tr>
+<tr><td>"<b>最长的选项</b>通常是正确答案"</td><td>正确项相对长度 <b>0.796</b>，错误项 <b>0.795</b>——完全一样</td><td>❌ <b>不成立</b></td></tr>
+<tr><td>"答案有位置规律，<b>蒙 C</b> / D 是陷阱位"</td><td>单选答案 A 26.1% / B 23.9% / C 25.9% / D 24.1%，<b>基本均匀</b>；多选各位置正确率 59%–65%，也均匀</td><td>❌ <b>不成立</b></td></tr>
+</table></div>
+<p><b>为什么重要</b>：如果你带着"见绝对化就划掉"去考试，会误杀正确项（每年约 8-9% 的选项里绝对化词是对的）。判断依据只能是<b>教材原话写没写</b>，不是词的长相。</p>
+<h2>一、八条真技巧（每条都有数据）</h2>
+<h3>技巧 1｜多选：<b>永远不要五项全勾</b></h3>
+<p><b>693 道真题里，"ABCDE 全选"出现 0 次。</b></p>
+<div class="scroll"><table>
+<tr><th>正确答案项数</th><th>占比</th></tr>
+<tr><td><b>3 项</b></td><td><b>40.1%</b></td></tr>
+<tr><td><b>4 项</b></td><td><b>35.0%</b></td></tr>
+<tr><td>2 项</td><td>24.9%</td></tr>
+<tr><td>5 项</td><td><b>0 次</b></td></tr>
+</table></div>
+<p>平均 3.10 项。<b>看到自己勾满了 5 个，立刻回头划掉最没底的那个</b>——历史数据告诉你，全选一次都没对过。</p>
+<h3>技巧 2｜多选：只勾 2 项就交卷 = 主动放弃 75% 题目的半分</h3>
+<p>正确答案 ≥3 项的占 <b>75.1%</b>。如果你每道多选都只勾两个最有把握的：</p>
+<ul><li>遇到答案正好 2 项的题（25%）→ 得 2 分</li><li>遇到答案 3-4 项的题（75%）→ 只能得 1 分</li></ul>
+<p><b>折算期望 1.25 / 2 分，等于每道白白丢掉 0.75 分。</b> 23 道多选就是 <b>17 分</b>——比合格线 84 分里的五分之一还多。</p>
+<h3>技巧 3｜但补项有门槛：<b>信心 ≥ 2/3 才补</b>（这是硬数学）</h3>
+<p>多选计分：全对 2 分 / 少选每项 0.5 分 / 错选 0 分。</p>
+<p>设你已确定 2 项，纠结第 3 项：</p>
+<div class="scroll"><table>
+<tr><th>你的做法</th><th>得分</th></tr>
+<tr><td>只勾 2 项（放弃第 3 项）</td><td>稳定 <b>1.0 分</b></td></tr>
+<tr><td>勾上第 3 项，对</td><td>1.5 分</td></tr>
+<tr><td>勾上第 3 项，错</td><td><b>0 分</b></td></tr>
+</table></div>
+<p>补项期望 = 1.5 × p。要超过 1.0，需要 <b>p &gt; 66.7%</b>。</p>
+<blockquote><b>一句话</b>：第 3 项你有 <b>三分之二以上</b>的把握 → 补；<b>只是"好像听过"→ 不补</b>。 风险回报比 4:1（丢 2 分 vs 拿 0.5 分），所以"宁缺毋滥"不是保守，是最优解。</blockquote>
+<h3>技巧 4｜你的多选病根：不是数量，是<b>黑白搞反</b></h3>
+<p>你 123 道多选错题的错法分布：</p>
+<div class="scroll"><table>
+<tr><th>错法</th><th>道数</th><th>占比</th></tr>
+<tr><td>又多勾又漏勾</td><td><b>77</b></td><td><b>62.6%</b></td></tr>
+<tr><td>只漏勾（少选，还能拿半分）</td><td>25</td><td>20.3%</td></tr>
+<tr><td>只多勾（错选归零）</td><td>21</td><td>17.1%</td></tr>
+</table></div>
+<p>你勾的项数平均 <b>2.97 项</b>，正确答案平均 <b>3.11 项</b>——<b>数量只差 0.14</b>。也就是说：你数的个数是对的，但选错了对象。</p>
+<p>而且你多勾的字母位置是 A 27 / B 31 / C 24 / D 23 / E 25 次，<b>完全均匀</b>——不存在"D 项是陷阱"这回事。</p>
+<p><b>处方（唯一有效的一条）</b>：多选的每个字母，<b>在草稿纸上单独写一个 ✓ 或 ✗</b>，五项全落笔，不许"整体感觉一下就选"。写完看一眼 ✓ 的个数：1 个 → 回去补，5 个 → 划掉最没底的。</p>
+<h3>技巧 5｜单选纠结时：优先 <b>C</b>，别往 D 靠（这条是你专属的）</h3>
+<p>先说明：这是<b>你的 133 道错题</b>样本，不是全部题目，所以它不是"答案位置规律"，而是"<b>你的错误习惯规律</b>"。</p>
+<div class="scroll"><table>
+<tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+<tr><td>你错的时候，选的是</td><td>33</td><td>37</td><td><b>23</b></td><td><b>40</b></td></tr>
+<tr><td>你错的那些题，正解在</td><td>37</td><td>30</td><td><b>39</b></td><td><b>27</b></td></tr>
+</table></div>
+<p>两条读法：</p>
+<ol><li><b>你错的时候最常选 D（40 次）</b>——说明你犹豫时习惯往靠后的选项靠</li><li><b>你错得最多的题，正解在 C（39 道，四个位置最多）</b>——说明"正确答案是 C"的题你最容易栽</li></ol>
+<p>把两条合起来就是：<b>你容易把 C 当错、把 D 当对</b>。</p>
+<p><b>做法</b>：单选只剩两个选项纠结、又完全没思路时，<b>手先别往 D 上放，回头看 C</b>。</p>
+<p>（全样本 693 题的答案位置是均匀的，所以这不是"蒙 C 有优势"，而是"纠正你个人往 D 偏的习惯"。）</p>
+<h3>技巧 6｜取非题：先圈"不"字，逐项标 ✅❌，<b>只勾 ❌</b></h3>
+<p>真题里取非题（问"不属于 / 不包括 / 错误的是 / 不正确"）共 <b>66 道，占 9.5%</b>——不多，但你在这类题上反复翻车。</p>
+<p><b>四步走（不许跳步）</b>：</p>
+<ol><li><b>圈题干</b>：把"不"字圈出来，在草稿纸顶端写一个"<b>反</b>"</li><li><b>逐项标</b>：A ✅   B ❌   C ❌   D ✅   E ✅（每项都落笔）</li><li><b>反向勾</b>：只勾标了 ❌ 的</li><li><b>数一遍</b>：勾的个数 = 你标的 ❌ 个数？不一致就是手滑</li></ol>
+<blockquote>补充数据：63 道单选取非里，答案在 C 的有 23 道（36.5%，高于均匀的 25%）——没思路时取非题蒙 C 略占优，但<b>只能当兜底，不能当方法</b>。</blockquote>
+<h3>技巧 7｜题眼词优先级：先看问的是<b>"属于"还是"属于…之外"</b></h3>
+<p>693 道真题的题干题眼词频排名：</p>
+<div class="scroll"><table>
+<tr><th>题眼</th><th>题数</th><th>占比</th><th>该干什么</th></tr>
+<tr><td><b>属于</b></td><td>111</td><td>16.0%</td><td>归类题：正确项是教材列举里的<b>原词</b>，出现"总体/全面/各个"这类跨类总括词直接划</td></tr>
+<tr><td><b>正确</b></td><td>100</td><td>14.4%</td><td>正向确认，逐项验"教材写没写"</td></tr>
+<tr><td><b>包括 / 主要有</b></td><td>63</td><td>9.1%</td><td>列举题，数教材列了几条</td></tr>
+<tr><td><b>错误 / 不属于 / 不包括</b></td><td>68</td><td>9.8%</td><td><b>取非，切到技巧 6 的流程</b></td></tr>
+<tr><td>最 / 首要 / 核心 / 根本 / 决定</td><td>40</td><td>5.8%</td><td>排序题，靠"唯一的等级记忆"，别推理</td></tr>
+</table></div>
+<p><b>动作</b>：读完题干第一件事——在草稿上写「正」或「反」。这一步花 2 秒，能救回 68 道取非题里的大部分失分。</p>
+<h3>技巧 8｜选项里有"对立对"时，答案九成在这一对里</h3>
+<p>真题里检出语义相反选项（提高/降低、增加/减少、长期/短期、名义/实际、顺差/逆差）的题共 15 道，其中 <b>13 道（86.7%）至少有一项是正确项</b>。</p>
+<ul><li>单选：<b>对立两项里挑一个</b>，别再往外看</li><li>多选：<b>至少勾其中一项</b>，两项都勾的只有同时满足"教材都写了"</li></ul>
+<blockquote>样本只有 15 道，是弱规律。但当你在两个相反说法间犹豫时，它比随机好。</blockquote>
+<h2>二、考场上按这个顺序走（60 秒流程）</h2>
+<pre>① 读题干 → 圈「不」字？（是则写&quot;反&quot;）        2 秒
+② 看问的是：属于 / 包括 / 错误 / 最            2 秒
+   ├─ 属于·包括 → 只认教材原词，跨类总括词划掉
+   ├─ 错误·不属于 → 切&quot;反&quot;流程，逐项 ✅❌ 只勾 ❌
+   └─ 最·首要·核心 → 想有没有唯一等级，没有就选最符合教材主旨的
+③ 单选：先排两个，剩两个 → 选 C（你的个人偏差）
+   多选：A B C D E 逐个写 ✓✗，五项全落笔，不许跳      60 秒
+④ 收尾自查（只查多选）：
+   ✓ 的个数 = 5？→ 划掉最没底的
+   ✓ 的个数 = 1？→ 回去补到 2-3 个</pre>
+<h2>三、时间与配分（140 分制，84 分合格）</h2>
+<div class="scroll"><table>
+<tr><th>题型</th><th>题量</th><th>单题</th><th>小计</th></tr>
+<tr><td>单选</td><td>70 题 × 1 分</td><td>≤ 50 秒</td><td>58 分钟</td></tr>
+<tr><td>多选</td><td>35 题 × 2 分</td><td>≤ 75 秒</td><td>44 分钟</td></tr>
+<tr><td>案例/不定项（如有）</td><td>—</td><td>—</td><td>余量</td></tr>
+</table></div>
+<ul><li><b>单选绝不空着</b>（1 分/题，蒙也有 25%）</li><li><b>多选绝不乱勾</b>（错选归零，宁可少拿半分）</li><li>卡住超过 90 秒 → 标记跳过，回头再战。舍一道题换三道题的时间</li></ul>
+<h2>四、三条兜底（实在不会时用，按顺序）</h2>
+<ol><li><b>单选</b>：排掉两个明显的 → 剩下两个选 <b>C</b></li><li><b>多选</b>：只勾<b>确定是教材原话</b>的项，凑到 <b>3 项</b>为止（3 项占正确答案 40%，是众数）；凑不到 3 项就交 2 项，别硬凑到 4-5 项</li><li><b>取非题</b>：找不到"错"的，选那个<b>最具体、最像教材某一句子条款</b>的选项——出题人造错项时喜欢写得很笼统</li></ol>
+<h2>五、这一晚只记这五句</h2>
+<pre>多选没有全选这回事（693 题 0 次）。
+只勾两个 = 白丢 17 分；补第 3 项要 2/3 把握。
+你的多选不是勾多了，是把对的划掉了 —— 五项逐个写 ✓✗。
+单选纠结选 C，别选 D。
+取非题先圈&quot;不&quot;，只勾 ❌，勾完数一遍。</pre>
+<blockquote><b>数据附录</b>（供你自己核） - 单选答案：A 119 / B 109 / C 118 / D 110（456 题） - 多选项数：2 项 59 / 3 项 95 / 4 项 83 / 5 项 0（237 题） - 多选各位置正确率：A 62.4% / B 64.1% / C 65.4% / D 59.1% / E 59.3% - 你 123 道多选错题：多勾 130 次、漏勾 148 次 - 病因码：E2 混淆 97 / E5 漏选 80 / E4 74 / E3 35 / E1 知识缺位 17 / E7 绝对化 8 - 「知识缺位」只占 36 次 → <b>你的错不是没学过，是记混了</b>，所以对比法、判定法比重新看书有效</blockquote>
+<div class="foot">多选不全选，只勾两个白丢 17 分，纠结别往 D 靠，取非只勾 ❌。<br>稳住，BOSS。</div>
+</div></body></html>

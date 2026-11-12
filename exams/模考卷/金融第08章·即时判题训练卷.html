@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第08章 · 公司治理与风险</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第08章 · 公司治理与风险<small id="sub">错题 3 题 + 自命题 20 题 ｜ 22 分钟 ｜ 满分 30</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div id="skelGate" style="position:fixed;inset:0;z-index:9999;background:#f4f6fa;overflow:auto"> <div style="max-width:920px;margin:0 auto;padding:26px 20px 60px">  <div style="background:#fff;border:1px solid #dde3ec;border-radius:12px;padding:18px 20px;box-shadow:0 2px 14px rgba(20,40,80,.08)">   <h2 style="margin:0 0 6px;font-size:20px;color:#12305e">金融第08章 · 公司治理与风险 · 骨架速过卡（约 5 分钟）</h2>   <div style="color:#6b7280;font-size:13px;margin-bottom:12px">    03/05 章裸做崩盘（24% / 43%）的根因是<b>先做题、后补骨架</b>；    06 章实测「先过骨架」后<b>自命题 93%、回炉 33%</b>——骨架过了新题就拿分。    从 06 章起：<b>骨架没过完，卷子不发</b>。下面 12 条是本章基础分，    逐条念一遍再开卷——念完点底部按钮。   </div>   <div style="border:1px solid #e5e9f0;border-radius:8px;overflow:hidden"><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">治理目标</div><div style="flex:1;color:#26303d;line-height:1.6"><b>保护股东与利益相关者权益、提高决策科学性、降低代理成本</b>（两权分离的委托代理问题）。见「<b>完全消除/消灭一切风险</b>」必错——风险只能管理，不能消灭。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">治理模式</div><div style="flex:1;color:#26303d;line-height:1.6"><b>英美＝市场导向、单层董事会、股权分散</b>，靠外部市场（收购接管、经理人市场）约束；<b>德日＝银行导向、双层董事会（监事会+董事会）、法人交叉持股</b>。见「交叉持股/双层」＝德日，「散股」＝英美。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">三会一层</div><div style="flex:1;color:#26303d;line-height:1.6"><b>股东会＝权力机构</b>（决定经营方针、选举董监）｜<b>董事会＝决策机构</b>（对股东会负责）｜<b>监事会＝监督机构</b>（成员不少于 <b>3</b> 人）｜<b>高管层＝执行机构</b>（董事会聘任）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">职权秒杀句</div><div style="flex:1;color:#26303d;line-height:1.6"><b>股东会管「决定/批准」，董事会管「制订/拟定」</b>：预算、利润分配、增减资本——董事会制订方案、股东会审议批准。「董事会审议批准利润分配方案」＝经典错项原句。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">监事会职权</div><div style="flex:1;color:#26303d;line-height:1.6">四件套：<b>查财务、督董高（提罢免建议）、提议召开临时股东会、列席董事会并质询</b>。「设机构、聘经理」是董事会的——监事会只监督、不下场经营。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">数字钉两个</div><div style="flex:1;color:#26303d;line-height:1.6">独立董事占比不低于 <b>1/3</b>（对关联交易、对外担保、聘高管发表<b>独立意见</b>，不参与日常经营）；监事会成员不少于 <b>3</b> 人。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">高管激励约束</div><div style="flex:1;color:#26303d;line-height:1.6">四件套：<b>年薪制、股权激励（股票期权/限制性股票）、绩效考核、问责与退出</b>。聘任高管的永远是<b>董事会</b>，监事会无聘任权。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">风险治理架构</div><div style="flex:1;color:#26303d;line-height:1.6"><b>董事会承担全面风险管理的最终责任</b>（不是 CRO、不是高管层）→ 风险管理委员会 → 首席风险官 CRO → 风险管理部门 → 业务部门。见「最终责任」＝董事会。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">七要素</div><div style="flex:1;color:#26303d;line-height:1.6"><b>治理架构、策略、偏好限额、政策流程、内控内审、数据IT、文化问责</b>。见「VaR 是唯一计量标准」＝绝对化错项（大纲未把 VaR 列为考点）。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">偏好→容忍度→限额</div><div style="flex:1;color:#26303d;line-height:1.6"><b>风险偏好（定性总纲）→ 风险容忍度（分类底线）→ 风险限额（量化指标）</b>，自上而下由抽象到具体。顺序反了＝方向错。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">流程 vs 策略</div><div style="flex:1;color:#26303d;line-height:1.6">流程五环「<b>识、计、监、控、报</b>」（识别→计量→监测→控制→报告）；策略六招「<b>规、分、对、转、补、承</b>」（规避/分散/对冲/转移/补偿/承受）。<b>「对冲」是策略不是流程</b>——问流程时它是错项，问策略时它是正确项。</div></div><div style="display:flex;gap:10px;padding:7px 10px;border-bottom:1px solid #eef1f6"><div style="flex:0 0 150px;color:#1a4fa0;font-weight:600">三道防线+风险辨析</div><div style="flex:1;color:#26303d;line-height:1.6"><b>一＝业务条线、二＝风控合规（独立制衡）、三＝内部审计（独立评价）</b>。风险配对：<b>信用＝违约（审授额三机制）、市场＝价格、操作＝流程/人员/系统/外部事件（含法律、不含声誉战略）、流动性＝挤兑、系统性＝多米诺传染（最后贷款人兜底）</b>；经济资本覆盖<b>非预期损失</b>（预期损失用拨备）。</div></div></div>   <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">    <button id="skelGo" style="background:#1a4fa0;color:#fff;border:0;border-radius:8px;padding:11px 22px;font-size:15px;cursor:pointer">✅ 骨架过完了，开始做题</button>    <span style="color:#8a94a6;font-size:12px">（点击后本卡收起，计时开始）</span>   </div>  </div> </div></div>
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第08章 公司治理与风险 · 即时判题训练卷", "totalMin": 22, "pass": 18, "full": 30, "nSingle": 16, "nMulti": 7, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 3 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 20 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "Q银行由于经营不善，发生挤兑事件。监管部门为防止产生多米诺骨牌效应，决定对该银行xxx于防控（）", "opts": [{"k": "A", "t": "合规风险"}, {"k": "B", "t": "声誉风险"}, {"k": "C", "t": "系统风险"}, {"k": "D", "t": "市场风险"}], "ans": "C", "kp": "第8章·系统性风险与监管处置", "model": "场景识别型（监管动机 → 风险类型）", "chain": ["场景关键词：<b>挤兑</b> + 监管部门 + <b>防止多米诺骨牌效应</b>（连锁倒闭）", "\"多米诺骨牌效应\" = 一家倒下传染整个银行体系 = <b>系统性风险</b>", "监管出手正是因为系统性风险具有<b>负外部性</b>，单家机构不会内部化"], "fast": "⚡抓关键词：<b>「多米诺骨牌 / 传染 / 整个体系」→ 系统性风险</b>。合规、声誉、市场都是<b>单家机构层面</b>的风险，只有系统性风险会让监管担心连锁反应 → C。", "traps": ["挤兑本身像\"流动性风险\"，但题干问的是监管<b>防控的对象</b>——是传导扩散后的系统性风险", "声誉风险只是个中环节，不足以解释\"多米诺骨牌效应\""], "mother": "母题抽象：<b>风险层级</b> —— 个体风险(信用/市场/操作/流动性/声誉/合规) ⊂ <b>系统性风险(传染·负外部性·波及整个体系)</b>。凡出现\"连锁、传染、体系、多米诺\"字样，一律上升到系统性风险。", "analysis": "<p>单家银行的挤兑若引发公众对其他银行的信心动摇，会沿同业往来、支付清算与公众预期等渠道<b>传染扩散</b>，形成\"多米诺骨牌效应\"，危及整个金融体系 —— 这正是<b>系统性风险</b>的典型表现。监管部门介入处置，防范的正是系统性风险。C 正确。</p><p>合规风险、声誉风险、市场风险均属<b>机构个体层面</b>的风险，无法解释监管对\"连锁反应\"的担忧。</p><p>（题干原文有个别缺字，已按语义修复为\"进行处置\"。）</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "根据《商业银行操作风险管理指引》，不属于操作风险管理体系基本要素的是（）", "opts": [{"k": "A", "t": "监事会的监督控制"}, {"k": "B", "t": "高级管理层的职责"}, {"k": "C", "t": "适当的组织架构"}, {"k": "D", "t": "操作风险管理政策、方法和程序"}], "ans": "A", "kp": "第8章·操作风险管理体系要素", "model": "选非题 · 治理主体辨析（「不属于」）", "chain": ["《商业银行操作风险管理指引》规定的基本要素包括：<b>董事会</b>的监督控制、<b>高级管理层</b>的职责、适当的组织架构、操作风险管理政策方法和程序、计提操作风险资本等", "承担监督控制职责的是<b>董事会</b>，不是监事会", "监事会是公司内部监督机构，不列入操作风险管理体系的基本要素"], "fast": "⚡圈「不属于」→ 抓治理主体：<b>操作风险的第一责任在董事会（监督控制）+ 高管层（执行）</b>。选项把「董事会」偷换成「监事会」→ 就是答案 = A。这是典型的<b>主体错位</b>干扰。", "traps": ["监事会也\"负责监督\"，极易误选为正确要素 —— 但指引明确写的是<b>董事会</b>", "选非题先圈「不」字"], "mother": "母题抽象：<b>银行风险治理三层</b> —— 董事会(监督控制·最终责任)｜高级管理层(组织实施)｜监事会(内部监督，非风险管理体系要素)。凡\"××体系基本要素\"题，先用这三层对号入座。", "analysis": "<p>《商业银行操作风险管理指引》规定，商业银行操作风险管理体系的基本要素包括：<b>董事会的监督控制</b>、<b>高级管理层的职责</b>、适当的组织架构、操作风险管理政策、方法和程序、计提操作风险所需资本等。<b>监事会的监督控制</b>不在其中 —— 指引明确承担监督控制职责的是<b>董事会</b>。A 正确（不属于）。</p>"}, {"no": 2003, "label": "R3", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "下列机制中，不属于信用风险管理机制的是()", "opts": [{"k": "A", "t": "额度管理机制"}, {"k": "B", "t": "支付匹配机制"}, {"k": "C", "t": "审贷分离机制"}, {"k": "D", "t": "授权管理机制"}], "ans": "B", "kp": "第8章·信用风险管理机制", "model": "", "chain": ["信用风险管理机制：审贷分离、授权管理、额度管理（授信限额）、内部评级等 → 「支付匹配机制」不属于（支付匹配是流动性管理范畴）"], "fast": "⚡信用风险三机制「审贷分离 + 授权 + 额度」——\"支付\"字眼属流动性题干", "traps": ["B 是流动性风险管理词汇串场"], "mother": "母题抽象：<b>信用风险三道闸</b>——事前（审贷分离）、事中（授权+额度）、事后（监测预警）；风险类型决定机制清单，别跨清单选。", "analysis": "<p>商业银行信用风险管理机制包括审贷分离机制、授权管理机制、额度管理机制等；<b>支付匹配机制属于流动性风险管理</b>范畴。故选 B。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "基", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>公司治理</b>的目标，说法<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "保护股东与利益相关者的合法权益"}, {"k": "B", "t": "提高公司决策的科学性"}, {"k": "C", "t": "降低因所有权与经营权分离产生的代理成本"}, {"k": "D", "t": "完全消除公司经营中的一切风险"}], "ans": "D", "kp": "第8章·公司治理目标", "model": "绝对化验伪", "chain": ["先圈「<b>错误</b>」——要选 ❌ 项", "A/B/C 是教材治理目标三句原文：保护权益、决策科学、<b>降低代理成本</b>（所有权与经营权分离产生的委托代理问题）", "D「完全消除……一切风险」＝<b>绝对化收网</b>：风险只能管理、转移、分散，不可能完全消除"], "fast": "⚡治理目标三件套：**护权益、提决策、降代理成本**。见「完全消除/消灭一切风险」直接判 ❌——风险管理的极限是「管理」，不是「消灭」。", "traps": ["没圈「错误」，正向选了一个眼熟的（A/B/C 全是正确表述）", "「降低代理成本」被当成错项划掉——它恰恰是治理目标的核心"], "mother": "见绝对化词（完全/一切/消灭）先找反例：银行做再多风控，信用风险和市场风险永远存在。", "analysis": "<p>公司治理的目标是保护股东与利益相关者权益、提高决策科学性、<b>降低代理成本</b>（两权分离下股东与经理人的利益冲突）。A、B、C 均为正确表述。</p><p>D「完全消除一切风险」为绝对化表述——风险管理的目标是识别、监测、控制风险，将风险控制在可承受范围内，<b>不可能完全消除</b>。与第 6 章「金融市场功能只能转移风险不能消除风险」同一条铁律。故选 <b>D</b>。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "单选", "lv": "基", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "公司治理模式中，以<b>银行导向、双层董事会（监事会+董事会）、法人交叉持股</b>为主要特征的是（　）。", "opts": [{"k": "A", "t": "英美模式"}, {"k": "B", "t": "德日模式"}, {"k": "C", "t": "东南亚家族模式"}, {"k": "D", "t": "外部控制型模式"}], "ans": "B", "kp": "第8章·公司治理模式", "model": "特征配对", "chain": ["题干三关键词：银行导向、双层董事会、法人交叉持股", "英美＝<b>市场导向</b>、<b>单层</b>董事会、股权<b>分散</b>、依赖外部接管市场——全反", "德日＝银行导向、<b>双层</b>（监事会+董事会）、法人<b>交叉持股</b> → B"], "fast": "⚡两模式一句话：<b>英美＝散股+单层+市场管；德日＝银行+双层+交叉持</b>。「双层董事会」出现即德日，「股权高度分散」出现即英美。", "traps": ["D「外部控制型」就是英美模式的别称（市场/外部导向），套在德日特征上是张冠李戴", "把「交叉持股」记到英美头上——英美是分散持股、流动性高"], "mother": "配对题先写对应表再对选项：模式 × （导向 / 董事会结构 / 股权结构 / 靠什么约束经理人）。", "analysis": "<p>德日模式（内部控制型/银行导向）：主银行体系深度参与公司治理，实行<b>双层董事会</b>（监事会与董事会分设），法人之间<b>交叉持股</b>，股权相对集中。B 正确。</p><p>英美模式（外部控制型/市场导向）：单层董事会、股权高度分散、依赖外部市场（收购接管、经理人市场、信息披露）约束经理人，A、D 错误；东南亚家族模式以家族控制为特征，C 错误。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>英美模式</b>的公司治理特征，说法<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "股权高度分散，流动性强"}, {"k": "B", "t": "依靠外部市场（收购接管、经理人市场）对管理层形成约束"}, {"k": "C", "t": "股权集中于法人间交叉持股，董事会设监事会与之并行"}, {"k": "D", "t": "信息披露要求高，以保护中小股东权益"}], "ans": "C", "kp": "第8章·公司治理模式（英美）", "model": "选非+张冠李戴验伪", "chain": ["先圈「<b>错误</b>」", "A 散股✓、B 外部市场约束✓、D 高披露护中小✓——都是英美模式特征", "C 是<b>德日模式</b>的特征（交叉持股+双层董事会）套进英美——张冠李戴 → 选 C"], "fast": "⚡「<b>交叉持股/监事会并行</b>」＝德日专属。英美题里出现这两词，直接判 ❌。反向同理。", "traps": ["C 是半真半假长选项：「信息披露+保护中小股东」可能拼在英美身上，但「交叉持股」露馅——长选项要逐段验"], "mother": "模式题盯四个维度词：导向（市场/银行）、董事会（单层/双层）、股权（分散/交叉）、约束（外部市场/主银行）。任何一项对不上就是错项。", "analysis": "<p>英美模式特征：股权高度分散且流动性强（A ✓）、依靠收购接管与经理人市场等<b>外部机制</b>约束管理层（B ✓）、强调信息披露与中小股东保护（D ✓）。</p><p>C 中的「法人交叉持股」「监事会与董事会并行（双层结构）」是<b>德日模式</b>的特征，张冠李戴，本题选非故选 <b>C</b>。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "根据公司治理的「三会一层」架构，<b>审议批准</b>公司年度财务预算方案、决算方案的是（　）。", "opts": [{"k": "A", "t": "董事会"}, {"k": "B", "t": "监事会"}, {"k": "C", "t": "股东会"}, {"k": "D", "t": "高级管理层"}], "ans": "C", "kp": "第8章·三会一层职权", "model": "主体配对", "chain": ["题眼：「审议<b>批准</b>」——批准权在谁？", "秒杀句：<b>股东会管「决定/批准」，董事会管「制订/拟定」</b>", "预算/决算/利润分配/增减资本：董事会<b>制订方案</b> → 股东会<b>审议批准</b> → C"], "fast": "⚡见「审议批准预算/利润分配/增减资本」→ <b>股东会</b>；见「制订/拟定方案」→ <b>董事会</b>。「董事会审议批准利润分配」＝错项原句。", "traps": ["选 A——把「制订方案的董事会」当成了批准者（主体错位）", "把高管层当成财务决策者——高管层只是执行机构"], "mother": "三会一层先定性质再答题：股东会＝权力机构、董事会＝决策机构（对股东会负责）、监事会＝监督机构、高管层＝执行机构（董事会聘任）。", "analysis": "<p>年度财务预算方案、决算方案、利润分配方案、弥补亏损方案等重大事项，由董事会<b>制订</b>（拟定），报<b>股东会审议批准</b>。C 正确。</p><p>监事会是监督机构，不行使审批权（B）；高级管理层是执行机构，执行董事会决议（D）；董事会是「制订方」而非「批准方」（A）。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>股东会与董事会职权</b>的表述，<b>错误</b>的是（　）。", "opts": [{"k": "A", "t": "股东会决定公司的经营方针和投资计划"}, {"k": "B", "t": "董事会决定公司内部管理机构的设置"}, {"k": "C", "t": "董事会审议批准公司的年度财务预算方案"}, {"k": "D", "t": "董事会制订公司的利润分配方案和弥补亏损方案"}], "ans": "C", "kp": "第8章·三会一层职权（制订vs批准）", "model": "选非+职权秒杀句", "chain": ["先圈「<b>错误</b>」", "A 股东会决定方针计划✓（教材原句）；B 机构设置归董事会✓；D 利润分配方案董事会<b>制订</b>✓", "C：预算方案是董事会<b>制订</b>、<b>股东会</b>审议批准——「董事会审议批准」职权错位 → 选 C"], "fast": "⚡一句话钉死：<b>股东会＝决定/批准，董事会＝制订/拟定/决定内部事务</b>。「董事会审议批准年度预算」＝经典错项原句，见即 ❌。", "traps": ["D 的「制订」看着级别低，其实是教材原句（董事会制订利润分配方案）——别把正确表述当错项", "C 用「审议批准」这个眼熟词掩盖了主体错位——半真半假"], "mother": "职权题逐项三问：这是谁的事？这个词（决定/批准/制订/拟定）配这个主体吗？教材原句是哪句？", "analysis": "<p>A：股东会决定经营方针和投资计划，正确。B：决定公司内部管理机构设置、聘任或解聘经理属于董事会职权，正确。D：董事会制订利润分配方案、弥补亏损方案，报股东会批准，正确。</p><p>C：年度财务预算方案的<b>审议批准权在股东会</b>，董事会只是制订方——主体错位，本题选非，故选 <b>C</b>。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "下列各项中，属于<b>监事会职权</b>的有（　）。", "opts": [{"k": "A", "t": "检查公司财务"}, {"k": "B", "t": "监督董事、高级管理人员履职，提出罢免建议"}, {"k": "C", "t": "决定公司内部管理机构的设置"}, {"k": "D", "t": "列席董事会会议，对董事会决议事项提出质询"}, {"k": "E", "t": "聘任或者解聘公司经理"}], "ans": "ABD", "kp": "第8章·监事会职权", "model": "职权清单+主体错位", "chain": ["监事会＝<b>监督机构</b>，职权全部围绕「查、督、提、列」", "A 检查财务✓；B 监督董高+罢免建议✓；D 列席董事会+质询✓", "C 机构设置＝<b>董事会</b>职权；E 聘任解聘经理＝<b>董事会</b>职权 → 双双 ✗"], "fast": "⚡监事会四件套：<b>查财务、督董高（提罢免）、提召开临时股东会、列席董事会质询</b>。「设机构」「聘经理」都是董事会的——监事会只管监督不管经营。", "traps": ["勾 C/E——「看着像管理层的活」就勾；监事会是监督机构，凡经营决策类一律不勾", "D「列席」容易误判成错项——列席（不是出席表决）正是监事会职权原文"], "mother": "监事会题先自问：这件事是「监督别人」还是「自己下场干」？监事会从不下场经营。", "analysis": "<p>监事会作为公司监督机构，职权包括：检查公司财务（A）；监督董事、高级管理人员履职并提出罢免建议（B）；要求董事、高管纠正损害公司利益的行为；提议召开临时股东会；列席董事会会议并对决议事项提出质询（D）。故 <b>ABD</b>。</p><p>C「决定内部管理机构设置」与 E「聘任或解聘公司经理」均为<b>董事会</b>职权，主体错位，不选。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "根据现行规定，上市公司董事会成员中<b>独立董事</b>的占比不得低于（　）。", "opts": [{"k": "A", "t": "1/4"}, {"k": "B", "t": "1/3"}, {"k": "C", "t": "1/2"}, {"k": "D", "t": "2/3"}], "ans": "B", "kp": "第8章·独立董事制度", "model": "数字钉", "chain": ["独立董事制度数字钉：<b>不低于 1/3</b>", "A 1/4 偏低、C 1/2 偏高、D 2/3 干扰"], "fast": "⚡独立董事 ≥ <b>1/3</b>。跟监事会「成员不得少于 <b>3 人</b>」放一起记：三分之一配三。", "traps": ["数值错位：1/4 与 1/2 都是常见干扰", "把「不少于 3 人」（监事会）与「不低于 1/3」（独董）互串"], "mother": "本章数字钉就两个：独立董事 1/3、监事会 3 人。考前一天扫一遍。", "analysis": "<p>现行规定要求上市公司董事会中独立董事占比<b>不低于三分之一</b>，且独立董事应当独立于公司及主要股东，对关联交易、对外担保、聘任高管等事项发表<b>独立意见</b>。故选 <b>B</b>。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>独立董事</b>的职责，<b>不属于</b>其职责范围的是（　）。", "opts": [{"k": "A", "t": "对公司的关联交易发表独立意见"}, {"k": "B", "t": "对上市公司对外担保事项发表独立意见"}, {"k": "C", "t": "负责公司日常经营管理与业务执行"}, {"k": "D", "t": "对公司聘任或解聘高级管理人员发表独立意见"}], "ans": "C", "kp": "第8章·独立董事职责", "model": "选非+主体错位", "chain": ["先圈「<b>不属于</b>」", "独立董事的活＝对重大事项<b>发表独立意见</b>：关联交易✓、对外担保✓、聘高管✓", "C「日常经营管理」＝<b>高管层</b>的活——独董是兼职监督角色，不执行 → 选 C"], "fast": "⚡独董＝<b>只动嘴（发表独立意见），不动手（不参与经营）</b>。见「负责经营/执行业务」直接判 ❌。", "traps": ["C 是典型的职责越界错项——「独立」被误解成「全面参与」", "A/B/D 全是教材列举的独立意见事项，别当错项划掉"], "mother": "独董题一句话：独董的价值在「独立」二字——独立于公司和大股东发表意见，不介入执行。", "analysis": "<p>独立董事应对关联交易（A）、对外担保（B）、聘任或解聘高级管理人员（D）等重大事项发表独立意见，这些是其法定职责范围。</p><p>公司日常经营管理与业务执行是<b>高级管理层</b>（经理层）的职责，独立董事不承担经营管理职能。本题选非，故选 <b>C</b>。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>高级管理人员的激励约束机制</b>，属于常见机制的有（　）。", "opts": [{"k": "A", "t": "年薪制"}, {"k": "B", "t": "股权激励（股票期权、限制性股票）"}, {"k": "C", "t": "绩效考核"}, {"k": "D", "t": "问责与退出机制"}, {"k": "E", "t": "由监事会直接聘任高管并决定其薪酬"}], "ans": "ABCD", "kp": "第8章·高管激励约束机制", "model": "清单题+半真半假", "chain": ["激励约束四件套：<b>年薪、股权激励、绩效考核、问责退出</b>", "A/B/C/D 逐项对应✓", "E 错在主体：高管由<b>董事会</b>聘任并决定报酬——「监事会直接聘任」主体错位 ✗"], "fast": "⚡高管激励四件套：<b>年薪、股权、绩效、问责</b>。聘任高管的永远是<b>董事会</b>，监事会只有监督权——「监事会聘任」见即划。", "traps": ["E 前半句「由监事会直接聘任」是主体错位，后半「决定薪酬」看着像监督职能——半真半假长选项要逐段验"], "mother": "聘任链只记一条：股东会选董事监事 → 董事会聘经理。谁的薪酬谁给：董事监事报酬股东会定，经理报酬董事会定。", "analysis": "<p>高级管理人员激励约束机制通常包括：年薪制（A）、股权激励如股票期权与限制性股票（B）、绩效考核（C）、问责与退出机制（D）。</p><p>E 错误：高级管理人员由<b>董事会</b>聘任并决定其报酬事项，监事会无聘任权——监事会的职权限于监督。故选 <b>ABCD</b>。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "在全面风险管理体系中，对风险管理<b>承担最终责任</b>的是（　）。", "opts": [{"k": "A", "t": "首席风险官（CRO）"}, {"k": "B", "t": "风险管理部门负责人"}, {"k": "C", "t": "董事会"}, {"k": "D", "t": "高级管理层"}], "ans": "C", "kp": "第8章·风险治理架构", "model": "主体配对（题眼级）", "chain": ["题眼：「承担<b>最终责任</b>」", "风险治理链：董事会（最终责任）→ 风险管理委员会 → CRO → 风险管理部门 → 业务部门（一线承担）", "CRO 和风险部门是<b>执行层</b>，最终责任在<b>董事会</b> → C"], "fast": "⚡「对全面风险管理承担<b>最终责任</b>」＝<b>董事会</b>。CRO 管日常、部门管执行、业务线一线承担——只有董事会担「最终」二字。", "traps": ["选 A（CRO）——首席风险官名气大，但他是执行者不是最终责任人", "选 D（高管层）——高管负责组织实施，最终责任仍是董事会"], "mother": "「最终」类题通用法则：最终责任/最终决策都在董事会；执行、组织、日常在高管层和部门。", "analysis": "<p>全面风险管理的风险治理架构为：董事会承担全面风险管理的<b>最终责任</b>，负责制定风险管理战略；董事会下设风险管理委员会；首席风险官（CRO）负责组织实施；风险管理部门执行；业务部门作为第一道防线直接承担。</p><p>A、B、D 均为执行或组织层级，本题选 <b>C</b>。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>全面风险管理体系</b>的构成要素，下列属于其要素的有（　）。", "opts": [{"k": "A", "t": "风险治理架构"}, {"k": "B", "t": "风险管理策略"}, {"k": "C", "t": "风险偏好与风险限额"}, {"k": "D", "t": "风险管理政策与流程"}, {"k": "E", "t": "以 VaR 模型作为全体系唯一计量标准"}], "ans": "ABCD", "kp": "第8章·全面风险管理七要素", "model": "清单题+绝对化收网", "chain": ["七要素速记：<b>治理架构、策略、偏好限额、政策流程、内控内审、数据IT、文化问责</b>", "A 治理架构✓ B 策略✓ C 偏好限额✓ D 政策流程✓", "E 双重错：VaR 只是众多计量工具之一（大纲未列为大纲级考点）＋「全体系唯一」绝对化 ✗"], "fast": "⚡七要素口诀：<b>架构、策略、偏好限额、政策流程、内控内审、数据IT、文化问责</b>。见「唯一/全部以 VaR」＝绝对化，直接划。", "traps": ["勾 E——「VaR」是眼熟术语；但「唯一计量标准」是绝对化收网，且大纲根本没把 VaR 列为考点", "把「风险文化」漏掉——它在七要素里，本题没考但考场上别漏"], "mother": "多选勾选前逐项问：这一项在七要素清单里吗？给不出清单位置的字母，宁漏不勾。", "analysis": "<p>全面风险管理体系构成要素包括：风险治理架构（A）、风险管理策略（B）、风险偏好与风险限额（C）、风险管理政策与流程（D）、内部控制与内部审计、风险数据与 IT 系统、风险文化与风险考核问责等。</p><p>E「以 VaR 模型作为全体系唯一计量标准」错误：一是「唯一」为绝对化表述，二是 VaR 只是风险计量的工具之一。故选 <b>ABCD</b>。</p>"}, {"no": 3012, "label": "P12", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "在全面风险管理中，<b>风险偏好、风险容忍度、风险限额</b>三者之间的正确关系是（　）。", "opts": [{"k": "A", "t": "风险限额 → 风险容忍度 → 风险偏好，由具体到抽象逐级推导"}, {"k": "B", "t": "风险偏好 → 风险容忍度 → 风险限额，由抽象到具体逐级量化"}, {"k": "C", "t": "三者相互独立，分别由不同监管部门各自设定"}, {"k": "D", "t": "风险容忍度 → 风险偏好 → 风险限额，容忍度是最顶层的定性表达"}], "ans": "B", "kp": "第8章·风险偏好与风险限额", "model": "方向排序", "chain": ["三层结构自上而下：<b>偏好（定性总纲）→ 容忍度（分类底线）→ 限额（量化指标）</b>", "记忆：越往下越<b>具体、越量化</b>；越往上越<b>抽象、越战略</b>", "B 方向正确 → 选 B"], "fast": "⚡<b>偏好定方向、容忍度画底线、限额给数字</b>——顺序「偏→容→限」，倒着写的一律 ❌。", "traps": ["A 是顺序反转（方向反转手法）", "D「容忍度最顶层」是层级错位——顶层永远是偏好"], "mother": "排序题先找锚点：最抽象的（战略层）放最上，最量化的（数字层）放最下，再对选项。", "analysis": "<p>风险偏好是公司愿意承担风险的整体定性表述（战略层），风险容忍度是在偏好框架下对各类风险可承受水平的界定（底线层），风险限额则是将容忍度转化为具体的量化指标（执行层）——由抽象到具体、逐级量化传导。B 正确。</p><p>A、D 顺序或层级错误；C「相互独立、监管部门各自设定」错误——三者是公司自身风险治理的自上而下传导链条。故选 <b>B</b>。</p>"}, {"no": 3013, "label": "P13", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "下列各项中，<b>不属于</b>风险管理<b>流程</b>环节的是（　）。", "opts": [{"k": "A", "t": "风险识别"}, {"k": "B", "t": "风险计量"}, {"k": "C", "t": "风险对冲"}, {"k": "D", "t": "风险报告"}], "ans": "C", "kp": "第8章·风险管理流程vs策略（F-41 同考点）", "model": "选非+相邻概念错位", "chain": ["先圈「<b>不属于</b>」＋「流程」二字", "流程五环：<b>识别 → 计量 → 监测 → 控制 → 报告</b>", "「对冲」是风险<b>策略</b>（规避/分散/对冲/转移/补偿/承受），不是流程环节 → 选 C"], "fast": "⚡流程 vs 策略一条线：<b>流程＝识计监控报</b>（对风险做什么步骤）；<b>策略＝规分对转补承</b>（用什么手段）。「对冲」见在流程题里＝错项，见在策略题里＝正确项。", "traps": ["C「风险对冲」眼熟且专业，正向思维下最容易误勾", "漏掉「流程」限定词，把它当「风险管理包括什么」做——那 C 反而像对的"], "mother": "这题是 F-41 的同款坑（D7-17 原题源）。判断步骤：先读题干宾语是「流程」还是「策略」，再检索对应清单。", "analysis": "<p>风险管理流程为：<b>识别 → 计量 → 监测 → 控制/缓释 → 报告</b>，A（识别）、B（计量）、D（报告）均在流程之中。</p><p>风险对冲属于风险管理<b>策略</b>（规避、分散、对冲、转移、补偿、承受），是处置风险的手段而非流程环节，本题选非，故选 <b>C</b>。</p>"}, {"no": 3014, "label": "P14", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "下列属于<b>风险管理策略</b>（处置手段）的有（　）。", "opts": [{"k": "A", "t": "风险规避"}, {"k": "B", "t": "风险分散"}, {"k": "C", "t": "风险对冲"}, {"k": "D", "t": "风险转移"}, {"k": "E", "t": "风险识别与风险计量"}], "ans": "ABCD", "kp": "第8章·风险管理策略清单", "model": "清单题+相邻概念错位", "chain": ["策略六件套：<b>规避、分散、对冲、转移、补偿、承受</b>", "A 规避✓ B 分散✓ C 对冲✓ D 转移✓", "E 识别/计量是<b>流程</b>环节，不是处置策略 ✗"], "fast": "⚡策略口诀「<b>规、分、对、转、补、承</b>」六字。识别计量监测＝流程，往策略题里塞就是错项。", "traps": ["勾 E——「风险识别」听上去无所不包，但它属于流程（第 1 环），与 P13 正好互为镜像"], "mother": "P13 与本题是一对镜像题：同一组词，问「流程」时勾识计监控报，问「策略」时勾规分对转补承。考前把两张清单并排抄一遍。", "analysis": "<p>风险管理策略（风险处置手段）包括：风险规避、风险分散、风险对冲、风险转移、风险补偿、风险承受。A、B、C、D 均属策略。</p><p>E 风险识别与风险计量属于风险管理<b>流程</b>的前两个环节，不是处置策略。故选 <b>ABCD</b>。</p>"}, {"no": 3015, "label": "P15", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于全面风险管理的<b>三道防线</b>，说法正确的有（　）。", "opts": [{"k": "A", "t": "第一道防线是业务条线，由一线业务部门直接承担风险管理责任"}, {"k": "B", "t": "第二道防线是风险管理与合规部门，对业务形成独立制衡"}, {"k": "C", "t": "第三道防线是内部审计，对风险管理进行独立评价"}, {"k": "D", "t": "董事会对一线业务直接执行承担第一道防线职责"}, {"k": "E", "t": "监事会是第二道防线的牵头部门"}], "ans": "ABC", "kp": "第8章·三道防线", "model": "清单题+主体错位", "chain": ["三道防线固定配对：<b>一=业务条线、二=风控合规、三=内部审计</b>", "A/B/C 逐项对应教材表述✓", "D 董事会是治理层（最终责任），<b>不下场执行</b> ✗；E 监事会是公司治理监督机构，不在三道防线序列 ✗"], "fast": "⚡三道防线口诀：<b>一业务、二风控、三内审</b>。董事会管「最终责任」、监事会管「治理监督」——都不占防线坑位。", "traps": ["D「董事会+第一道防线」是主体错位——董事会承担最终责任≠一线执行", "E 用监事会冒充风控合规——两个「监督」角色（监事会 vs 内审 vs 风控）极易串"], "mother": "把「监督」分三个：监事会监督董事高管（治理层）、风控合规制衡业务（第二道防线）、内审独立评价（第三道防线）。层级不同，互不替代。", "analysis": "<p>三道防线：第一道防线为业务条线，业务部门在开展业务的同时直接承担风险管理责任（A ✓）；第二道防线为风险管理与合规部门，独立于业务形成制衡（B ✓）；第三道防线为内部审计，对风险管理和内部控制的有效性进行独立评价（C ✓）。</p><p>董事会承担全面风险管理的最终责任，属于治理架构而非防线执行层（D ✗）；监事会是公司治理层面的监督机构，不是第二道防线的牵头部门（E ✗）。故选 <b>ABC</b>。</p>"}, {"no": 3016, "label": "P16", "sec": "prop", "type": "单选", "lv": "基", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "在内部控制体系中，对公司内部控制的<b>有效性进行独立评价</b>的职能属于（　）。", "opts": [{"k": "A", "t": "业务部门"}, {"k": "B", "t": "风险管理部门"}, {"k": "C", "t": "内部审计部门"}, {"k": "D", "t": "董事会秘书"}], "ans": "C", "kp": "第8章·内部控制与内部审计职能", "model": "职能配对", "chain": ["题眼：「<b>独立评价</b>」——谁既独立于业务、又独立于风控？", "一业务、二风控、<b>三内审</b>——只有内审是「评价别人」的第三道防线", "→ C"], "fast": "⚡「独立<b>评价</b>」＝内审（第三道防线）；「独立<b>制衡</b>」＝风控合规（第二道）；「直接承担」＝业务（第一道）。三个动词配三道防线。", "traps": ["选 B——风险管理部门也「独立」，但它制衡业务、不评价自己体系；「评价」二字是内审专属"], "mother": "职能题抓动词：执行/承担→业务；制衡/管理→风控；评价/审计→内审。动词对不上就是错位。", "analysis": "<p>内部审计作为第三道防线，独立于业务部门和风险管理部门，对公司内部控制与风险管理的<b>有效性进行独立评价</b>并直接向董事会（或审计委员会）报告。C 正确。</p><p>A 是第一道防线（直接承担）、B 是第二道防线（制衡管理）——都不能「独立评价」整个体系，否则既当运动员又当裁判员；D 董事会秘书是事务性角色。故选 <b>C</b>。</p>"}, {"no": 3017, "label": "P17", "sec": "prop", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "银行因<b>内部流程不完善、员工操作失误、系统故障或外部欺诈事件</b>而遭受损失的风险属于（　）。", "opts": [{"k": "A", "t": "信用风险"}, {"k": "B", "t": "市场风险"}, {"k": "C", "t": "操作风险"}, {"k": "D", "t": "声誉风险"}], "ans": "C", "kp": "第8章·各类专业风险辨析", "model": "定义配对", "chain": ["题干四来源：内部流程、人员、系统、外部事件——操作风险定义的四大来源", "信用=对手违约；市场=价格变动；声誉=负面舆情", "→ C 操作风险（<b>含法律风险，不含声誉风险和战略风险</b>）"], "fast": "⚡操作风险＝<b>流程、人员、系统、外部事件</b>四来源；边界：<b>含法律风险，不含声誉/战略风险</b>。「外部欺诈」看着像外部风险，仍归操作风险。", "traps": ["「外部欺诈事件」被当成声誉风险——外部事件造成直接损失是操作风险，舆情导致客户流失才是声誉风险", "系统故障被当成 IT 风险单独记忆——教材口径里并入操作风险"], "mother": "风险辨析按「损失从哪来」分类：对手不还钱=信用；价格动=市场；自己流程人系统出岔子+外来事件=操作；钱一时拿不出=流动性；恐慌传染=系统性。", "analysis": "<p>操作风险是由<b>内部流程、人员、系统缺陷或外部事件</b>造成损失的风险，题干四要素正是其定义原文。教材口径下操作风险<b>包含法律风险</b>，但不包含声誉风险与战略风险。</p><p>A 信用风险是交易对手违约；B 市场风险是利率、汇率、股价、商品价格的不利变动；D 声誉风险是负面评价导致的损失。故选 <b>C</b>。</p>"}, {"no": 3018, "label": "P18", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "下列情形中，属于<b>操作风险</b>损失事件的有（　）。", "opts": [{"k": "A", "t": "柜员违规操作导致资金错付"}, {"k": "B", "t": "核心系统宕机导致业务中断"}, {"k": "C", "t": "客户经理伪造资料骗取贷款"}, {"k": "D", "t": "外部不法分子利用伪造票据实施诈骗"}, {"k": "E", "t": "负面舆情发酵导致大量客户流失"}], "ans": "ABCD", "kp": "第8章·操作风险边界（含法律不含声誉战略）", "model": "场景配对", "chain": ["逐项对号入座：A 人员（柜员失误/违规）✓；B <b>系统</b>故障✓；C <b>人员</b> fraud✓；D <b>外部事件</b>（外部欺诈）✓", "E 是<b>声誉风险</b>——操作风险不含声誉风险 ✗"], "fast": "⚡操作风险四来源对号：<b>人（A/C）、系统（B）、流程、外部事件（D）</b>。「客户流失」四字一出就是声誉风险，划掉。", "traps": ["勾 E——「损失」二字迷惑；判断依据是损失来源（舆情）而非损失本身", "D「外部」二字让人犹豫——外部事件恰是操作风险定义的第四来源"], "mother": "场景题两步：先问损失从哪来（人/系统/流程/外部/价格/违约/舆情），再归类。来源词比结果词可靠。", "analysis": "<p>A（人员违规操作）、B（系统缺陷）、C（人员舞弊）、D（外部欺诈事件）分别对应操作风险的<b>人员、系统、流程、外部事件</b>四大来源，均属操作风险损失事件。</p><p>E 负面舆情导致客户流失属于<b>声誉风险</b>——教材口径明确操作风险不含声誉风险与战略风险。故选 <b>ABCD</b>。</p>"}, {"no": 3019, "label": "P19", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 60, "wasWrong": false, "src": "自命题·仿真", "stem": "商业银行持有<b>经济资本</b>的主要目的是（　）。", "opts": [{"k": "A", "t": "覆盖一定时期内的预期损失"}, {"k": "B", "t": "覆盖一定时期内的非预期损失"}, {"k": "C", "t": "覆盖已经发生的财务损失"}, {"k": "D", "t": "覆盖系统性风险导致的全部损失"}], "ans": "B", "kp": "第8章·经济资本（非预期损失）", "model": "概念配对（真题变式）", "chain": ["经济资本＝银行为<b>非预期损失</b>持有的缓冲", "预期损失由<b>拨备（计提）</b>覆盖；非预期损失才动用<b>经济资本</b>；极端损失（尾部）靠保险/压力测试", "→ B"], "fast": "⚡三段配对死记：<b>预期损失→拨备计提｜非预期损失→经济资本｜极端损失→保险+压力测试</b>。「预期」和「非预期」一字之差，方向反。", "traps": ["A 预期损失——一字之差错位（真题原卷干扰项）", "D「全部损失」绝对化——经济资本只覆盖非预期部分"], "mother": "损失分层记忆：常发生的（预期）用拨备；意外的波动（非预期）用资本；百年一遇的（极端）靠保险和自救预案。", "analysis": "<p>经济资本是商业银行根据自身风险水平测算的、用于覆盖<b>非预期损失</b>的资本要求。预期损失通过拨备（贷款损失准备）计入经营成本；非预期损失（超出预期的波动部分）由经济资本缓冲吸收；极端损失则依赖保险转移与压力测试应对。</p><p>A 为一字之差错位；C「已发生」是事后核销概念；D「全部」绝对化。故选 <b>B</b>。</p>"}, {"no": 3020, "label": "P20", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "关于<b>系统性风险</b>与危机处置，说法正确的有（　）。", "opts": [{"k": "A", "t": "单一机构挤兑可能通过同业往来、支付清算体系向其他机构传染"}, {"k": "B", "t": "防控系统性风险的重要目标是防止「多米诺骨牌效应」式的连锁倒闭"}, {"k": "C", "t": "中央银行可以通过最后贷款人职能向困境机构提供紧急流动性"}, {"k": "D", "t": "投资者通过充分分散化投资可以完全消除系统性风险"}, {"k": "E", "t": "系统性风险就是市场价格波动带来的风险"}], "ans": "ABC", "kp": "第8章·系统性风险与最后贷款人（F-86 同考点）", "model": "概念+绝对化+张冠李戴三合一", "chain": ["A 传染渠道：同业往来、支付清算、信心传染✓", "B 多米诺骨牌＝系统性风险的经典意象✓", "C 最后贷款人＝央行的兜底职能（再贷款/再贴现）✓", "D「完全消除」绝对化——系统风险恰恰<b>无法分散</b>，与第 7 章分散化铁律同源 ✗", "E 张冠李戴——「价格波动」是<b>市场风险</b>的定义 ✗"], "fast": "⚡见「多米诺、连锁、传染、挤兑」→ <b>系统性风险</b>，兜底靠<b>最后贷款人</b>。「完全消除系统风险」＝必错（和「消除系统风险」同一颗雷）；「价格变动」＝市场风险。", "traps": ["勾 D——「分散化消除系统风险」第 7 章 P2 刚踩过（『充分分散化可以消除系统风险』），同一颗雷连章埋", "E 用市场风险定义偷换系统性风险——相邻概念错位"], "mother": "风险类别题最后三查：能分散的是非系统风险吗？价格变动是不是被说成了别的风险？「完全消除」出现了吗？", "analysis": "<p>系统性风险是单一机构风险经同业往来、支付清算体系与信心渠道<b>传染</b>至整个金融体系的风险（A ✓），监管处置的核心目标即阻断多米诺骨牌式连锁倒闭（B ✓），中央银行的最后贷款人职能（紧急再贷款、再贴现）是防止传染的关键制度安排（C ✓）。</p><p>D 错误：分散化只能降低非系统风险，系统性风险无法通过分散化消除（与投资组合理论一致）；E 错误：市场价格不利变动属于市场风险。故选 <b>ABC</b>。</p>"}]};
+const KEY  = 'fin_drill_ch08_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+<script>
+(function(){
+  var g=document.getElementById("skelGate");
+  var b=document.getElementById("skelGo");
+  if(!g||!b) return;
+  b.onclick=function(){ g.style.display="none"; try{ window.dispatchEvent(new Event("skelDone")); }catch(e){} window.scrollTo(0,0); };
+})();
+</script>
+</body>
+</html>

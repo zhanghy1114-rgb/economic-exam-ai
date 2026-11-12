@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>金融第03章 · 商业银行</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --line:#e3e6ea; --ink:#1f2328; --ink2:#57606a; --ink3:#8b949e;
+  --brand:#1f6feb; --brand-soft:#e8f1ff;
+  --ok:#1a7f37; --ok-bg:#eaf6ec; --ok-line:#a7d9b4;
+  --bad:#cf222e; --bad-bg:#fdeceb; --bad-line:#f0b3b3;
+  --warn:#9a6700; --warn-bg:#fff8e5; --warn-line:#e3cf8a;
+  --radius:10px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif}
+a{color:var(--brand)}
+
+/* ---------- 顶部工具条 ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--panel);border-bottom:1px solid var(--line);
+  box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.top-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:15px;letter-spacing:.3px}
+.brand small{font-weight:400;color:var(--ink3);font-size:12px;margin-left:6px}
+.timer{font:700 20px/1 ui-monospace,Menlo,Consolas,monospace;padding:7px 12px;border-radius:8px;
+  background:var(--brand-soft);color:var(--brand);letter-spacing:1px}
+.timer.warn{background:var(--warn-bg);color:var(--warn)}
+.timer.over{background:var(--bad-bg);color:var(--bad)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink2)}
+.stat b{color:var(--ink);font-size:15px}
+.acc{font:700 15px/1 ui-monospace,Menlo,monospace}
+.acc.good{color:var(--ok)} .acc.mid{color:var(--warn)} .acc.low{color:var(--bad)}
+.grow{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:7px;
+  padding:6px 11px;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.pri:hover{opacity:.88;color:#fff}
+.btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1180px;margin:0 auto;padding:16px;display:flex;gap:16px;align-items:flex-start}
+.side{width:236px;flex:none;position:sticky;top:74px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;color:var(--ink2);font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font:12px/1 ui-monospace,monospace;color:var(--ink2)}
+.cell:hover{border-color:var(--brand)}
+.cell.done{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand);font-weight:700}
+.cell.right{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok);font-weight:700}
+.cell.wrong{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad);font-weight:700}
+.cell.part{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn);font-weight:700}
+.side-tip{font-size:11.5px;color:var(--ink3);margin-top:8px;line-height:1.5}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--ink3);margin-top:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+.main{flex:1;min-width:0}
+
+/* ---------- 章节标题 ---------- */
+.sec{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:12px 14px;margin:0 0 12px}
+.sec h2{margin:0 0 4px;font-size:16px}
+.sec p{margin:0;font-size:12.5px;color:var(--ink2)}
+.sec .sr{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+.sec .sr b{color:var(--ink)}
+
+/* ---------- 题目 ---------- */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
+.q.locked{border-color:#cfd6dd}
+.q.right{border-left:4px solid var(--ok)}
+.q.wrong{border-left:4px solid var(--bad)}
+.q.part{border-left:4px solid var(--warn)}
+.qhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.no{font:700 13px/1 ui-monospace,monospace;background:var(--ink);color:#fff;padding:4px 7px;border-radius:5px}
+.q.right .no{background:var(--ok)} .q.wrong .no{background:var(--bad)} .q.part .no{background:var(--warn)}
+.tag{font-size:11px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--ink2);background:#fbfcfd}
+.tag.multi{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.tag.was{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.tag.lv1{background:#f2fdf5;border-color:var(--ok-line);color:var(--ok)}
+.tag.lv2{background:var(--brand-soft);border-color:#bcd9ff;color:var(--brand)}
+.tag.lv3{background:#fdeffb;border-color:#e8b8dd;color:#a03a86}
+.tag.neg{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.stem{margin:0 0 10px;font-size:15px;line-height:1.75}
+.stem em{font-style:normal;font-weight:700;border-bottom:2px solid var(--bad);padding:0 1px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;cursor:pointer;background:#fff;transition:.12s}
+.opt:hover{border-color:var(--brand);background:#fafbff}
+.opt .k{flex:none;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font:600 12px/1 ui-monospace,monospace;color:var(--ink2);background:#fff}
+.opt .t{flex:1;line-height:1.65}
+.opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+.opt.sel .k{background:var(--brand);border-color:var(--brand);color:#fff}
+.opt.ok{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.ok .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad-line);background:var(--bad-bg)}
+.opt.bad .k{background:var(--bad);border-color:var(--bad);color:#fff}
+.opt.dis{cursor:default}
+.opt.dis:hover{border-color:var(--line);background:#fff}
+.opt.dis.ok:hover{border-color:var(--ok-line);background:var(--ok-bg)}
+.opt.dis.bad:hover{border-color:var(--bad-line);background:var(--bad-bg)}
+.qfoot{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.verdict{font-size:13px;font-weight:700;padding:4px 10px;border-radius:6px}
+.verdict.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad-line)}
+.verdict.part{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.hint{font-size:12px;color:var(--ink3)}
+
+/* ---------- 解析区 ---------- */
+.exp{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.row{margin:0 0 7px;font-size:14px;line-height:1.75}
+.row b{color:var(--brand);flex:none}
+.row .lab{display:inline-block;min-width:64px;font-weight:700;font-size:12.5px;color:var(--ink2);vertical-align:top}
+.row .cnt{display:inline-block;width:calc(100% - 70px);vertical-align:top}
+.ansline{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:7px;padding:7px 10px;
+  font-size:14px;margin-bottom:8px}
+.ansline b{color:var(--ok)}
+.ansline .mybad{color:var(--bad);font-weight:700}
+.fast{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:7px;padding:7px 10px;font-size:14px}
+.fast b{color:var(--warn)}
+ol.chain{margin:2px 0 0;padding-left:20px}
+ol.chain li{margin-bottom:3px}
+ul.t{margin:2px 0 0;padding-left:20px;color:var(--bad)}
+ul.t li{margin-bottom:3px;font-size:13.5px}
+.mother{color:var(--ink2);font-size:13.5px;background:#f8f9fb;border-radius:7px;padding:7px 10px;border:1px solid var(--line)}
+.details{margin-top:8px}
+.details summary{cursor:pointer;font-size:13px;color:var(--brand);user-select:none}
+.details .ana{margin-top:7px;font-size:14px;line-height:1.8;border-left:3px solid var(--brand);padding-left:10px;color:var(--ink)}
+
+/* ---------- 结果页 ---------- */
+.res{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.res h2{margin:0 0 12px;font-size:19px}
+.big{font:800 42px/1 ui-monospace,Menlo,monospace;letter-spacing:-1px}
+.big.ok{color:var(--ok)} .big.bad{color:var(--bad)}
+table.rpt{width:100%;border-collapse:collapse;font-size:13.5px}
+table.rpt th,table.rpt td{border:1px solid var(--line);padding:6px 9px;text-align:left}
+table.rpt th{background:#f3f5f8;font-weight:700}
+table.rpt td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+.bar{height:9px;background:#eef1f4;border-radius:5px;overflow:hidden;min-width:110px}
+.bar i{display:block;height:100%;background:var(--brand)}
+.bar i.lo{background:var(--bad)} .bar i.mid{background:var(--warn)}
+.diag{margin-top:12px;background:var(--brand-soft);border:1px solid #bcd9ff;border-radius:8px;padding:11px 13px;font-size:14px}
+.diag b{color:var(--brand)}
+.hidden{display:none !important}
+
+.foot{max-width:1180px;margin:0 auto;padding:0 16px 30px;color:var(--ink3);font-size:12px;line-height:1.7}
+
+@media (max-width:900px){
+  .side{display:none}
+  .wrap{padding:12px}
+}
+@media print{
+  .top,.side,.qfoot,.detailstoggle,.foot,.btn{display:none !important}
+  body{background:#fff}
+  .q{page-break-inside:avoid;border:none;border-left:3px solid #999}
+  .details .ana{display:block !important}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">金融第03章 · 商业银行<small id="sub">错题 27 题 + 自命题 11 题 ｜ 38 分钟 ｜ 满分 54</small></div>
+    <div class="timer" id="timer">00:00</div>
+    <div class="stat">
+      <span>已答 <b id="sdone">0</b>/<span id="stot">0</span></span>
+      <span>得分 <b id="sscore">0</b></span>
+      <span>正确率 <span class="acc" id="sacc">—</span></span>
+    </div>
+    <div class="grow"></div>
+    <button class="btn on" id="btnInst">即时判题 ON</button>
+    <button class="btn" id="btnWrong">只看错题</button>
+    <button class="btn" id="btnPause">暂停</button>
+    <button class="btn pri" id="btnSubmit">交卷</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="side">
+    <div class="card">
+      <h3>答题卡</h3>
+      <div id="cards"></div>
+      <div class="legend">
+        <span><i style="background:var(--ok-bg);border:1px solid var(--ok-line)"></i>对</span>
+        <span><i style="background:var(--warn-bg);border:1px solid var(--warn-line)"></i>少选</span>
+        <span><i style="background:var(--bad-bg);border:1px solid var(--bad-line)"></i>错</span>
+        <span><i style="background:var(--brand-soft);border:1px solid #bcd9ff"></i>已答</span>
+      </div>
+      <div class="side-tip">数字=题号。点击跳转。数字右侧标记：✅全对 · △少选 · ✗错误</div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <h3>配速提示</h3>
+      <div class="side-tip">
+        单选 ≤ 50 秒 · 多选 ≤ 75 秒<br>
+        到点<b>即跳过</b>，单选绝不空着<br>
+        清空进度请点「重做」
+      </div>
+      <div style="margin-top:8px"><button class="btn" id="btnReset">重做本卷</button></div>
+    </div>
+  </div>
+
+  <div class="main" id="main"></div>
+</div>
+
+<div class="foot" id="footnote">
+  <b>使用说明</b>：① 单选点一下立即判定；多选勾完点「确认本题」判定。② 判定后自动展开正解 + ⚡秒杀判据，点「展开完整解析」看推理链与易错点。③ 「即时判题 ON/OFF」——想测真实水平时先关掉（变成传统交卷后才判）。④ 进度自动存本机浏览器，换设备不同步；勿用无痕模式。<br><b>来源声明</b>：第一部分为你在金融第一套 / 第二套真题模考中答错的本局真题；第二部分为按 2026 官方考试大纲与本人错题本编写的自命题仿真题，<b>不得视为真题</b>。
+</div>
+
+<script>
+const CFG = {"title": "金融第03章 商业银行 · 即时判题训练卷", "totalMin": 38, "pass": 32, "full": 54, "nSingle": 22, "nMulti": 16, "sections": [{"key": "wrong", "name": "第一部分 · 错题回炉（真题）", "short": "R 错题回炉", "desc": "这 27 题是你在两套真题模考中<b>答错过的本题真题</b>（含错选与少选）。右上角红色标签 = 上次你的答案。先不看解析重做一遍——<b>能全对才叫真的销账</b>。"}, {"key": "prop", "name": "第二部分 · 自命题检验", "short": "P 自命题", "desc": "⚠️ 本节的 11 题是<b>自命题仿真题，不是真题</b>（依 2026 大纲 + 一本通本章 A 段骨架编写，手法照真题但无年份题号），用来补<b>错题覆盖不到的大纲考点</b>，避免背答案式刷分。"}]};
+const DATA = {"qs": [{"no": 2001, "label": "R1", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "存款准备金率的变动会引起货币供应量的变动，其中，超额存款准备金率的变动主要取决于（）", "opts": [{"k": "A", "t": "监管机构"}, {"k": "B", "t": "中央政府"}, {"k": "C", "t": "中央银行"}, {"k": "D", "t": "商业银行"}], "ans": "D", "kp": "第3章·货币供给与存款准备金", "model": "主体归属型（谁决定这个变量）", "chain": ["法定存款准备金率 —— 由<b>中央银行</b>决定（货币政策工具）", "<b>超额</b>存款准备金率 —— 由<b>商业银行</b>自主决定（多留还是多放）", "商业银行在「流动性安全」与「盈利」之间权衡超额头寸"], "fast": "⚡切一刀：<b>「法定的归央行，超额的归商行」</b>。题干只要出现「超额」二字 → 答案必是<b>商业银行</b> = D。", "traps": ["见「存款准备金率」五字就条件反射选中央银行 —— <b>没看见前面的「超额」</b>", "货币乘数公式 m = (1+c)/(r+e+t)，央行只定 r，<b>e 由商行定</b>，这是常考点"], "mother": "母题抽象：<b>货币乘数四变量归谁管</b> —— r 法定(央行)、e 超额(商行)、c 现金漏损(公众)、t 定期存款比率(公众)。凡问「谁的意愿 / 行为影响货币供给」，查这张归属表。", "analysis": "<p>超额存款准备金是商业银行<b>自愿</b>存放在央行、超过法定要求的部分。其比率高低取决于商业银行自身的流动性偏好、风险判断与盈利权衡（经济向好、信贷需求旺时倾向降低超额率），因此主要取决于<b>商业银行</b>。D 正确。</p><p>中央银行（C）决定的是<b>法定</b>存款准备金率；监管机构（A）与中央政府（B）不直接决定该比率。</p>"}, {"no": 2002, "label": "R2", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "根据《商业银行理财业务监督管理办法》，购买私募理财产品的合格法人投资者最近一年末净资产不得低于（）", "opts": [{"k": "A", "t": "100万元"}, {"k": "B", "t": "500万元"}, {"k": "C", "t": "800万元"}, {"k": "D", "t": "1000万元"}], "ans": "D", "kp": "第3章·理财业务投资者门槛（数字钉子）", "model": "数字规定型（净资产下限）", "chain": ["《商业银行理财业务监督管理办法》区分公募与私募理财产品", "私募理财面向<b>合格投资者</b>，门槛更高", "法人合格投资者：最近<b>1 年末净资产不低于 1000 万元</b>"], "fast": "⚡理财数字钉子：<b>私募 — 法人净资产 ≥ 1000 万；私募 — 个人 300 万金融资产或近 3 年年均收入 ≥ 40 万</b>。题干「合格<u>法人</u>」→ 1000 万 → D。别和公募理财混。", "traps": ["把法人的 1000 万和个人的 300 万记串", "100 万 / 500 万是干扰数字，教材里没有这两个门槛"], "mother": "母题抽象：<b>理财业务三档数字</b> —— 私募法人 1000 万净资产｜私募个人 300 万金融资产或年均收入 40 万｜公募（已取消最低起点）。凡「合格投资者」题查这三档。", "analysis": "<p>根据《商业银行理财业务监督管理办法》，私募理财产品只能向合格投资者销售。合格投资者中，<b>法人</b>或其他组织需满足：最近<b>1 年末净资产不低于 1000 万元人民币</b>。D 正确。</p><p>（对照：自然人合格投资者需具有 2 年以上投资经历，且满足家庭金融净资产 ≥ 300 万 / 家庭金融资产 ≥ 500 万 / 近 3 年年均收入 ≥ 40 万之一。）</p>"}, {"no": 2003, "label": "R3", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "根据《商业银行资本管理办法(试行)》，关于商业银行各级资本充足率的说法，正确的是（）", "opts": [{"k": "A", "t": "核心一级资本充足率不得低于4.5%、一级资本充足率不得低于5%、资本充足率不得低于8%"}, {"k": "B", "t": "核心一级资本充足率不得低于4%、一级资本充足率不得低于6%、资本充足率不得低于10%"}, {"k": "C", "t": "核心一级资本充足李不得低于4%、一级资本充足李不得低于5%、资本充足率不得低于8%"}, {"k": "D", "t": "核心一级资本充足率不得低于5%、一级资本充足率不得低于6%、资本充足率不得低于8%"}], "ans": "D", "kp": "第3章·资本充足率三层指标（数字钉子）", "model": "数字组合判断型（三个比率同时给，挑全对的一组）", "chain": ["《商业银行资本管理办法（试行）》最低要求：核心一级资本充足率 ≥ <b>5%</b>、一级资本充足率 ≥ <b>6%</b>、资本充足率 ≥ <b>8%</b>", "6% = 5% + 1%（其他一级资本），8% = 6% + 2%（二级资本）", "D 项三个数字全部正确"], "fast": "⚡三数口诀「<b>五、六、八</b>」（核心一级 5 / 一级 6 / 总 8），<b>层层加码、只升不降</b>。选项里凡是出现 4%、4.5% 的（A、B、C）一律划掉 —— 那是巴塞尔或旧口径的干扰数。", "traps": ["把巴塞尔的 4.5% / 6% 当成我国口径（我国核心一级是 5%，更严）", "别忘了还要叠加储备资本 2.5%，所以<b>实际达标线是 8% + 2.5% = 10.5%</b>（本题只问最低要求）"], "mother": "母题抽象：<b>资本充足率三兄弟</b>必须一起背：<b>5 / 6 / 8</b>（最低）+ 储备 2.5%（逆周期 0-2.5%）+ 系统重要性附加 1%。凡选项出现「低于 5% 的核心一级」，必错。", "analysis": "<p>《商业银行资本管理办法（试行）》规定：商业银行<b>核心一级资本充足率不得低于 5%</b>，<b>一级资本充足率不得低于 6%</b>，<b>资本充足率不得低于 8%</b>。D 正确。</p><p>此外还需计提储备资本 2.5%（必要时加逆周期资本 0—2.5%），系统重要性银行另加 1% 附加资本，故实际监管要求高于最低线。</p>"}, {"no": 2004, "label": "R4", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "根据凯恩斯流动性偏好理论，发生“流动性陷阱”时，货币需求曲线是（）", "opts": [{"k": "A", "t": "一条平行于纵轴的直线"}, {"k": "B", "t": "一条向下倾斜的直线"}, {"k": "C", "t": "一条向上倾斜的直线"}, {"k": "D", "t": "一条平行于横轴的直线"}], "ans": "D", "kp": "第3章·凯恩斯货币需求理论（流动性陷阱）", "model": "图形 / 形状判断型（曲线长什么样）", "chain": ["凯恩斯把货币需求分为交易、预防（与收入相关）和<b>投机</b>需求（与利率负相关）", "利率越低 → 投机性货币需求越大", "当利率降到极低水平，人们预期利率只会上升、债券只会跌 → 宁愿<b>无限持有货币</b>", "货币需求曲线在此处变成<b>水平线（平行于横轴）</b> = 流动性陷阱"], "fast": "⚡记画面：<b>利率极低时需求曲线「躺平」</b> → 平行于<b>横轴</b>（横轴是货币量 L，纵轴是利率 i）→ D。「平行于纵轴」是古典情形（货币需求只由收入决定、与利率无关）。", "traps": ["横轴纵轴搞反：货币需求图的<b>纵轴是利率 i、横轴是货币量 L</b>，陷阱区是水平线", "把「流动性陷阱」与「流动性溢价」混为一谈（后者是期限结构理论）"], "mother": "母题抽象：<b>货币需求曲线三种形状</b> —— 常规向右下方倾斜(利率高需求少)｜<b>流动性陷阱水平段</b>(利率极低)｜古典垂直(只与收入有关)。问形状先定位在哪个利率区间。", "analysis": "<p>凯恩斯认为，当利率下降到极低水平时，人们预期利率将回升、债券价格将下跌，因而愿意持有任意数量的货币而不去购买债券，<b>投机性货币需求变得无限大</b> —— 此即「流动性陷阱」。此时货币需求曲线表现为<b>一条平行于横轴的水平线</b>。D 正确。</p><p>此时货币政策失效（再投放货币也会被「吸收」而不进入实体经济），需依靠财政政策。</p>"}, {"no": 2005, "label": "R5", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "商业银行安全性、流动性、效益性的关系是()", "opts": [{"k": "A", "t": "相互矛盾"}, {"k": "B", "t": "对立统一"}, {"k": "C", "t": "相互独立"}, {"k": "D", "t": "同一关系"}], "ans": "B", "kp": "第3章·商业银行经营三性原则", "model": "关系判断型（三者之间是什么关系）", "chain": ["三性原则：安全性、流动性、效益性（盈利性）", "矛盾面：越追求盈利 → 越要投放长期高收益资产 → 安全性、流动性下降", "统一面：没有安全性，盈利无从谈起；没有流动性，银行会倒闭，长期盈利也没了", "所以是<b>对立统一</b>，不是单纯矛盾或独立"], "fast": "⚡银行业所有「XX 与 XX 的关系」题，标准答案几乎都是<b>对立统一</b>（又矛盾又依存）。看到「相互矛盾」「相互独立」「同一关系」这种<b>单向绝对</b>的表述直接划掉。", "traps": ["只看到矛盾面选 A —— 教材原话是「既矛盾又统一」", "选「相互独立」是明显错误，三性互相牵制"], "mother": "母题抽象：<b>银行经营「三性」口诀</b> —— 安全性是前提、流动性是条件、效益性是目标。三者关系恒为对立统一，凡出现「完全矛盾 / 互不相干」必错。", "analysis": "<p>安全性、流动性、效益性（盈利性）之间既有矛盾的一面（如追求高盈利往往要牺牲流动性与安全性），又有统一的一面（安全性是盈利的前提，流动性是银行持续经营并实现长期盈利的保障），因此是<b>对立统一</b>关系。B 正确。</p>"}, {"no": 2006, "label": "R6", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABCDE", "src": "真题错题", "stem": "在资本市场中，目前商业银行柜台市场的交易类型有()。", "opts": [{"k": "A", "t": "现劵交易"}, {"k": "B", "t": "T+1交易"}, {"k": "C", "t": "T+0交易"}, {"k": "D", "t": "回购交易"}, {"k": "E", "t": "远期交易"}], "ans": "ABDE", "kp": "第3章·商业银行柜台市场业务", "model": "多选 · 业务类型列举型", "chain": ["商业银行柜台市场（柜台债券市场）可办理的交易类型：<b>现券交易</b>、<b>回购交易</b>、<b>远期交易</b>等", "结算方式上，柜台债券交易实行 <b>T+1</b>（次日交割），不是 T+0", "故 A、B、D、E 选；C（T+0）不选"], "fast": "⚡两组概念分开记：<b>交易类型</b>（现券/回购/远期 = ADE）与 <b>结算周期</b>（柜台为 T+1 = B）。本题把两组混在一起考，逐项定位即可 → ABDE。", "traps": ["把\"交易类型\"和\"结算方式\"混为一谈，导致 B 被漏选", "柜台的 T+1 与交易所的 T+0 记串"], "mother": "母题抽象：<b>债券市场三层次</b> —— 银行间市场(机构·询价·大宗)、交易所市场(竞价·T+0/T+1)、<b>商业银行柜台市场(个人与中小机构·T+1·现券/回购/远期)</b>。柜台市场的两个标签：<b>做市商报价 + T+1</b>。", "analysis": "<p>商业银行柜台市场的交易类型包括<b>现券交易</b>（A）、<b>回购交易</b>（D）、<b>远期交易</b>（E）；在结算周期上实行 <b>T+1</b> 交易（B，即成交后下一个工作日办理交割）。故选 <b>ABDE</b>。</p><p>C 的 T+0（当日交割）不是商业银行柜台市场的交易安排。</p>"}, {"no": 2007, "label": "R7", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABC", "src": "真题错题", "stem": "关于投资银行的说法，正确的有().", "opts": [{"k": "A", "t": "投资银行的主要资金来源是商业银行贷款"}, {"k": "B", "t": "投资银行的资金来源主要依靠发行自己的股票和债券"}, {"k": "C", "t": "投资银行在大多数国家可以吸收活期存款"}, {"k": "D", "t": "投资银行的基本特征是业务具有单一性"}, {"k": "E", "t": "投资银行的主要业务是对公司股覃和债券进行直接投资"}], "ans": "BE", "kp": "第3章·投资银行的特征", "model": "多选 · 正误判断型（正确的有）", "chain": ["A 资金来源是商业银行贷款？投资银行<b>不能吸储</b>，主要靠发行自己的股票和债券筹资 → A <b>不选</b>", "B 资金来源主要依靠发行自己的股票和债券 → <b>选</b>", "C 可以吸收活期存款？只有商业银行才有此特权 → <b>不选</b>", "D 业务具有单一性？投资银行业务<b>多元化</b>（承销、并购、自营、资管、研究）→ <b>不选</b>", "E 主要业务是对公司股票和债券进行直接投资 → <b>选</b>（教材口径：投资银行主要活动于资本市场，从事证券承销与直接投资等）"], "fast": "⚡投资银行三句话：<b>① 不能吸活期存款 ② 靠发自己的股债筹资 ③ 业务多元、以资本市场业务为主</b>。逐项对照 → B、E 正确。", "traps": ["把投资银行当\"银行\"（A、C 都错在这一点）—— <b>名字带\"银行\"但无存款牌照</b>", "D 的\"单一性\"与投资银行\"业务多元\"的常识相反"], "mother": "母题抽象：<b>投资银行 vs 商业银行三区别</b> —— 资金来源(发股债 vs 吸存款)、业务重心(资本市场直接融资 vs 存贷间接融资)、监管归属(证监会 vs 金融监管总局)。凡\"吸储\"必属商行。", "analysis": "<p>投资银行是主要活跃于资本市场的非存款类金融机构：<b>资金来源主要依靠发行自己的股票和债券</b>（B 正确，因其不能吸收公众存款）；其主要业务围绕公司股票与债券展开，包括证券承销、直接投资、并购重组等（E 正确）。故选 <b>BE</b>。</p><p>A 错误（不能靠商行贷款作主要来源）；C 错误（<b>不能吸收活期存款</b>，这是商业银行的特有功能）；D 错误（投资银行业务具有<b>多元性</b>而非单一性）。</p>"}, {"no": 2008, "label": "R8", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "AE", "src": "真题错题", "stem": "关于我国村镇银行的说法，正确的有().", "opts": [{"k": "A", "t": "村镇银行是为当地农业和农村经济提供金融服务的机构"}, {"k": "B", "t": "村镇银行在县(市)设立的，注册资本不得低于200万元人民币"}, {"k": "C", "t": "村镇银行至少有一家符合条件的商业银行作为发起行"}, {"k": "D", "t": "新镇银行可以由境外全融机构出资设立"}, {"k": "E", "t": "村镇银行为满足当地农户的小额贷款需求提供资金支持"}], "ans": "ACD", "kp": "第3章·村镇银行的设立与定位", "model": "多选 · 正误判断型（正确的有）", "chain": ["A 为当地农业和农村经济提供金融服务 → <b>选</b>（村镇银行的定位）", "B 在县（市）设立的注册资本不得低于 200 万元？教材口径：在<b>县（市）设立的为 300 万元</b>、在<b>乡（镇）设立的为 100 万元</b> → <b>不选</b>", "C 至少有一家符合条件的商业银行作为发起行 → <b>选</b>（村镇银行须由银行业金融机构发起，且最大股东须为银行业金融机构）", "D 可以由境外金融机构出资设立 → <b>选</b>（允许境外金融机构参与设立）", "E 为满足当地农户的小额贷款需求提供资金支持 → 按标准答案<b>不计入</b>"], "fast": "⚡村镇银行三钉子：<b>① 定位\"三农\" ② 县(市)300万/乡(镇)100万 ③ 须有银行类发起行</b>。B 的 200 万是错的数字（教材为 300 万）→ 排除 B → ACD。", "traps": ["注册资本两个数字记混：县（市）<b>300 万</b>、乡（镇）<b>100 万</b>，B 给的是 200 万，属<b>数值错位</b>", "E 的表述在教材口径下也有支持，但标准答案未计入，实考以官方答案为准"], "mother": "母题抽象：<b>新型农村金融机构数字钉子</b> —— 村镇银行(县市300万/乡镇100万·须银行发起)｜小额贷款公司(不吸储·自有资金放贷)｜农村资金互助社(社员互助)。设立门槛与发起要求是高频考点。", "analysis": "<p>村镇银行是经监管部门批准、为<b>当地农业和农村经济</b>提供金融服务的银行业金融机构（A 正确）；至少应有<b>一家符合条件的商业银行作为发起行</b>（C 正确，且最大股东或唯一股东须为银行业金融机构）；允许<b>境外金融机构</b>出资设立（D 正确）。故选 <b>ACD</b>。</p><p>B 错误：村镇银行在<b>县（市）</b>设立的，注册资本不得低于 <b>300 万元</b>；在<b>乡（镇）</b>设立的，不得低于 100 万元 —— 200 万元为错误数字。</p><p><b>⚠ 提示：</b>E 项（为农户小额贷款需求提供资金支持）在教材对村镇银行功能的描述中亦可成立，但本题标准答案未将其计入。实考请以官方公布答案为准；平时按 ACD 记忆。</p>"}, {"no": 2009, "label": "R9", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "CDE", "src": "真题错题", "stem": "商业银行内部控制应当坚持的原则有（）。", "opts": [{"k": "A", "t": "对称性原则"}, {"k": "B", "t": "制衡性原则"}, {"k": "C", "t": "审慎性原则"}, {"k": "D", "t": "全覆盖原则"}, {"k": "E", "t": "相匹配原则"}], "ans": "BCDE", "kp": "第3章·商业银行内部控制原则", "model": "多选 · 原则列举型", "chain": ["《商业银行内部控制指引》确立的原则：<b>全覆盖原则</b>、<b>制衡性原则</b>、<b>审慎性原则</b>、<b>相匹配原则</b>", "A 对称性原则 → <b>不选</b>（无此原则）"], "fast": "⚡内控四原则口诀「<b>全、衡、慎、配</b>」（全覆盖 / 制衡 / 审慎 / 相匹配）。题干问内控原则 → 直接检索这四个词 → BCDE。A「对称性」是生造词，划掉。", "traps": ["「相匹配原则」最易漏选（它指控制措施与风险程度、业务规模相匹配）", "把内控原则和风险管理原则、公司治理原则混记"], "mother": "母题抽象：<b>内控四原则</b> —— 全覆盖(不留死角)、制衡性(相互制约)、审慎性(稳健)、相匹配(与风险/规模匹配)。凡出现\"盈利性/效率性/对称性\"一律为干扰项。", "analysis": "<p>《商业银行内部控制指引》规定，商业银行内部控制应当坚持<b>全覆盖原则</b>（D）、<b>制衡性原则</b>（B）、<b>审慎性原则</b>（C）、<b>相匹配原则</b>（E，即内部控制措施与业务规模、复杂程度和风险状况相匹配）。故选 <b>BCDE</b>。</p><p>A「对称性原则」不是商业银行内部控制的原则。</p>"}, {"no": 2010, "label": "R10", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "CD", "src": "真题错题", "stem": "根据《商业银行风险监管核心指标(试行)》，关于对信用风险指标要求的说去，错误的有()。", "opts": [{"k": "A", "t": "单一集团客户授信集中度，即对最大一家集团客户授信总额与资本净额之比，不得高于15%"}, {"k": "B", "t": "单一客户贷款集中度，即对最大一家客户贷款总额与资本净额之比，不得高于10%"}, {"k": "C", "t": "全部关联度，即全部关联授信与加权风险资产总额之比，不得高于50%"}, {"k": "D", "t": "不良贷款率，即不良贷款与贷款总额之比，不得高于4%"}, {"k": "E", "t": "不良资产率，即不良资产与资产总额之比，不得高于5%"}], "ans": "CDE", "kp": "第3章·信用风险监管核心指标（数字钉子）", "model": "多选 · 选非型（「错误的有」）", "chain": ["A 单一集团客户授信集中度 = 对最大一家集团客户授信总额 / 资本净额 ≤ <b>15%</b> → 表述<b>正确</b>，不选", "B 单一客户贷款集中度 = 最大一家客户贷款总额 / 资本净额 ≤ <b>10%</b> → 表述<b>正确</b>，不选", "C 全部关联度 = 全部关联授信 / <b>资本净额</b> ≤ 50%，题干写\"与加权风险资产总额之比\" → <b>错误</b>，选", "D 不良贷款率 = 不良贷款 / 贷款总额 ≤ <b>5%</b>，题干写 4% → <b>错误</b>，选", "E 不良资产率 = 不良资产 / 资产总额 ≤ <b>4%</b>，题干写 5% → <b>错误</b>，选"], "fast": "⚡先圈「错误」→ 数字钉子对照：<b>集团 15% / 单一客户 10% / 全部关联 50%（分母是资本净额）/ 不良贷款率 5% / 不良资产率 4%</b>。C 分母错、D 与 E 的数字<b>恰好互换</b> → CDE。", "traps": ["不良贷款率(5%) 与 不良资产率(4%) 的数字被故意互换 —— 这是本题的核心陷阱", "选非题方向：要选「错误」的，别把正确项（A、B）勾上"], "mother": "母题抽象：<b>信用风险指标五钉子</b> —— 单一集团 15%｜单一客户 10%｜全部关联 50%（分母均为资本净额）｜<b>不良贷款率 ≤5%、不良资产率 ≤4%</b>（贷款分母 vs 资产分母）。两个\"不良\"率数字反向，务必对比记忆。", "analysis": "<p>逐一核对《商业银行风险监管核心指标（试行）》：单一集团客户授信集中度（授信总额/资本净额）不得高于 <b>15%</b>（A 表述正确）；单一客户贷款集中度（贷款总额/资本净额）不得高于 <b>10%</b>（B 表述正确）；全部关联度应为全部关联授信与<b>资本净额</b>之比不高于 50%，而非与加权风险资产总额之比（C <b>错误</b>）；不良贷款率不得高于 <b>5%</b>，题干写 4%（D <b>错误</b>）；不良资产率不得高于 <b>4%</b>，题干写 5%（E <b>错误</b>）。</p><p>故选 <b>CDE</b>。</p>"}, {"no": 2011, "label": "R11", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ABCD", "src": "真题错题", "stem": "以下属于商业银行拟任董事和高级管理人员的任职资格包括()", "opts": [{"k": "A", "t": "具有良好的守法合规记录;"}, {"k": "B", "t": "具有良好的品行、声誉"}, {"k": "C", "t": "具有良好的经济、金融从业记录;"}, {"k": "D", "t": "具有所任职机构要求的从业年限"}, {"k": "E", "t": "具有担任职务所需的独立性"}], "ans": "ABCE", "kp": "第3章·董事与高管任职资格", "model": "多选 · 条件列举型", "chain": ["《中资商业银行行政许可事项实施办法》规定的基本条件：良好守法合规记录（A 选）、良好品行与声誉（B 选）、良好经济金融从业记录（C 选）、具备任职所需的独立性（E 选）", "D「具有所任职机构要求的从业年限」—— 按标准答案<b>不计入</b>"], "fast": "⚡四项基本条件口诀「<b>合规、品行、从业记录、独立性</b>」→ ABCE。D 的\"机构要求的从业年限\"属机构自定条件，不是法规规定的基本条件。", "traps": ["D 看似合理（任职当然要年限），但法规层面的<b>基本条件</b>不含\"机构要求的年限\"", "少选得 0.5 分/项，多选错选 0 分，拿不准优先保守"], "mother": "母题抽象：<b>任职资格条件的层次</b> —— 法规基本条件（合规、品行、记录、独立性、专业知识）vs 机构自定条件（年限、岗位经验）。凡\"机构要求的\"多为自定条件，不是法定基本条件。", "analysis": "<p>商业银行拟任董事和高级管理人员的任职资格基本条件包括：具有良好的<b>守法合规</b>记录（A）、具有良好的<b>品行、声誉</b>（B）、具有良好的<b>经济、金融从业记录</b>（C）、具有担任职务所需的<b>独立性</b>（E）等。故选 <b>ABCE</b>。</p><p>D「具有所任职机构要求的从业年限」属机构层面的具体岗位要求，按标准答案未计入法定基本条件。</p>"}, {"no": 2012, "label": "R12", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "AD", "src": "真题错题", "stem": "关于金融租赁公司的监管指标的说法，正确的有(", "opts": [{"k": "A", "t": "金融租赁公司的资本充足率不得低于25%"}, {"k": "B", "t": "金融租赁公司对全部关联方的全部融资租赁业务余额不得超过其资本净额的50%"}, {"k": "C", "t": "对一个关联方的全部融资租赁业务余额不得超过资本净额的30%"}, {"k": "D", "t": "对单一承租人的全部融资租赁业务余额不得超过资本净额的30%"}, {"k": "E", "t": "金融租赁公司同业拆入资金余额不得超过资本净额的100%"}], "ans": "BCDE", "kp": "第3章·金融租赁公司监管指标（数字钉子）", "model": "多选 · 指标判断型（正确的有）", "chain": ["A 资本充足率不得低于 25%？金融租赁公司资本充足率要求为不低于 <b>8%</b>（按资本管理办法口径）→ A <b>不选</b>", "B 对全部关联方的融资租赁业务余额 ≤ 资本净额 <b>50%</b> → <b>选</b>", "C 对一个关联方的融资租赁业务余额 ≤ 资本净额 <b>30%</b> → <b>选</b>", "D 对单一承租人的融资租赁业务余额 ≤ 资本净额 <b>30%</b> → <b>选</b>", "E 同业拆入资金余额 ≤ 资本净额 <b>100%</b> → <b>选</b>"], "fast": "⚡金融租赁三档数字：<b>关联方合计 50%｜单个关联方 30%｜单一承租人 30%｜同业拆入 100%</b>；资本充足率与银行同口径（8%，不是 25%）→ A 错 → BCDE。", "traps": ["A 的 25% 是生造数字（金融租赁公司资本充足率与其他银行业机构一致，为 8%）", "30% 出现两次（关联方与承租人），别以为重复就矛盾"], "mother": "母题抽象：<b>\"集中度\"指标通用逻辑</b> —— 单个主体 ≤30%（或 10%）、全部关联方 ≤50%、同业融入 ≤100%（负债端）。各类非银机构的集中度指标模板一致，只需记具体数字。", "analysis": "<p>金融租赁公司的监管指标：对<b>全部关联方</b>的全部融资租赁业务余额不得超过资本净额的 <b>50%</b>（B 正确）；对<b>一个关联方</b>的全部融资租赁业务余额不得超过资本净额的 <b>30%</b>（C 正确）；对<b>单一承租人</b>的全部融资租赁业务余额不得超过资本净额的 <b>30%</b>（D 正确）；<b>同业拆入</b>资金余额不得超过资本净额的 <b>100%</b>（E 正确）。故选 <b>BCDE</b>。</p><p>A 错误：金融租赁公司的资本充足率要求与商业银行<b>同口径（不低于 8%）</b>，而非 25%。</p>"}, {"no": 2013, "label": "R13", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "CDE", "src": "真题错题", "stem": "关于商业银行特点的说法，正确的有()", "opts": [{"k": "A", "t": "在所有的金融机构中，商业银行是历史最悠久、资本最雄厚、体系最庞大、业务范围最广的金融机构"}, {"k": "B", "t": "与其他金融机构相比，商业银行最明显的特征是吸收活期存款，创造信用货币"}, {"k": "C", "t": "商业银行是以吸收存款、发放贷款、办理结算和金融服务为主要业务，以盈利为目的的金融企业"}, {"k": "D", "t": "商业银行的各项存款和所有者权益构成货币供给或交换媒介的重要组成部分，是信用创造的主体"}, {"k": "E", "t": "开展商业银行业务的投资银行以及专门吸收居民储蓄的金融机构均是商业银行"}], "ans": "ABC", "kp": "第3章·商业银行的特征", "model": "多选 · 特征判断型（正确的有）", "chain": ["A 商业银行是历史最悠久、资本最雄厚、体系最庞大、业务范围最广的金融机构 → <b>选</b>", "B 最明显的特征是<b>吸收活期存款、创造信用货币</b> → <b>选</b>（这是商业银行区别于其他金融机构的关键）", "C 以吸收存款、发放贷款、办理结算和金融服务为主要业务，以盈利为目的 → <b>选</b>", "D 各项存款和<b>所有者权益</b>构成货币供给的重要组成部分 → <b>不选</b>（所有者权益不是货币供给，只有存款尤其是活期存款才是）", "E 开展商业银行业务的投资银行、专门吸收居民储蓄的金融机构<b>均是商业银行</b> → <b>不选</b>（投资银行不是商业银行）"], "fast": "⚡商业银行的\"<b>唯一性标签</b>\"只有一个：<b>吸收活期存款 + 创造信用货币</b>（B）。围绕它展开：历史最久✓、业务最广✓、存贷结算盈利✓；凡\"××也是商业银行\"（E）和\"所有者权益也是货币\"（D）一律排除 → ABC。", "traps": ["D 把\"所有者权益\"混进货币供给 —— 货币供给只由<b>存款与现金</b>构成", "E 把\"开展商业银行业务\"等同于\"是商业银行\" —— 判断机构性质看<b>牌照与能否吸活期存款</b>"], "mother": "母题抽象：<b>商业银行的本质特征</b> —— 唯一能吸收<b>活期存款</b>并据此<b>创造信用货币</b>的金融机构。这是所有\"商业银行特点\"题的总开关，其余描述都是它的推论。", "analysis": "<p>商业银行的特征：在所有金融机构中历史最悠久、资本最雄厚、体系最庞大、业务范围最广（A 正确）；与其他金融机构相比最明显的特征是<b>吸收活期存款、创造信用货币</b>（B 正确）；以吸收存款、发放贷款、办理结算和金融服务为主要业务，以<b>盈利为目的</b>（C 正确）。故选 <b>ABC</b>。</p><p>D 错误：构成货币供给的是<b>存款（尤其是活期存款）与流通中现金</b>，所有者权益不属于货币供给。E 错误：投资银行不是商业银行，机构性质取决于牌照与能否吸收活期存款，而非是否开展同类业务。</p><p>（题干与选项原有缺字，已按教材口径补全。）</p>"}, {"no": 2014, "label": "R14", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "2020年6月末，某商业银行的营业收入为80亿元，按照监管要求，经营期内该商业银行的营业费用加折旧不应高于（ ）", "opts": [{"k": "A", "t": "40亿元"}, {"k": "B", "t": "20亿元"}, {"k": "C", "t": "36亿元"}, {"k": "D", "t": "28亿元"}], "ans": "C", "kp": "第3章·商业银行经营（成本收入比监管）", "model": "", "chain": ["监管要求商业银行成本收入比 ≤ 45% → 营业费用 + 折旧 ≤ 营业收入 × 45% = 80 × 45% = 36 亿元"], "fast": "⚡「营业费用+折旧 vs 营业收入」→ 成本收入比 45% 钉子，80×45%=36", "traps": ["45% 与 35%（拨备覆盖率相关）/25%（流动性比例）等数字混淆", "别用「营业收入 × 25%」等杂系数"], "mother": "母题抽象：<b>商业银行监管比率钉子</b>——成本收入比 ≤45%｜拨贷比 ≥2.5%｜拨备覆盖率 ≥120%-150%｜流动性比例 ≥25%｜资本充足率 ≥8%。", "analysis": "<p>按监管要求，商业银行<b>成本收入比不应高于 45%</b>。成本收入比 =（营业费用 + 折旧）/ 营业收入，故营业费用加折旧 ≤ 80 × 45% = <b>36 亿元</b>。故选 C。</p>"}, {"no": 2015, "label": "R15", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "商业银行的市场营销主要表现为服务营销，其营销中心是（）", "opts": [{"k": "A", "t": "服务"}, {"k": "B", "t": "产品"}, {"k": "C", "t": "利润"}, {"k": "D", "t": "客户"}], "ans": "D", "kp": "第3章·商业银行市场营销", "model": "", "chain": ["银行产品高度同质化、可复制 → 差异化只能靠服务和客户关系 → 市场营销中心是<b>客户</b>（以客户需求为导向）"], "fast": "⚡「银行服务营销中心」→ 锁「客户」；「服务/产品/利润」都是围绕客户的派生要素", "traps": ["「服务」是银行营销的表现形式（题干已说\"表现为服务营销\"），不是中心", "「利润」是结果不是中心"], "mother": "母题抽象：<b>营销中心的演进</b>——产品中心 → 销售中心 → 客户中心（4P → 4C），金融业因同质化直接进入客户中心阶段。", "analysis": "<p>商业银行市场营销主要表现为服务营销，其营销中心是<b>客户</b>——银行产品同质化程度高，竞争的本质是争夺和维护客户，营销活动围绕客户需求展开。故选 D。</p>"}, {"no": 2016, "label": "R16", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "C", "src": "真题错题", "stem": "在商业银行成本管理中，固定资产折旧属于（）", "opts": [{"k": "A", "t": "税费支出"}, {"k": "B", "t": "补偿性支出"}, {"k": "C", "t": "营业外支出"}, {"k": "D", "t": "利息支出"}], "ans": "B", "kp": "第3章·商业银行成本管理", "model": "", "chain": ["商业银行成本（费用）分为：利息支出、工资性支出、<b>补偿性支出</b>（折旧）、税费支出、其他 → 折旧是对固定资产损耗的补偿 → 补偿性支出"], "fast": "⚡「折旧」在银行成本分类里 = 补偿性支出，四选一直接锁", "traps": ["「营业外支出」是会计利润表概念（与经营无关的损失），不是成本管理分类", "折旧不是利息支出（那是付给储户的）"], "mother": "母题抽象：<b>银行成本五分类</b>——利息｜工资｜补偿（折旧）｜税费｜其他。考法就是\"某项 → 归哪类\"。", "analysis": "<p>在商业银行成本管理中，固定资产折旧是对固定资产价值损耗的补偿，属于<b>补偿性支出</b>。故选 B。</p>"}, {"no": 2017, "label": "R17", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "商业银行在计算资本充足率时，可以计入其资本扣减项的项目是()。", "opts": [{"k": "A", "t": "一般风险准备"}, {"k": "B", "t": "商誉"}, {"k": "C", "t": "土地使用权"}, {"k": "D", "t": "超额贷款损失准备"}], "ans": "B", "kp": "第3章·商业银行资本管理（资本扣减项）", "model": "", "chain": ["计算资本充足率：资本净额 = 总资本 − 扣减项 → 扣减项包括商誉、其他无形资产、非自用不动产等 → 商誉从资本中<b>全额扣除</b>"], "fast": "⚡扣减项口诀「商誉 + 无形资产 + 递延税净额」—— A/D 是资本项、C 是无形资产（部分扣），商誉必扣", "traps": ["A「一般风险准备」、D「超额贷款损失准备」是资本的组成部分（可计入），方向完全相反", "C「土地使用权」属于无形资产，需扣除的是超额部分，但最标准答案是商誉"], "mother": "母题抽象：<b>资本的\"进与出\"</b>——进：实收资本、资本公积、盈余公积、一般风险准备、超额贷款损失准备；出（扣减）：商誉、其他无形资产、递延所得税净负债。", "analysis": "<p>商业银行计算资本充足率时，应从资本中扣除的项目包括<b>商誉</b>、其他无形资产（土地使用权除外部分）等；而一般风险准备、超额贷款损失准备是可计入资本的项目。故选 B。</p>"}, {"no": 2018, "label": "R18", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "B", "src": "真题错题", "stem": "影响商业银行存款经营的因素不包括()", "opts": [{"k": "A", "t": "存款创造的调控"}, {"k": "B", "t": "支付机制的创新"}, {"k": "C", "t": "政府的监管措施"}, {"k": "D", "t": "LPR报价机制"}], "ans": "D", "kp": "第3章·存款经营的影响因素", "model": "", "chain": ["影响存款经营的因素：①存款创造的调控（央行货币政策）②支付机制的创新（电子支付改变存款形态）③政府的监管措施 → 「LPR 报价机制」是贷款定价机制，与存款经营无关"], "fast": "⚡LPR = 贷款端的事，存款经营题直接选 LPR", "traps": ["D 原文有排版错字「LPP」，实为 LPR", "别因「报价机制」字眼联想到利率市场化而误选 A"], "mother": "母题抽象：<b>\"三因素\"清单题定位法</b>——教材列点题用排除法：三个在教材清单里、一个在清单外，选清单外的。", "analysis": "<p>影响商业银行存款经营的因素包括存款创造的调控、支付机制的创新、政府的监管措施。<b>LPR 报价机制是贷款市场报价利率的形成机制</b>，属于贷款定价范畴，不影响存款经营。故选 D。</p>"}, {"no": 2019, "label": "R19", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "根据《中华人民共和国商业银行法》，商业银行实行（）", "opts": [{"k": "A", "t": "自主管理、分摊风险、自负盈亏、自我发展"}, {"k": "B", "t": "自主管理、自担风险、自负盈亏、自我开发"}, {"k": "C", "t": "自主经营、分摊风险、自负盈亏、自行负责"}, {"k": "D", "t": "自主经营、自担风险、自负盈亏、自我约束"}], "ans": "D", "kp": "第3章·商业银行法（经营原则）", "model": "", "chain": ["《商业银行法》：商业银行以安全性、流动性、效益性为经营原则，实行<b>自主经营、自担风险、自负盈亏、自我约束</b>"], "fast": "⚡四自钉子「经营、风险、盈亏、约束」—— 见「分摊风险/自我开发/自行负责」划掉", "traps": ["A/B 用「自主管理」偷换「自主经营」", "「分摊风险」≠「自担风险」：风险要自己承担，不是摊给别人"], "mother": "母题抽象：<b>法条\"四自\"裸背法</b>——每个词都是教材原词，干扰项总有一个字被换，逐词比对。", "analysis": "<p>《商业银行法》第四条：商业银行以安全性、流动性、效益性为经营原则，实行<b>自主经营、自担风险、自负盈亏、自我约束</b>。故选 D。</p>"}, {"no": 2020, "label": "R20", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "A", "src": "真题错题", "stem": "商业银行资产管理内容不包括()", "opts": [{"k": "A", "t": "债券投资管理"}, {"k": "B", "t": "贷款管理"}, {"k": "C", "t": "现金资产管理"}, {"k": "D", "t": "存款管理"}], "ans": "D", "kp": "第3章·商业银行资产管理", "model": "", "chain": ["资产管理 = 对<b>资产方</b>的管理：贷款管理、债券投资管理、现金资产管理 → 「存款管理」属于负债管理"], "fast": "⚡资产 vs 负债定位：存款/借款 → 负债；贷款/投资/现金 → 资产", "traps": ["别选「现金资产管理」——现金（准备金）是银行第一线资产"], "mother": "母题抽象：<b>资产负债表定位法</b>——题干问\"资产/负债管理包括啥\"，先给选项标资产/负债方向再排除。", "analysis": "<p>商业银行资产管理主要包括贷款管理、债券投资管理、现金资产管理等内容；<b>存款管理属于负债管理</b>范畴。故选 D。</p>"}, {"no": 2021, "label": "R21", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "黄金价格被纳入商业银行的()", "opts": [{"k": "A", "t": "利率范畴"}, {"k": "B", "t": "国别范畴"}, {"k": "C", "t": "汇率范畴"}, {"k": "D", "t": "商品范畴"}], "ans": "C", "kp": "第3章·商业银行市场风险（黄金的归属）", "model": "", "chain": ["巴塞尔市场风险四要素：利率、汇率、股价、商品价格 → 但我国监管实践中，<b>黄金被视为外汇（汇率）风险</b>的一部分（黄金曾长期按汇率类风险计量）"], "fast": "⚡我国监管口径钉子：「黄金 → 汇率范畴」；国际口径里商品价格才含黄金，注意题干问\"我国商业银行\"", "traps": ["D「商品范畴」是巴塞尔国际口径的归类，我国教材按汇率处理", "A「利率范畴」：金银与利率无关"], "mother": "母题抽象：<b>\"特殊归类\"考点</b>——黄金按汇率、票据贴现按信用+利率、表外按信用等价系数，特殊归类是高频坑。", "analysis": "<p>在我国商业银行市场风险管理口径中，<b>黄金价格波动被纳入汇率（外汇）风险范畴</b>计量管理——这与巴塞尔框架下\"商品价格风险\"的国际口径不同，是教材明确的中国化处理。故选 C。</p>"}, {"no": 2022, "label": "R22", "sec": "wrong", "type": "单选", "lv": "真", "sec2": 50, "wasWrong": true, "myOld": "D", "src": "真题错题", "stem": "哪些不属于商业银行核心一级资本()。", "opts": [{"k": "A", "t": "超额损失准备"}, {"k": "B", "t": "资本公积"}, {"k": "C", "t": "盈余公积"}, {"k": "D", "t": "累计其他综合收益"}], "ans": "A", "kp": "第3章·商业银行资本（核心一级资本构成）", "model": "", "chain": ["核心一级资本 = 实收资本/普通股 + 资本公积 + 盈余公积 + 一般风险准备 + 未分配利润 + 累计其他综合收益 + 少数股东资本可计入部分 → 「超额贷款损失准备」计入<b>二级资本</b>"], "fast": "⚡「超额损失/超额贷款损失准备 → 二级资本」，核心一级全是\"股 + 留存收益\"类", "traps": ["A 是干扰主角：超额准备只进二级资本，核心一级与它无关", "别把「一般风险准备」（核心一级）与「超额贷款损失准备」（二级）混"], "mother": "母题抽象：<b>资本三层归属速查</b>——核心一级：股本+公积+利润；其他一级：优先股/永续债；二级：超额贷款损失准备+二级资本工具。", "analysis": "<p>核心一级资本包括实收资本、资本公积、盈余公积、一般风险准备、未分配利润、累计其他综合收益等；<b>超额贷款损失准备计入二级资本</b>，不属于核心一级资本。故选 A。</p>"}, {"no": 2023, "label": "R23", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "BD", "src": "真题错题", "stem": "关于商业银行负债业务的说法，正确的有()", "opts": [{"k": "A", "t": "负债是商业银行的资金来源"}, {"k": "B", "t": "负债是商业银行开展经营活动的基础"}, {"k": "C", "t": "商业银行的存款经营必须不断创新金融产品"}, {"k": "D", "t": "现金管理是存款经营的衍生服务"}, {"k": "E", "t": "商业银行的负债主要来源于同业借款"}], "ans": "ABCD", "kp": "第3章·商业银行负债业务", "model": "", "chain": ["逐项判定：A 负债 = 资金来源 ✅；B 负债是经营基础 ✅（先有负债才能放贷）；C 存款经营须不断创新金融产品 ✅（应对支付创新与竞争）；D 现金管理是存款经营的衍生服务 ✅（教材原句）；E「负债主要来源于同业借款」❌——最主要来源是<b>存款</b>"], "fast": "⚡负债主力是存款不是同业——E 方向性错误一票否决", "traps": ["E 偷换\"主要来源\"：同业借款只是主动负债补充", "C/D 是教材细节句，容易被误判为错而漏选"], "mother": "母题抽象：<b>负债两分法</b>——被动负债（存款，主力）+ 主动负债（同业、央行借款、债券，补充）；衍生服务（现金管理）从存款经营中生长。", "analysis": "<p>负债是商业银行的资金来源和开展经营活动的基础；存款经营必须不断创新金融产品，现金管理是存款经营的衍生服务；<b>负债的主要来源是存款而非同业借款</b>。故选 ABCD。</p>"}, {"no": 2024, "label": "R24", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ACE", "src": "真题错题", "stem": "商业银行风险管理流程包括（）。", "opts": [{"k": "A", "t": "风险监测"}, {"k": "B", "t": "风险计量"}, {"k": "C", "t": "风险识别"}, {"k": "D", "t": "风险对冲"}, {"k": "E", "t": "风险控制"}], "ans": "ABCE", "kp": "第3章·商业银行风险管理流程", "model": "", "chain": ["流程四环节：<b>风险识别 → 风险计量 → 风险监测 → 风险控制</b> → D「风险对冲」是风险管理<b>策略</b>（对冲/转移/补偿/预防），不是流程环节"], "fast": "⚡「流程 vs 策略」双清单辨析：流程=识计量测控；策略=对冲转移补偿预防——见\"对冲\"在流程题里必划", "traps": ["D 与流程词汇长得像，是\"策略清单串场\"干扰", "漏选 C（识别是第一环节）属典型失分"], "mother": "母题抽象：<b>风险管理两组清单</b>——流程：识别→计量→监测→控制；策略：预防/对冲/转移/补偿（+回避）。看清题干问哪一组。", "analysis": "<p>商业银行风险管理流程包括风险识别、风险计量、风险监测、风险控制；<b>风险对冲属于风险管理策略而非流程环节</b>。故选 ABCE。</p>"}, {"no": 2025, "label": "R25", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "ADE", "src": "真题错题", "stem": "商业银行负债业务主要包括()", "opts": [{"k": "A", "t": "吸纳公众存款"}, {"k": "B", "t": "理财业务"}, {"k": "C", "t": "央行再贷款"}, {"k": "D", "t": "同业资金"}, {"k": "E", "t": "发行金融债券"}], "ans": "ACDE", "kp": "第3章·商业银行负债业务构成", "model": "", "chain": ["逐项判定：A 吸纳公众存款 ✅（负债主力）；B 理财业务 ❌（表外/资管业务，理财资金不入表，不构成银行负债）；C 央行再贷款（向中央银行借款）✅；D 同业资金（同业存放/拆入）✅；E 发行金融债券 ✅（长期借款形式）→ 本卷已将 E 选项按真题原貌补全为「发行金融债券」，答案相应为 ACDE"], "fast": "⚡「理财 = 表外」一票划掉 B；存款 + 借款（同业/央行/债券）全选", "traps": ["B 理财：资管新规后银行理财为独立资管产品，绝不能计入银行负债", "别漏 E——发行金融债券是标准的长期借入负债", "⚠ 2024 真题考生回忆版 E 项缺失（标\"暂缺\"），本卷按完整真题口径补全，答案由 ACD 修正为 <b>ACDE</b>"], "mother": "母题抽象：<b>负债业务 = 存款 + 借款</b>——借款三来源：同业、央行、债券；表外业务（理财）永远不进负债清单。", "analysis": "<p>商业银行负债业务主要包括吸纳公众存款、向中央银行借款（再贷款）、同业资金融入、发行金融债券等；<b>理财业务属于资管/表外业务</b>，不构成银行负债。故选 ACDE。</p>"}, {"no": 2026, "label": "R26", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "BCE", "src": "真题错题", "stem": "关于资产负债管理中缺口分析的说法，正确的有()", "opts": [{"k": "A", "t": "如果某一时期内到期或需重新定价的负债大于资产，则为利率敏感性正缺口"}, {"k": "B", "t": "在利率上升的环境中，保持正缺口对商业银行是有利的"}, {"k": "C", "t": "流动性期限缺口是衡量一定时期内到期或重新定价的资产与负债之间的差额"}, {"k": "D", "t": "主要用于利率敏感性缺口和流动性期限缺口分析"}, {"k": "E", "t": "在利率下降的环境中，保持负缺口会减少利差，对商业银行是不利的"}], "ans": "BD", "kp": "第3章·资产负债管理（缺口分析）", "model": "", "chain": ["逐项判定：A「负债大于资产 = 正缺口」❌（正缺口 = 敏感性<b>资产</b> > 敏感性负债，即\"资产敏感\"）；B 利率上升时正缺口有利 ✅（资产先重定价、收益涨得快）；C 流动性期限缺口含\"重新定价\"❌——流动性期限缺口只算<b>到期</b>的资产负债差额，\"重新定价\"属于利率敏感性缺口；D 缺口分析主要用于利率敏感性缺口与流动性期限缺口 ✅；E 利率下降时负缺口减少利差、不利 ❌（利率下降时负缺口反而有利——负债先降价）"], "fast": "⚡正缺口=资产多 → 利升赚利差；负缺口=负债多 → 利降赚利差。两句话反推全部选项", "traps": ["A 把正缺口定义写反（高频陷阱）", "C 偷加\"重新定价\"混淆两种缺口"], "mother": "母题抽象：<b>缺口方向-利率-损益九宫格</b>——正缺口：升利↑收益/降利↓；负缺口：降利↑收益/升利↓；零缺口：免疫。先定方向再判损益。", "analysis": "<p>缺口分析主要用于利率敏感性缺口和流动性期限缺口分析；利率上升环境中保持正缺口（资产敏感）对银行有利。<b>A 把正缺口定义颠倒；C 混入\"重新定价\"（那是利率敏感性缺口的口径）；E 把负缺口的利率环境判反</b>。故选 BD。</p>"}, {"no": 2027, "label": "R27", "sec": "wrong", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": true, "myOld": "BCD", "src": "真题错题", "stem": "关于金融市场功能的说法，正确的有()。", "opts": [{"k": "A", "t": "金融资产流动性本身不会影响潜在的资金供给者的预期和实体经济的资金供"}, {"k": "B", "t": "金融市场中供需双方的相互作用决定了交易资产的价格"}, {"k": "C", "t": "金融资产本身存在的价格风险，很难通过期货期权等金融衍生品交易进行管理"}, {"k": "D", "t": "金融市场能够迅速有效地促成资金供给者与需求者之间的金融产品交易，实现资源优化配置"}, {"k": "E", "t": "金融市场能够降低交易者的信息成本"}], "ans": "BDE", "kp": "第6章·金融市场功能", "model": "", "chain": ["逐项判定：A「流动性不会影响预期与资金供给」❌（流动性影响资产定价与供给者预期）；B 供需双方相互作用决定价格 ✅（价格发现）；C「价格风险很难通过期货期权管理」❌（衍生品正是价格风险管理的工具）；D 有效促成交易、实现资源优化配置 ✅；E 降低信息成本 ✅"], "fast": "⚡功能五件套「价格发现/资源配置/信息降低成本/流动性/风险管理」——凡\"不能/很难\"否定功能的说法先质疑", "traps": ["C 反着说风险管理功能", "A 否定流动性作用", "原卷 D 选项被截断（\"实现\"后缺尾），已按教材口径补全"], "mother": "母题抽象：<b>金融市场功能清单题</b>——价格发现、资源配置、信息生产（降低成本）、流动性提供、风险管理；题干\"否定式\"选项基本是错项。", "analysis": "<p>金融市场中供需双方相互作用决定交易资产价格（价格发现），并能有效促成交易实现资源优化配置、降低交易者信息成本；<b>A 否认流动性影响、C 否认衍生品的风险管理作用</b>，均错误。故选 BDE。</p>"}, {"no": 3001, "label": "P1", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "下列经营原则中，要求商业银行不得从事信托投资、证券经营等非银行业务的是（　）。", "opts": [{"k": "A", "t": "“三性”原则"}, {"k": "B", "t": "审慎经营原则"}, {"k": "C", "t": "分业经营原则"}, {"k": "D", "t": "金融创新原则"}], "ans": "C", "kp": "第3章·经营原则·分业经营", "model": "2026新增四原则配对", "chain": ["教材经营原则四套：<b>“三性”原则、审慎经营原则、分业经营原则、金融创新原则</b>", "“不得从事信托投资、证券经营业务”“不得向非银行金融机构和企业投资”——这是<b>分业经营</b>的法定表述（《商业银行法》口径）", "“三性”原则＝安全性（前提）＋流动性（条件）＋盈利性（目标）；审慎经营＝风险管理、内控、资本约束、拨备充足；金融创新＝合法合规、风险可控、披露充分", "题干关键词“<b>不得从事……非银行业务</b>”直接锁定分业经营"], "fast": "⚡四原则各一句题眼：<b>不得跨界</b>→分业经营；<b>安全/流动/盈利</b>→三性；<b>风险内控资本拨备</b>→审慎；<b>合法合规风险可控披露充分</b>→金融创新。", "traps": ["把“不得从事证券业务”当成审慎经营（审慎管的是自身风险，不是经营范围）→ B", "看到“经营原则”四个字直接选最熟的“三性”→ A"], "mother": "经营原则题一律按“<b>管什么</b>”定位：管边界→分业；管风险→审慎；管目标→三性；管创新尺度→金融创新。", "analysis": "<p>商业银行经营原则包括“三性”原则、审慎经营原则、<b>分业经营原则</b>与金融创新原则。</p><p><b>分业经营原则</b>要求商业银行在法定业务范围内经营，不得从事信托投资、证券经营业务，不得向非自用不动产投资或者向非银行金融机构和企业投资，<b>C 正确</b>。</p><p>A“三性”原则指安全性、流动性、盈利性；B 审慎经营原则强调风险管理、内部控制、资本约束与拨备充足；D 金融创新原则要求创新活动合法合规、风险可控、信息披露充分。</p>"}, {"no": 3002, "label": "P2", "sec": "prop", "type": "单选", "lv": "基", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "根据商业银行经营原则，开展金融创新应当满足的基本要求是（　）。", "opts": [{"k": "A", "t": "以盈利最大化为首要目标，其余从简"}, {"k": "B", "t": "合法合规、风险可控、信息披露充分"}, {"k": "C", "t": "优先追求业务规模扩张与创新速度"}, {"k": "D", "t": "由监管部门代为设计并承担风险"}], "ans": "B", "kp": "第3章·经营原则·金融创新原则", "model": "原则内涵识记", "chain": ["金融创新原则的三条基本要求：<b>合法合规、风险可控、信息披露充分</b>", "A 把盈利当唯一目标——与“风险可控”冲突", "C 先求规模速度——顺序错了，风险可控在前", "D 监管部门代设计——创新主体仍是银行，监管只定规则", "故选 B"], "fast": "⚡金融创新三要求口诀：<b>合规、控险、披露</b>。凡是“盈利最大化”“规模优先”“监管代设计”的表述一律错。", "traps": ["把“提高盈利能力”当成创新的首要目标 → A", "认为监管“背书即无风险” → D"], "mother": "凡原则类题出现“<b>优先／唯一／最大化</b>”这类绝对化词，先找反例——银行三性里盈利性是目标，但从来不是“唯一”。", "analysis": "<p>金融创新原则要求商业银行的创新活动必须<b>合法合规、风险可控、信息披露充分</b>，即创新不能突破法律与监管边界、不能引入不可测风险、必须向客户充分揭示产品风险与收益特征，<b>B 正确</b>。</p><p>A 将盈利置于合规与风控之上，违背创新原则；C 追求规模与速度优先，同样颠倒顺序；D 错误——金融创新的设计主体和实施主体是商业银行，监管机构负责规则制定与监督，不代为设计产品，也不承担经营风险。</p>"}, {"no": 3003, "label": "P3", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "下列业务中，属于商业银行表外业务的是（　）。", "opts": [{"k": "A", "t": "吸收活期存款"}, {"k": "B", "t": "发放中长期贷款"}, {"k": "C", "t": "开出不可撤销的备用信用证"}, {"k": "D", "t": "买入国债"}], "ans": "C", "kp": "第3章·三大业务·表外业务", "model": "业务归类", "chain": ["三大业务速判：钱<b>进来</b>（吸存、同业拆入、发债、向央行借款）＝负债业务；钱<b>出去</b>（贷款、债券投资、现金资产）＝资产业务；<b>不进资产负债表、形成或有权利义务</b>＝表外业务", "表外业务四大类：<b>担保类</b>（保函、备用信用证、跟单信用证）、<b>承诺类</b>（贷款承诺、透支额度）、金融衍生交易类、代理投融资服务类", "备用信用证属于<b>担保类</b>表外业务 → C", "A 是负债业务，B、D 是资产业务"], "fast": "⚡一秒归类：题干出现<b>保函／信用证／承诺／额度／衍生</b> → 表外业务；出现<b>吸收／拆入／发行</b> → 负债；出现<b>发放／投资／存放</b> → 资产。", "traps": ["把“信用证”当成国际结算（中间业务）而不选（结算是中间业务，但<b>备用</b>信用证是担保，属表外）", "混淆表外业务与中间业务：两者有交集，本题按“不进表”判"], "mother": "业务归类题先问一句“<b>这笔钱现在进没进资产负债表</b>”：没进、只有在特定条件下才可能发生的 → 表外。", "analysis": "<p>表外业务是指不列入资产负债表、但会形成<b>或有资产/或有负债</b>的业务，包括担保类（保函、备用信用证等）、承诺类（贷款承诺、透支额度）、金融衍生交易类和代理投融资服务类。开出不可撤销的备用信用证属于<b>担保类</b>表外业务，<b>C 正确</b>。</p><p>A 吸收活期存款是负债业务；B 发放贷款、D 买入国债均为资产业务。</p>"}, {"no": 3004, "label": "P4", "sec": "prop", "type": "单选", "lv": "真", "sec2": 45, "wasWrong": false, "src": "自命题·仿真", "stem": "关于商业银行中间业务的特点，下列说法正确的是（　）。", "opts": [{"k": "A", "t": "占用银行自有资金，并计入资产负债表"}, {"k": "B", "t": "不以占用自有资金为主，主要收入来源是手续费"}, {"k": "C", "t": "必然形成银行的或有负债"}, {"k": "D", "t": "只包括结算和代理两类业务"}], "ans": "B", "kp": "第3章·中间业务特点", "model": "概念辨析（中间业务 vs 表外业务）", "chain": ["中间业务的本质：银行以<b>中介人</b>身份提供服务，<b>不占用或较少占用自有资金</b>，收入形式是<b>手续费/佣金</b>", "常见种类：结算、代理、咨询顾问、托管、银行卡、担保承诺、基金代销等 → D 错（不止两类）", "形成或有负债的是<b>表外业务</b>的特征，中间业务不必然形成 → C 错", "占用自有资金并计入表内的是资产/负债业务 → A 错", "故选 B"], "fast": "⚡两句话钉死：<b>中间业务＝不占资金收手续费</b>；<b>表外业务＝不进表、有或有风险</b>。两者有交集但判据不同，别串。", "traps": ["把“不进表”（表外）与“不占资金”（中间）混为一谈 → 选 A 或 C", "以为中间业务只有结算代理 → D"], "mother": "中间业务 vs 表外业务：<b>看钱还是看表</b>——问收入来源（手续费）→中间；问在不在表内→表外。", "analysis": "<p>中间业务是商业银行以中介人身份为客户办理收付、委托等事项并<b>收取手续费</b>的业务，其核心特点是<b>不占用或较少占用银行自有资金</b>、不构成银行表内资产或负债，收入体现为手续费及佣金，<b>B 正确</b>。</p><p>A 描述的是资产/负债业务；C“必然形成或有负债”是表外业务（担保类、承诺类）的特征，中间业务不必然如此；D 错误，中间业务还包括咨询顾问、托管、银行卡、担保承诺、代销等多种类型。</p>"}, {"no": 3005, "label": "P5", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 55, "wasWrong": false, "src": "自命题·仿真", "stem": "某商业银行利率敏感性资产为 500 亿元，利率敏感性负债为 400 亿元。若市场利率下降，在其他条件不变的情况下，该行净利息收入将（　）。", "opts": [{"k": "A", "t": "增加，因为资产收益的下降幅度小于负债成本的下降幅度"}, {"k": "B", "t": "减少，因为资产收益的下降幅度大于负债成本的下降幅度"}, {"k": "C", "t": "保持不变"}, {"k": "D", "t": "减少，因为负债成本下降得更快"}], "ans": "B", "kp": "第3章·资产负债管理·利率敏感性缺口", "model": "缺口计算 + 方向判断", "chain": ["先算缺口：利率敏感性缺口 = 利率敏感性资产 − 利率敏感性负债 = 500 − 400 = <b>+100 亿元（正缺口）</b>", "正缺口＝利率敏感资产多于负债 → 利率变动时<b>资产端反应更大</b>", "利率<b>下降</b>：资产收益减少 100×Δr，负债成本减少相对更少 → <b>净利息收入减少</b>", "记忆：正缺口<b>怕降息</b>；负缺口<b>怕升息</b>", "故选 B"], "fast": "⚡两步：①算缺口正负（资产−负债）；②<b>正缺口怕降、负缺口怕升</b>。本题正缺口 + 降息 → 净利息收入<b>减少</b>。", "traps": ["方向记反：以为降息让负债更便宜一定赚钱 → A（正缺口时资产端降得更多）", "选 D（因果写反：负债成本下降更快是负缺口情形）"], "mother": "缺口题一律把“<b>谁的敏感金额大</b>”想清楚：敏感金额大的那一端，利率变动时<b>吃亏/占便宜都更多</b>。", "analysis": "<p>利率敏感性缺口 = 利率敏感性资产 − 利率敏感性负债 = 500 − 400 = <b>+100 亿元</b>，为<b>正缺口</b>。</p><p>正缺口意味着利率变动时资产端受影响更大。市场利率<b>下降</b>时，资产收益的减少额大于负债成本的减少额，因此<b>净利息收入减少</b>，<b>B 正确</b>。</p><p>A 方向相反；D 的因果对应的是<b>负缺口</b>（负债敏感金额更大）的情形，与题干不符。口诀：<b>正缺口怕降息，负缺口怕升息</b>。</p>"}, {"no": 3006, "label": "P6", "sec": "prop", "type": "单选", "lv": "真", "sec2": 40, "wasWrong": false, "src": "自命题·仿真", "stem": "我国对商业银行流动性覆盖率（LCR）的监管要求是不得低于（　）。", "opts": [{"k": "A", "t": "25%"}, {"k": "B", "t": "50%"}, {"k": "C", "t": "100%"}, {"k": "D", "t": "150%"}], "ans": "C", "kp": "第3章·流动性监管指标数字", "model": "数字钉", "chain": ["三个流动性指标别混：<b>流动性覆盖率 LCR ≥100%</b>（短期，优质流动性资产/未来30天净现金流出）", "<b>净稳定资金比率 NSFR ≥100%</b>（长期，可用稳定资金/所需稳定资金）", "<b>流动性比例 ≥25%</b>（流动性资产/流动性负债）——25% 是流动性比例，不是 LCR", "故选 C"], "fast": "⚡数字对：<b>LCR 100%、NSFR 100%、流动性比例 25%</b>。题目给 25% 是专门骗你把“流动性比例”安到 LCR 头上。", "traps": ["把流动性比例的 25% 当成 LCR → A（最高频）", "把 LCR 与拨备覆盖率（150%）混淆 → D"], "mother": "流动性三指标记“<b>两百一二十五</b>”：两个 100%（LCR/NSFR）＋一个 25%（流动性比例）。", "analysis": "<p>流动性覆盖率（LCR）＝优质流动性资产 ÷ 未来 30 天净现金流出量，用于衡量银行短期流动性压力情景下的应对能力，我国监管要求<b>不得低于 100%</b>，<b>C 正确</b>。</p><p>A 25% 是<b>流动性比例</b>（流动性资产/流动性负债）的最低要求，不是 LCR；B 无对应指标；D 150% 容易与拨备覆盖率等混淆。相关指标：净稳定资金比率 NSFR 同样要求 ≥100%。</p>"}, {"no": 3007, "label": "P7", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "下列措施中，能够补充商业银行其他一级资本的是（　）。", "opts": [{"k": "A", "t": "发行二级资本债券"}, {"k": "B", "t": "发行优先股"}, {"k": "C", "t": "计提超额贷款损失准备"}, {"k": "D", "t": "提高拨备覆盖率"}], "ans": "B", "kp": "第3章·资本构成与补充", "model": "资本工具归类", "chain": ["资本三档：<b>核心一级资本</b>（实收资本/普通股、资本公积、盈余公积、一般风险准备、未分配利润）｜<b>其他一级资本</b>（优先股、永续债）｜<b>二级资本</b>（二级资本债、超额贷款损失准备）", "优先股、永续债具“永续、非累积、可减记/转股”特征 → <b>其他一级资本</b>工具 → B", "A、C 属二级资本；D 拨备覆盖率是监管指标，不是资本补充工具", "故选 B"], "fast": "⚡资本工具对号入座：<b>普通股/利润留存</b>→核心一级；<b>优先股/永续债</b>→其他一级；<b>二级资本债/超额拨备</b>→二级。", "traps": ["把优先股当核心一级（实收资本才是）", "把超额贷款损失准备当一级资本（它是二级资本）→ C"], "mother": "资本补充题先问“<b>这个工具能不能吸收损失、是不是永续</b>”：永续且非累积→一级；有期限、次级→二级。", "analysis": "<p>其他一级资本工具包括<b>优先股</b>和<b>永续债</b>等，其共同特征是具有永久性、可计入持续经营条件下的资本、具备损失吸收机制（减记或转股），<b>B 正确</b>。</p><p>A 发行二级资本债券、C 计提超额贷款损失准备均计入<b>二级资本</b>；D 提高拨备覆盖率属于风险抵补安排，不改变资本结构，不是资本补充工具。核心一级资本的补充则主要依靠利润留存、增资扩股（发行普通股）等。</p>"}, {"no": 3008, "label": "P8", "sec": "prop", "type": "单选", "lv": "拔", "sec2": 50, "wasWrong": false, "src": "自命题·仿真", "stem": "根据《商业银行资本管理办法》，下列项目中，不属于资本扣减项的是（　）。", "opts": [{"k": "A", "t": "商誉"}, {"k": "B", "t": "其他无形资产（土地使用权除外）"}, {"k": "C", "t": "对未并表金融机构的资本投资"}, {"k": "D", "t": "超额贷款损失准备"}], "ans": "D", "kp": "第3章·资本扣减项", "model": "选非题 + 范畴判定", "chain": ["先圈“<b>不属于</b>”→ 找那个<b>不是扣减项</b>的（它是别的范畴）", "扣减项三件套：<b>商誉</b>（A）、<b>其他无形资产（土地使用权除外）</b>（B）、<b>对未并表金融机构的资本投资</b>（C）", "D 超额贷款损失准备是<b>二级资本</b>的构成内容，是“加项”不是“减项”", "故选 D"], "fast": "⚡扣减项三件套口诀：<b>商誉、其他无形、未并表投资</b>。看到“超额贷款损失准备”立刻反应——它进<b>二级资本</b>，属加项。", "traps": ["选非方向丢失，把 A（教材第一项）当答案", "看到“准备”二字以为是扣减 → 选 D"], "mother": "资本构成题分清“<b>加项/减项</b>”：核心一级＋其他一级＋二级＝分子；商誉等＝分子里<b>扣掉</b>的。", "analysis": "<p>计算资本充足率时，应从核心一级资本中全额扣除的项目主要包括：<b>商誉</b>、<b>其他无形资产（土地使用权除外）</b>、由经营亏损引起的净递延税资产、<b>对未并表金融机构的资本投资</b>等。A、B、C 均属扣减项。</p><p>D <b>超额贷款损失准备</b>（超过最低要求的贷款损失准备）可按规定计入<b>二级资本</b>，属于资本的构成内容而非扣减项。故选 <b>D</b>。</p>"}, {"no": 3009, "label": "P9", "sec": "prop", "type": "多选", "lv": "真", "sec2": 75, "wasWrong": false, "src": "自命题·仿真", "stem": "下列属于商业银行资产业务的有（　）。", "opts": [{"k": "A", "t": "发放贷款"}, {"k": "B", "t": "债券投资"}, {"k": "C", "t": "存放中央银行款项"}, {"k": "D", "t": "吸收活期存款"}, {"k": "E", "t": "发行金融债券"}], "ans": "ABC", "kp": "第3章·三大业务·资产业务", "model": "多选·业务归类", "chain": ["逐项判：资产业务＝银行<b>资金运用</b>（钱出去形成债权/资产）", "A 发放贷款——形成对客户的债权 → 资产", "B 债券投资——持有的金融资产 → 资产", "C 存放中央银行款项（含法定准备金）——现金类资产 → 资产", "D 吸收活期存款——客户把钱存进来，是银行的<b>负债</b>（对客户负债）", "E 发行金融债券——借入资金，形成负债", "故选 ABC"], "fast": "⚡口诀：<b>存款是银行的负债，贷款是银行的资产</b>。凡“吸收/发行/拆入/向央行借款”→负债；凡“发放/投资/存放”→资产。", "traps": ["把“存放中央银行款项”当负债（它是资产，是准备金资产）→ 漏 C", "把“发行金融债券”当资产（发债是借钱，是负债）→ 勾 E"], "mother": "业务归类先判<b>钱的方向</b>：进银行＝负债，出银行＝资产，两边都不占＝中间/表外。", "analysis": "<p>商业银行资产业务是<b>资金运用</b>业务，主要包括贷款（A）、债券投资（B）和现金资产（C，含存放中央银行款项的法定存款准备金与超额准备金、存放同业、库存现金）。</p><p>D 吸收活期存款是<b>负债业务</b>（银行对存款人负有支付义务）；E 发行金融债券同样是<b>负债业务</b>（银行作为债务人融入资金）。故选 <b>ABC</b>。</p>"}, {"no": 3010, "label": "P10", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 80, "wasWrong": false, "src": "自命题·仿真", "stem": "下列内容中，属于商业银行审慎经营原则要求的有（　）。", "opts": [{"k": "A", "t": "建立健全风险管理体系"}, {"k": "B", "t": "计提充足的贷款损失准备"}, {"k": "C", "t": "保持资本充足"}, {"k": "D", "t": "不得从事证券经营业务"}, {"k": "E", "t": "内部控制健全有效"}], "ans": "ABCE", "kp": "第3章·经营原则·审慎经营", "model": "多选·原则内涵归属", "chain": ["审慎经营原则管的是<b>自身稳健性</b>：风险管理、内部控制、资本约束、拨备充足四大块", "A 风险管理体系 → 属", "B 贷款损失准备（拨备） → 属", "C 资本充足 → 属", "E 内控健全 → 属", "D“不得从事证券经营业务”是<b>分业经营原则</b>的内容，属经营范围约束，不是审慎经营 → 排除", "故选 ABCE"], "fast": "⚡审慎经营四块：<b>风险、内控、资本、拨备</b>。凡是“不得从事××业务”（经营范围）→ 分业经营原则，划掉。", "traps": ["勾 D（把经营范围约束当审慎）", "漏 E（以为内控与审慎并列、不属审慎）"], "mother": "原则归属题按“<b>管什么</b>”分类：管边界→分业；管稳健（风险/内控/资本/拨备）→审慎；管效益目标→三性。", "analysis": "<p>审慎经营原则要求商业银行以<b>防范风险、稳健经营</b>为核心，主要包括：建立健全风险管理体系（A）、保持资本充足（C）、计提充足的贷款损失准备（B）、内部控制健全有效（E）等内容。</p><p>D“不得从事证券经营业务”属于<b>分业经营原则</b>对经营范围的限定，不属审慎经营原则。故选 <b>ABCE</b>。</p>"}, {"no": 3011, "label": "P11", "sec": "prop", "type": "多选", "lv": "拔", "sec2": 80, "wasWrong": false, "src": "自命题·仿真", "stem": "关于商业银行资本充足率监管要求，下列说法正确的有（　）。", "opts": [{"k": "A", "t": "核心一级资本充足率不得低于 5%"}, {"k": "B", "t": "一级资本充足率不得低于 6%"}, {"k": "C", "t": "资本充足率不得低于 8%"}, {"k": "D", "t": "杠杆率不得低于 6%"}, {"k": "E", "t": "资本充足率的分母是风险加权资产"}], "ans": "ABCE", "kp": "第3章·资本充足率三档 + 杠杆率", "model": "多选·数字钉综合", "chain": ["我国三档（由低到高）：核心一级 <b>5%</b> → 一级 <b>6%</b> → 总资本 <b>8%</b>（A、B、C 均对）", "E 资本充足率＝资本净额 ÷ <b>风险加权资产</b>，分母是风险加权资产 → 对", "D 杠杆率：我国要求 <b>≥4%</b>（巴塞尔 3%），不是 6% → 错", "故选 ABCE"], "fast": "⚡两组数字分开钉：<b>充足率 5/6/8</b>（核心一级/一级/总）；<b>杠杆率 4%</b>（巴塞尔 3%）。杠杆率分母是<b>不加权</b>的表内外资产余额。", "traps": ["把 6% 安到杠杆率上（6% 是一级资本充足率）→ 勾 D", "漏 E（只背数字，忘了分母定义）"], "mother": "资本类数字题先分“<b>充足率家族 5/6/8</b>”与“<b>杠杆率 4%</b>”两堆，再逐项归堆。", "analysis": "<p>我国《商业银行资本管理办法》规定：核心一级资本充足率<b>不得低于 5%</b>（A）、一级资本充足率<b>不得低于 6%</b>（B）、资本充足率<b>不得低于 8%</b>（C）；资本充足率＝资本净额 ÷ <b>风险加权资产</b>（E 正确）。</p><p>D 错误：我国杠杆率监管要求为<b>不得低于 4%</b>（一级资本净额 ÷ 调整后表内外资产余额），巴塞尔Ⅲ国际标准为 3%。6% 是一级资本充足率的要求，不是杠杆率。故选 <b>ABCE</b>。</p>"}]};
+const KEY  = 'fin_drill_ch03_v1';
+const TOTAL_TIME = CFG.totalMin * 60;
+const SECTIONS = CFG.sections;
+
+let ans = {};        // no -> 'A' / 'ABE'
+let locked = {};     // no -> true 已判定
+let draft = {};      // no -> 多选未确认前的临时勾选
+let left = TOTAL_TIME, paused = false, timerId = null, finished = false;
+let instant = true, onlyWrong = false;
+
+const $ = id => document.getElementById(id);
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({ans,locked,draft,left,instant,finished,ts:Date.now()})); }catch(e){} }
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; } }
+function esc(s){ return (s||'').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function fmt(s){
+  const neg = s<0; s = Math.abs(s);
+  const m = Math.floor(s/60), ss = s%60;
+  return (neg?'-':'') + String(m).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+}
+
+/* ---------- 计分：单选1；多选全对2，少选每项0.5，错选0 ---------- */
+function scoreOf(q, my){
+  if(!my) return {sc:0, res:'empty', label:'未作答'};
+  if(q.type === '单选') return my === q.ans ? {sc:1,res:'right',label:'✅ 正确'} : {sc:0,res:'wrong',label:'✗ 错误'};
+  const S = new Set(my.split('')), A = new Set(q.ans.split(''));
+  let bad = false, hit = 0;
+  S.forEach(c => { if(A.has(c)) hit++; else bad = true; });
+  if(bad) return {sc:0,res:'wrong',label:'✗ 错选，本题 0 分'};
+  if(hit === A.size) return {sc:2,res:'right',label:'✅ 完全正确'};
+  return {sc:0.5*hit, res:'part', label:'△ 少选，得 ' + (0.5*hit) + ' 分'};
+}
+
+/* ---------- 渲染 ---------- */
+function secTitle(t){
+  return '<div class="sec"><h2>' + esc(t.name) + '</h2><p>' + t.desc + '</p></div>';
+}
+
+function render(){
+  const M = $('main'); let html = '';
+  SECTIONS.forEach((sc,i) => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    html += '<div class="sec"><h2>' + (i+1) + '. ' + esc(sc.name) + '</h2><p>' + sc.desc + '</p>';
+    html += '<div class="sr" id="sr-' + sc.key + '"></div></div>';
+    qs.forEach(q => { html += qHTML(q); });
+  });
+  html += '<div id="resbox"></div>';
+  M.innerHTML = html;
+  $('stot').textContent = DATA.qs.length;
+
+  // 绑定事件
+  DATA.qs.forEach(q => {
+    q.opts.forEach(o => {
+      const el = document.querySelector('[data-no="' + q.no + '"][data-k="' + o.k + '"]');
+      if(!el) return;
+      el.addEventListener('click', () => pick(q, o.k));
+    });
+    const cb = document.querySelector('.confirm[data-no="' + q.no + '"]');
+    if(cb) cb.addEventListener('click', () => confirmMulti(q));
+    const rb = document.querySelector('.undo[data-no="' + q.no + '"]');
+    if(rb) rb.addEventListener('click', () => undo(q));
+    const nb = document.querySelector('.next[data-no="' + q.no + '"]');
+    if(nb) nb.addEventListener('click', () => nextUnlocked(q.no));
+  });
+  document.querySelectorAll('[data-jump]').forEach(el => {
+    el.addEventListener('click', () => jump(parseInt(el.dataset.jump,10)));
+  });
+  buildCards(); refresh();
+}
+
+function qHTML(q){
+  const isMulti = q.type === '多选';
+  const lvcls = {'基':'lv1','真':'lv2','拔':'lv3'}[q.lv] || 'lv2';
+  let h = '<div class="q" id="q-' + q.no + '" data-no="' + q.no + '">';
+  h += '<div class="qhead"><span class="no">' + displayNo(q) + '</span>';
+  h += '<span class="tag ' + (isMulti?'multi':'') + '">' + q.type + '</span>';
+  h += '<span class="tag ' + lvcls + '">' + (q.lv||'真') + '</span>';
+  if(/错误|不包括|不属于|不是/.test(q.stem)) h += '<span class="tag neg">⚠ 选非题</span>';
+  if(q.wasWrong) h += '<span class="tag was">上次答 ' + esc(q.myOld||'') + '</span>';
+  if(q.src) h += '<span class="tag">' + esc(q.src) + '</span>';
+  h += '<span class="tag">⏱ ' + (q.sec2||(isMulti?75:50)) + 's</span>';
+  h += '</div>';
+  h += '<div class="stem">' + hlNeg(q.stem) + '</div>';
+  h += '<div class="opts">';
+  q.opts.forEach(o => {
+    h += '<div class="opt" data-no="' + q.no + '" data-k="' + o.k + '">'
+       + '<span class="k">' + o.k + '</span><span class="t">' + esc(o.t) + '</span></div>';
+  });
+  h += '</div>';
+  h += '<div class="qfoot hidden" id="foot-' + q.no + '">';
+  if(isMulti) h += '<button class="btn pri confirm" data-no="' + q.no + '">确认本题</button>';
+  h += '<span class="verdict" id="vd-' + q.no + '"></span>';
+  h += '<button class="btn undo hidden" data-no="' + q.no + '">重做本题</button>';
+  h += '<button class="btn next hidden" data-no="' + q.no + '">继续下一题 →</button>';
+  h += '<span class="hint" id="hint-' + q.no + '"></span>';
+  h += '</div>';
+  h += '<div id="exp-' + q.no + '"></div>';
+  h += '</div>';
+  return h;
+}
+
+function hlNeg(s){
+  return esc(s).replace(/(错误|不包括|不属于|不是| except)/g, '<em>$1</em>');
+}
+function displayNo(q){ return q.label || String(q.no); }
+
+function hlStem(s){
+  // 题干中的关键词（供选非题提示）
+  return s;
+}
+
+/* ---------- 交互 ---------- */
+function pick(q, k){
+  if(finished) return;
+  if(locked[q.no]) return;
+  if(q.type === '单选'){
+    ans[q.no] = k;
+    if(instant) return judge(q);
+    paintOpts(q); save(); refresh();
+  }else{
+    let cur = draft[q.no] || '';
+    cur = cur.includes(k) ? cur.replace(k,'') : (cur + k);
+    draft[q.no] = cur.split('').sort().join('');
+    ans[q.no] = draft[q.no];
+    paintOpts(q);
+    $('foot-' + q.no).classList.remove('hidden');
+    $('hint-' + q.no).textContent = draft[q.no] ? ('已选 ' + draft[q.no] + '，点「确认本题」判定') : '请至少选择一项';
+    save(); refresh();
+  }
+}
+
+function confirmMulti(q){
+  if(locked[q.no]) return;
+  if(!ans[q.no]){ alert('请至少选择一项'); return; }
+  if(instant) return judge(q);
+  locked[q.no] = true; paintOpts(q); save(); refresh();
+}
+
+function judge(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no);
+  box.innerHTML = verdictHTML(q, r);
+  $('foot-' + q.no).classList.remove('hidden');
+  const vd = $('vd-' + q.no);
+  vd.textContent = r.label;
+  vd.className = 'verdict ' + (r.res==='right'?'ok':(r.res==='part'?'part':'bad'));
+  $('hint-' + q.no).textContent = '本题 ' + r.sc + ' 分';
+  document.querySelector('.undo[data-no="'+q.no+'"]').classList.remove('hidden');
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.add('hidden');
+  paintOpts(q);
+  paintClass(q, r.res);
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb.classList.remove('hidden');
+  save(); refresh();
+}
+
+function undo(q){
+  const keep = instant;
+  delete locked[q.no]; delete ans[q.no]; delete draft[q.no];
+  paintOpts(q);
+  paintClass(q,null);
+  $('exp-' + q.no).innerHTML = '';
+  $('vd-' + q.no).textContent = '';
+  $('hint-' + q.no).textContent = '';
+  const cf = document.querySelector('.confirm[data-no="'+q.no+'"]');
+  if(cf) cf.classList.remove('hidden');
+  const nb = document.querySelector('.next[data-no="'+q.no+'"]');
+  if(nb) nb.classList.add('hidden');
+  $('foot-' + q.no).classList.add('hidden');
+  save(); refresh();
+}
+
+function paintOpts(q){
+  const lock = !!locked[q.no];
+  const my = ans[q.no] || '';
+  const A = new Set(q.ans.split(''));
+  q.opts.forEach(o => {
+    const el = document.querySelector('[data-no="'+q.no+'"][data-k="'+o.k+'"]');
+    if(!el) return;
+    el.classList.remove('sel','ok','bad','dis');
+    if(lock){
+      el.classList.add('dis');
+      // 判完之后：正解标绿、被选且错误标红
+      if(A.has(o.k)) el.classList.add('ok');
+      if(my.includes(o.k) && !A.has(o.k)) el.classList.add('bad');
+    }else{
+      if(my.includes(o.k)) el.classList.add('sel');
+    }
+  });
+}
+
+function paintClass(q, res){
+  const el = $('q-' + q.no);
+  el.classList.remove('right','wrong','part','locked');
+  if(res) el.classList.add(res, 'locked');
+}
+
+function verdictHTML(q, r){
+  const A = q.ans;
+  let h = '';
+  h += '<div class="exp">';
+  h += '<div class="ansline">正解 <b>' + A + '</b>'
+     + (q.type==='多选' ? '（多选，共 ' + A.length + ' 项）' : '')
+     + (ans[q.no] ? '　你答 <span class="' + (r.res==='right'?'':'mybad') + '">' + ans[q.no] + '</span>' : '')
+     + '　本题 <b>' + r.sc + '</b> 分</div>';
+  if(q.kp) h += '<div class="row"><span class="lab">考点</span><span class="cnt">' + esc(q.kp) + '</span></div>';
+  if(q.model) h += '<div class="row"><span class="lab">问法</span><span class="cnt">' + esc(q.model) + '</span></div>';
+  if(q.fast) h += '<div class="fast">⚡ <b>秒杀</b>　' + q.fast + '</div>';
+  h += '<div class="details"><summary>展开完整解析（推理链 / 易错点 / 母题）</summary><div class="ana detbody">';
+  if(Array.isArray(q.chain) && q.chain.length){
+    h += '<div class="row"><span class="lab">推理链</span><span class="cnt"><ol class="chain">'
+       + q.chain.map(c => '<li>' + c + '</li>').join('') + '</ol></span></div>';
+  }
+  if(Array.isArray(q.traps) && q.traps.length){
+    h += '<div class="row"><span class="lab">易错点</span><span class="cnt"><ul class="t">'
+       + q.traps.map(c => '<li>' + c + '</li>').join('') + '</ul></span></div>';
+  }
+  if(q.mother) h += '<div class="row"><span class="lab">母题</span><span class="cnt"><span class="mother">' + q.mother + '</span></span></div>';
+  if(q.analysis) h += '<div style="margin-top:8px">' + q.analysis + '</div>';
+  h += '</div></div></div>';
+  return h;
+}
+
+function nextUnlocked(no){
+  const idx = DATA.qs.findIndex(q => q.no === no);
+  for(let i = idx+1; i < DATA.qs.length; i++){
+    if(!locked[DATA.qs[i].no]){ scrollTo(DATA.qs[i].no); return; }
+  }
+}
+
+function scrollTo(no){
+  const el = $('q-' + no); if(!el) return;
+  const y = el.getBoundingClientRect().top + window.scrollY - 78;
+  window.scrollTo({top:y, behavior:'smooth'});
+}
+function jump(no){ document.querySelectorAll('.q').forEach(e=>e.classList.remove('hidden')); scrollTo(no); }
+
+/* ---------- 答题卡 ---------- */
+function buildCards(){
+  let h = '';
+  SECTIONS.forEach(sc => {
+    const qs = DATA.qs.filter(q => q.sec === sc.key);
+    if(!qs.length) return;
+    h += '<div style="font-size:11.5px;color:var(--ink3);margin:6px 0 4px">' + esc(sc.short||sc.name) + '</div>';
+    h += '<div class="grid">';
+    qs.forEach(q => {
+      h += '<div class="cell" id="c-' + q.no + '" data-jump="' + q.no + '">' + displayNo(q) + '</div>';
+    });
+    h += '</div>';
+  });
+  $('cards').innerHTML = h;
+}
+
+function refresh(){
+  const reveal = instant || finished;   // 考试模式（即时判题 OFF）下不泄露对错
+  let done = 0, sc = 0, right = 0, wrong = 0, part = 0;
+  DATA.qs.forEach(q => {
+    const el = $('c-' + q.no);
+    if(!el) return;
+    el.classList.remove('done','right','wrong','part');
+    if(locked[q.no]){
+      done++; const r = scoreOf(q, ans[q.no]); sc += r.sc;
+      if(!reveal){ el.classList.add('done'); return; }
+      if(r.res==='right'){ el.classList.add('right'); right++; }
+      else if(r.res==='part'){ el.classList.add('part'); part++; }
+      else { el.classList.add('wrong'); wrong++; }
+    }else if(ans[q.no] || draft[q.no]){ el.classList.add('done'); }
+  });
+  $('sdone').textContent = done;
+  $('sscore').textContent = reveal ? sc : '—';
+  const acc = done ? Math.round(right/done*100) : 0;
+  const el = $('sacc');
+  el.textContent = (reveal && done) ? acc + '%' : '—';
+  el.className = 'acc ' + (acc>=75?'good':(acc>=50?'mid':'low'));
+  // 分节统计
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let d=0, s2=0, full=0;
+    qs.forEach(q => { full += q.type==='单选'?1:2; if(locked[q.no]){ d++; s2 += scoreOf(q, ans[q.no]).sc; } });
+    const box = $('sr-' + s.key);
+    if(box){
+      box.innerHTML = '本节进度 <b>' + d + '/' + qs.length + '</b>'
+        + (reveal && d ? '　得分 <b>' + s2 + '/' + full + '</b>　正确率 <b>' + Math.round(s2/full*100) + '%</b>' : '');
+    }
+  });
+  if(onlyWrong) applyFilter();
+  if(done === DATA.qs.length && !finished) setTimeout(()=>submit(false),400);
+}
+
+function applyFilter(){
+  DATA.qs.forEach(q => {
+    const el = $('q-' + q.no); if(!el) return;
+    const isBad = locked[q.no] && scoreOf(q, ans[q.no]).res !== 'right';
+    if(onlyWrong) el.classList.toggle('hidden', !isBad);
+    else el.classList.remove('hidden');
+  });
+}
+
+/* ---------- 计时 ---------- */
+function tick(){
+  if(paused || finished) return;
+  left--;
+  const t = $('timer');
+  t.textContent = fmt(left);
+  t.className = 'timer' + (left<=0?' over':(left<=300?' warn':''));
+  if(left % 10 === 0) save();
+  if(left <= 0) submit(true);
+}
+function setPause(p){
+  paused = p;
+  $('btnPause').textContent = p ? '继续' : '暂停';
+  $('btnPause').className = 'btn' + (p?' on':'');
+  if(!p && !timerId) timerId = setInterval(tick,1000);
+}
+
+/* ---------- 交卷 ---------- */
+function submit(auto){
+  if(finished) return;
+  finished = true;
+  if(timerId){ clearInterval(timerId); timerId = null; }
+  DATA.qs.forEach(q => {
+    if(!locked[q.no] && ans[q.no]) judgeSilent(q);
+  });
+  let sc = 0, full = 0, right = 0, part = 0, wrong = 0, empty = 0;
+  const stat = {};
+  DATA.qs.forEach(q => {
+    full += q.type==='单选'?1:2;
+    const r = scoreOf(q, ans[q.no]); sc += r.sc;
+    if(r.res==='right') right++; else if(r.res==='part') part++; else if(r.res==='empty') empty++; else wrong++;
+    const k = q.kpSec || q.kp || '其他';
+    stat[k] = stat[k] || {t:0,s:0};
+    stat[k].t += q.type==='单选'?1:2; stat[k].s += r.sc;
+  });
+  const pct = Math.round(sc/full*100);
+  let h = '<div class="res"><h2>' + (auto?'⏰ 时间到 · 自动交卷':'📊 交卷结果') + '</h2>';
+  h += '<div style="display:flex;gap:26px;flex-wrap:wrap;align-items:baseline">';
+  h += '<div><div class="big ' + (sc>=CFG.pass?'ok':'bad') + '">' + sc + '</div><div style="color:var(--ink2);font-size:13px">总分 / ' + full + '　合格线 ' + CFG.pass + '</div></div>';
+  h += '<div><div class="big" style="color:var(--ink2)">' + pct + '%</div><div style="color:var(--ink2);font-size:13px">得分率</div></div>';
+  h += '<div style="font-size:14px;line-height:2">全对 <b>' + right + '</b>　少选 <b>' + part + '</b>　错误 <b style="color:var(--bad)">' + wrong + '</b>　未答 <b>' + empty + '</b></div>';
+  h += '</div>';
+  h += diagnosis(sc, full, pct, right, wrong, part, empty);
+  h += '</div>';
+
+  // 分节报告
+  h += '<div class="res"><h2 style="font-size:16px">分节 / 考点统计</h2><table class="rpt">';
+  h += '<tr><th>板块 / 考点</th><th style="width:70px">得分</th><th style="width:70px">满分</th><th style="width:90px">得分率</th><th style="width:130px"></th></tr>';
+  SECTIONS.forEach(s => {
+    const qs = DATA.qs.filter(q => q.sec === s.key);
+    if(!qs.length) return;
+    let a=0,b=0; qs.forEach(q => { b += q.type==='单选'?1:2; a += scoreOf(q, ans[q.no]).sc; });
+    h += '<tr><td><b>' + esc(s.name) + '</b></td><td class="num">' + a + '</td><td class="num">' + b + '</td><td class="num">'
+       + Math.round(a/b*100) + '%</td><td><div class="bar"><i class="' + (a/b>=.75?'':(a/b>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,a/b*100) + '%"></i></div></td></tr>';
+  });
+  const ks = Object.keys(stat).sort((x,y)=> stat[x].s/stat[x].t - stat[y].s/stat[y].t);
+  ks.forEach(k => {
+    if(k === '其他' && stat[k].t <= 2) return;
+    const o = stat[k];
+    h += '<tr><td>' + esc(k) + '</td><td class="num">' + o.s + '</td><td class="num">' + o.t + '</td><td class="num">'
+       + Math.round(o.s/o.t*100) + '%</td><td><div class="bar"><i class="' + (o.s/o.t>=.75?'':(o.s/o.t>=.5?'mid':'lo')) + '" style="width:' + Math.max(3,o.s/o.t*100) + '%"></i></div></td></tr>';
+  });
+  h += '</table></div>';
+
+  // 错题清单
+  const bads = DATA.qs.filter(q => scoreOf(q, ans[q.no]).res !== 'right');
+  if(bads.length){
+    h += '<div class="res"><h2 style="font-size:16px">错题清单（' + bads.length + ' 题）</h2><table class="rpt">';
+    h += '<tr><th style="width:60px">题号</th><th style="width:60px">题型</th><th>考点</th><th style="width:70px">你答</th><th style="width:70px">正解</th><th style="width:80px"></th></tr>';
+    bads.forEach(q => {
+      const r = scoreOf(q, ans[q.no]);
+      h += '<tr><td>' + displayNo(q) + '</td><td>' + q.type + '</td><td>' + esc(q.kp||'') + '</td>'
+         + '<td style="color:var(--bad);font-weight:700">' + (ans[q.no]||'未答') + '</td><td style="color:var(--ok);font-weight:700">' + q.ans + '</td>'
+         + '<td><span class="tag ' + (r.res==='part'?'multi':'was') + '">' + (r.res==='part'?'少选':'错误') + '</span></td></tr>';
+    });
+    h += '</table><div style="margin-top:10px"><button class="btn" id="btnReview">只看错题，回炉重看</button></div></div>';
+  }
+
+  h += '<div class="res" style="display:flex;gap:10px;flex-wrap:wrap">'
+     + '<button class="btn" onclick="window.print()">打印本卷</button>'
+     + '<button class="btn" id="btnRedo2">清空进度重做</button>'
+     + '<button class="btn" id="btnExport">导出答题记录</button></div>';
+
+  $('resbox').innerHTML = h;
+  const b1 = $('btnReview'); if(b1) b1.addEventListener('click', ()=>{ onlyWrong = true; $('btnWrong').className='btn on'; applyFilter(); window.scrollTo({top:0,behavior:'smooth'}); });
+  $('btnRedo2').addEventListener('click', redo);
+  $('btnExport').addEventListener('click', exportRecord);
+  window.scrollTo({top:0, behavior:'smooth'});
+  save();
+}
+
+function judgeSilent(q){
+  locked[q.no] = true;
+  const r = scoreOf(q, ans[q.no]);
+  const box = $('exp-' + q.no); if(box) box.innerHTML = verdictHTML(q, r);
+  paintOpts(q); paintClass(q, r.res);
+  const vd = $('vd-' + q.no); if(vd){ vd.textContent = r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+  $('foot-' + q.no).classList.remove('hidden');
+}
+
+function diagnosis(sc, full, pct, right, wrong, part, empty){
+  let s = '';
+  if(pct >= 80) s = '本章<b>已达过线水平</b>。剩余风险在多选题的「最后一票」——把少选的 ' + part + ' 题逐个回到教材找依据，别靠印象补。<br>下一步：换章，别在舒适区耗时间。';
+  else if(pct >= 60) s = '过线区间，<b>但不稳</b>。失分集中在 ' + (wrong+part) + ' 题（错 ' + wrong + ' + 少选 ' + part + '）。<br>治理办法：错的题分两类 —— 「不知道」回去啃 A 段骨架；「知道但选错」属于方向/主体错位，把题干里的否定词先圈出来再读选项。';
+  else s = '<b>未过线</b>，主要问题不是不知道，而是<b>提取不稳</b>：' + wrong + ' 题错选 + ' + part + ' 题少选。<br>治理办法：① 先背本章秒杀行的题眼，做到「见关键词 → 出答案」不需思考；② 多选一律先判「教材写没写」，没写的字母果断不勾；③ 48 小时后重做本卷的错题部分。';
+  return '<div class="diag"><b>诊断：</b>' + s + '</div>';
+}
+
+function exportRecord(){
+  const lines = DATA.qs.map(q => {
+    const r = scoreOf(q, ans[q.no]);
+    return [displayNo(q), q.type, (ans[q.no]||'未答'), q.ans, r.sc, r.label].join('\t');
+  });
+  const head = ['题号','题型','你答','正解','得分','判定'].join('\t');
+  const txt = '本卷：' + CFG.title + '\n' + '得分：' + $('sscore').textContent + '\n\n' + head + '\n' + lines.join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([txt], {type:'text/plain;charset=utf-8'}));
+  a.download = CFG.title + '_答题记录.txt';
+  a.click();
+}
+
+function redo(){
+  if(!confirm('清空本卷全部作答记录与计时，重新开始？')) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+}
+
+/* ---------- 初始化 ---------- */
+$('btnInst').addEventListener('click', () => {
+  instant = !instant;
+  $('btnInst').textContent = '即时判题 ' + (instant?'ON':'OFF');
+  $('btnInst').className = 'btn' + (instant?' on':'');
+  save();
+});
+$('btnWrong').addEventListener('click', () => {
+  onlyWrong = !onlyWrong;
+  $('btnWrong').className = 'btn' + (onlyWrong?' on':'');
+  applyFilter();
+});
+$('btnPause').addEventListener('click', () => setPause(!paused));
+$('btnSubmit').addEventListener('click', () => {
+  const nLeft = DATA.qs.filter(q => !locked[q.no]).length;
+  if(nLeft && !confirm('还有 ' + nLeft + ' 题未完成（未确认/未作答），确定现在交卷？')) return;
+  submit(false);
+});
+$('btnReset').addEventListener('click', redo);
+
+render();
+const sv = load();
+if(sv){
+  if(sv.ans) ans = sv.ans;
+  if(sv.locked) locked = sv.locked;
+  if(sv.draft) draft = sv.draft;
+  if(typeof sv.left === 'number') left = sv.left;
+  if(typeof sv.instant === 'boolean'){ instant = sv.instant; $('btnInst').textContent='即时判题 '+(instant?'ON':'OFF'); $('btnInst').className='btn'+(instant?' on':''); }
+  if(sv.finished) finished = true;
+  render();
+  DATA.qs.forEach(q => {
+    if(locked[q.no]){
+      const r = scoreOf(q, ans[q.no]);
+      const box = $('exp-'+q.no); if(box) box.innerHTML = verdictHTML(q, r);
+      const vd = $('vd-'+q.no); if(vd){ vd.textContent=r.label; vd.className='verdict '+(r.res==='right'?'ok':(r.res==='part'?'part':'bad')); }
+      $('foot-'+q.no).classList.remove('hidden');
+      if(document.querySelector('.confirm[data-no="'+q.no+'"]')) document.querySelector('.confirm[data-no="'+q.no+'"]').classList.add('hidden');
+      paintOpts(q); paintClass(q, r.res);
+      const nb2 = document.querySelector('.next[data-no="'+q.no+'"]');
+      if(nb2 && instant && DATA.qs.findIndex(x=>x.no===q.no) < DATA.qs.length-1) nb2.classList.remove('hidden');
+    }else{
+      paintOpts(q);
+      if(ans[q.no] && q.type==='多选') $('foot-'+q.no).classList.remove('hidden');
+    }
+  });
+  if(finished){ finished = false; submit(false); }
+  refresh();
+}
+$('timer').textContent = fmt(left);
+setPause(false);
+
+document.addEventListener('keydown', e => {
+  if(finished) return;
+  const els = [...document.querySelectorAll('.q')].filter(x => !x.classList.contains('hidden'));
+  let cur = els.find(x => {
+    const r = x.getBoundingClientRect();
+    return r.top < 200 && r.bottom > 200;
+  }) || els[0];
+  if(!cur) return;
+  const no = parseInt(cur.dataset.no,10);
+  const q = DATA.qs.find(x => x.no === no);
+  if(!q || locked[q.no]) return;
+  const k = e.key.toUpperCase();
+  if(q.type==='单选' && 'ABCD'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && 'ABCDE'.includes(k) && q.opts.some(o=>o.k===k)) pick(q,k);
+  if(q.type==='多选' && e.key === 'Enter') confirmMulti(q);
+});
+</script>
+</body>
+</html>
